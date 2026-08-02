@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: traceops
+      POSTGRES_USER: traceops
+      POSTGRES_PASSWORD: traceops
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+
+volumes:
+  pgdata:

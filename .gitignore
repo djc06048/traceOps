@@ -1,0 +1,23 @@
+# backend (Maven/Java)
+backend/target/
+*.class
+
+# frontend (Node)
+frontend/node_modules/
+frontend/dist/
+
+# analyzer (Python)
+analyzer/__pycache__/
+analyzer/.venv/
+*.pyc
+
+# ai (원본 회의록 - 실명·업무 내용 포함, 로컬 전용)
+ai/sample/
+
+# infra
+infra/pgdata/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
