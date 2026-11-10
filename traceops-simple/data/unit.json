@@ -402,14 +402,14 @@
       ],
       "expected": "완료 건만 전송 대상에 포함되고 전송 성공 로그가 남는다",
       "round": "1차",
-      "worker": "이학수",
+      "worker": "이외화",
       "execDate": "2026-11-09",
       "result": "PASS",
       "evidence": [],
       "remarks": [
         {
           "date": "2026-11-09",
-          "author": "이학수",
+          "author": "이외화",
           "text": "회귀 테스트 대상으로 등록"
         }
       ],
@@ -428,14 +428,14 @@
       ],
       "expected": "발송 이력이 없는 건만 재발송된다",
       "round": "1차",
-      "worker": "이학수",
+      "worker": "이외화",
       "execDate": "2026-11-09",
       "result": "PASS",
       "evidence": [],
       "remarks": [
         {
           "date": "2026-11-09",
-          "author": "이학수",
+          "author": "이외화",
           "text": "회귀 테스트 대상으로 등록"
         }
       ],
@@ -480,14 +480,14 @@
       ],
       "expected": "나전층상물 정보 생성 시 정의된 포맷으로 생성된다",
       "round": "1차",
-      "worker": "김영수",
+      "worker": "정현규",
       "execDate": "2026-04-21",
       "result": "PASS",
       "evidence": [],
       "remarks": [
         {
           "date": "2026-04-21",
-          "author": "김영수",
+          "author": "정현규",
           "text": "회귀 테스트 대상으로 등록"
         }
       ],
@@ -506,14 +506,14 @@
       ],
       "expected": "보험업종 코드 조회 시 코드 목록이 반환된다",
       "round": "1차",
-      "worker": "김종학",
+      "worker": "최재호",
       "execDate": "2026-05-06",
       "result": "PASS",
       "evidence": [],
       "remarks": [
         {
           "date": "2026-05-06",
-          "author": "김종학",
+          "author": "최재호",
           "text": "회귀 테스트 대상으로 등록"
         }
       ],
@@ -532,14 +532,14 @@
       ],
       "expected": "신용정보 담당자 카드 목록이 조회된다",
       "round": "1차",
-      "worker": "김종학",
+      "worker": "최재호",
       "execDate": "2026-09-21",
       "result": "PASS",
       "evidence": [],
       "remarks": [
         {
           "date": "2026-09-21",
-          "author": "김종학",
+          "author": "최재호",
           "text": "회귀 테스트 대상으로 등록"
         }
       ],

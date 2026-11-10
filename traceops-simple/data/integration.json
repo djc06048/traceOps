@@ -139,14 +139,14 @@
       ],
       "expected": "묶인 단위테스트가 모두 통과하고 연계 데이터 흐름이 끊기지 않는다",
       "round": "1차",
-      "worker": "이학수",
+      "worker": "이외화",
       "execDate": "2026-11-09",
       "result": "PASS",
       "evidence": [],
       "remarks": [
         {
           "date": "2026-11-09",
-          "author": "이학수",
+          "author": "이외화",
           "text": "묶인 단위테스트 결과 확인, 연계 흐름 검증 완료"
         }
       ],

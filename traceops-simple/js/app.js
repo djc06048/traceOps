@@ -28,7 +28,7 @@
     test: [['unit', '단위테스트'], ['integration', '통합테스트']]
   };
   var GROUP_LABEL = {
-    workerPlan: '작업자 계획기간', workerActual: '작업자 실적기간',
+    sys: '시스템·서브시스템', workerPlan: '작업자 계획기간', workerActual: '작업자 실적기간',
     plPlan: 'PL 계획기간', plActual: 'PL 실적기간', devMeta: '개발유형·차수', mapping: '매핑'
   };
   var STATUS_ORDER = { '지연': 0, '진행중': 1, '미착수': 2, '완료': 3 };
@@ -51,7 +51,7 @@
   var S = {
     master: null, data: {}, draft: {},
     mode: 'pl', account: '', route: 'analysis',
-    hidden: {}, applied: {}, pick: null, pop: null
+    hidden: { sys: true }, applied: {}, pick: null, pop: null
   };
 
   /* ---------- 공통 유틸 ---------- */
@@ -118,35 +118,41 @@
     if (it.wActStart && it.wActEnd && it.wActEnd < it.wActStart) m.push('실적 종료일이 시작일보다 빠름');
     if (it.pActStart && it.pActEnd && it.pActEnd < it.pActStart) m.push('PL 실적 종료일이 시작일보다 빠름');
   }
-  function validate(page, it, all) {
-    var m = [];
+  // 반환: { err: 오류(입력/매핑 필요), info: 특이사항(하위 연결 누락) } — 메시지는 '무엇이 없고 → 무엇을 하라'
+  function checkItem(page, it, all) {
+    var err = [], info = [];
     if (page.kind === 'stage') {
-      if (!arr(it.reqIds).length) m.push('요구사항 미매핑');
-      if (page.typesKey !== 'analysis' && !arr(it.physIds).length) m.push('물리ID 미매핑');
-      if (page.typesKey === 'design' && !arr(it.analysisRef).length) m.push('분석ID 미연결');
-      if (page.typesKey === 'dev' && !arr(it.designRef).length) m.push('설계ID 미연결');
-      if (all.filter(function (x) { return x.id === it.id; }).length > 1) m.push('ID 중복');
-      actualErrors(it, m);
+      if (!it.name) err.push('명 미입력 → 명칭을 입력하세요');
+      if (!it.worker) err.push('작업자 미지정 → 작업자를 선택하세요');
+      if (!it.wPlanStart || !it.wPlanEnd) err.push('작업자 계획기간 미등록 → 계획 시작·종료일을 입력하세요');
+      if (!arr(it.reqIds).length) err.push('요구사항 미등록 → 분석 단계에서 요구사항ID를 매핑하세요');
+      if (page.typesKey !== 'analysis' && !arr(it.physIds).length) err.push('물리ID 미등록 → 물리ID를 선택하세요 (AS-IS 목록에 먼저 등록)');
+      if (page.typesKey === 'design' && !arr(it.analysisRef).length) err.push('분석ID 미연결 → 분석 항목을 선택하세요');
+      if (page.typesKey === 'dev' && !arr(it.designRef).length) err.push('설계ID 미연결 → 설계 항목을 선택하세요');
+      if (all.filter(function (x) { return x.id === it.id; }).length > 1) err.push('ID 중복 → 다른 ID로 변경하세요');
+      actualErrors(it, err);
     } else {
-      if (!arr(it.linked).length) m.push(page.multi ? '연계 개발ID 미지정' : '개발ID 미연결');
-      if (page.multi && !arr(it.units).length) m.push('묶인 단위테스트 없음');
-      if (!arr(it.reqIds).length) m.push('요구사항 미매핑');
-      if (!arr(it.physIds).length) m.push('물리ID 미매핑');
-      if (it.result === 'FAIL' && !arr(it.evidence).length) m.push('FAIL 증적 필요');
-      actualErrors(it, m);
+      if (!it.name) err.push('테스트명 미입력 → 테스트명을 입력하세요');
+      if (!arr(it.linked).length) err.push(page.multi ? '연계 개발ID 미지정 → 개발 항목을 선택하세요' : '개발ID 미연결 → 개발 항목을 선택하세요');
+      if (page.multi && !arr(it.units).length) err.push('묶인 단위테스트 없음 → 단위테스트를 선택하세요');
+      if (!arr(it.reqIds).length) err.push('요구사항 미등록 → 개발 항목의 요구사항을 확인하세요');
+      if (!arr(it.physIds).length) err.push('물리ID 미등록 → 개발 항목의 물리ID를 확인하세요');
+      if (!it.worker) err.push('담당자 미지정 → 담당자를 선택하세요');
+      if (!it.expected) err.push('기대결과 미입력 → 기대결과를 작성하세요');
+      if (it.result === 'FAIL' && !arr(it.evidence).length) err.push('FAIL 증적 미첨부 → 증적을 등록해야 저장됩니다');
+      actualErrors(it, err);
     }
-    return m;
+    // 하위 연결 특이사항
+    var ch = CHAIN[page.file];
+    if (ch && chainCount(page.file, it) === 0) {
+      info.push((page.kind === 'stage' ? '하위 ' : '') + ch.label + ' 미등록 → ' + ch.label + ' 항목을 추가하고 연결하세요');
+    }
+    return { err: err, info: info };
   }
   function chainCount(file, it) {
     var ch = CHAIN[file];
     if (!ch) return 0;
     return S.data[ch.to].items.filter(function (x) { return arr(x[ch.key]).indexOf(it.id) >= 0; }).length;
-  }
-  function chainCell(page, it) {
-    var ch = CHAIN[page.file], n = chainCount(page.file, it);
-    return n
-      ? '<span class="mono">' + ch.label + ' ' + n + '건</span>'
-      : '<span class="chip-missing">⚠ ' + ch.label + ' 없음</span>';
   }
   function needsEvidence(page, it) {
     if (page.kind === 'test') return it.result === 'FAIL' && !arr(it.evidence).length;
@@ -157,10 +163,9 @@
   function columnsOf(page) {
     var c = [], t = page.typesKey;
     c.push({ k: 'v', label: '검증', kind: 'v' });
-    if (CHAIN[page.file]) c.push({ k: 'chain', label: '하위 연결', kind: 'chain' });
     if (page.kind === 'stage') {
-      c.push({ k: 'system', label: '시스템', kind: 'sys', edit: 'pl' });
-      c.push({ k: 'subsystem', label: '서브시스템', kind: 'sub', edit: 'pl' });
+      c.push({ k: 'system', label: '시스템', kind: 'sys', edit: 'pl', g: 'sys' });
+      c.push({ k: 'subsystem', label: '서브시스템', kind: 'sub', edit: 'pl', g: 'sys' });
       c.push({ k: 'type', label: '처리유형', kind: 'typeSel', edit: t === 'analysis' ? 'none' : 'pl' });
       c.push({ k: 'id', label: 'ID', kind: 'id' });
       c.push({ k: 'name', label: page.nameLabel, kind: 'text', edit: 'pl', w: 140 });
@@ -276,9 +281,11 @@
     var ed = canEdit(c), dis = ed ? '' : ' disabled', k = c.k, v = it[k];
     switch (c.kind) {
       case 'v':
-        return msgs.length
-          ? '<span class="check-err" title="' + esc(msgs.join(' / ')) + '">⚠</span>'
-          : '<span class="check-ok">✓</span>';
+        var tip = msgs.err.map(function (x) { return '⚠ ' + x; }).concat(msgs.info.map(function (x) { return '🔗 ' + x; })).join('\n');
+        if (!msgs.err.length && !msgs.info.length) return '<span class="check-ok">✓</span>';
+        return '<span class="v-wrap" title="' + esc(tip) + '">' +
+          (msgs.err.length ? '<span class="check-err">⚠</span>' : '') +
+          (msgs.info.length ? '<span class="chain-mark">🔗</span>' : '') + '</span>';
       case 'id': return '<span class="disabled-field">' + esc(it.id) + '</span>';
       case 'status': var s = statusOf(it); return '<span class="st ' + STATUS_CLS[s] + '">' + s + '</span>';
       case 'sys': return '<select class="txt-input" data-k="system"' + dis + '>' + opts(sysNames(), v) + '</select>';
@@ -295,7 +302,6 @@
         }
         return v ? esc(v) : '<span class="mono">-</span>';
       case 'chips': return chipsHTML(c, it, ed);
-      case 'chain': return chainCell(page, it);
       case 'evidence': return badge(page, it, 'evidence');
       case 'remark': return badge(page, it, 'remarks');
     }
@@ -332,7 +338,7 @@
     $('thead').innerHTML = headerHTML(cols);
     $('tbody').innerHTML = list.length
       ? list.map(function (it) {
-          var msgs = validate(page, it, all);
+          var msgs = checkItem(page, it, all);
           return '<tr data-id="' + esc(it.id) + '">' + cols.map(function (c) {
             return '<td class="' + (c.kind === 'date' ? 'mono' : '') + needClass(c, it) + '">' + cell(c, it, page, msgs) + '</td>';
           }).join('') + '</tr>';
@@ -355,30 +361,22 @@
     $('resultCount').innerHTML = h;
   }
   function renderBanner(page, all) {
-    var html = '';
-    if (S.mode === 'pl') {
-      var rows = 0, kinds = {};
-      all.forEach(function (it) {
-        var m = validate(page, it, all);
-        if (m.length) {
-          rows++;
-          m.forEach(function (x) { kinds[x] = (kinds[x] || 0) + 1; });
-        }
+    var rows = 0, kinds = {}, ids = [];
+    all.forEach(function (it) {
+      var r = checkItem(page, it, all), list = r.err.concat(r.info);
+      if (!list.length) return;
+      rows++;
+      ids.push(it.id);
+      list.forEach(function (m) {
+        var k = m.split(' → ')[0];
+        kinds[k] = (kinds[k] || 0) + 1;
       });
-      if (rows) {
-        html += '<div class="validation-banner">⚠ 검증 오류 ' + rows + '행 — ' +
-          Object.keys(kinds).map(function (k) { return k + ' ' + kinds[k] + '건'; }).join(', ') +
-          '. 저장 전 확인이 필요합니다.</div>';
-      }
-    }
-    var ch = CHAIN[page.file];
-    if (ch) {
-      var miss = all.filter(function (it) { return chainCount(page.file, it) === 0; }).map(function (it) { return it.id; });
-      if (miss.length) {
-        html += '<div class="paste-hint">🔗 ' + ch.label + ' 연결이 없는 항목 ' + miss.length + '건: ' + esc(miss.join(', ')) + '</div>';
-      }
-    }
-    $('banner').innerHTML = html;
+    });
+    $('banner').innerHTML = rows
+      ? '<div class="validation-banner">⚠ 정합성 확인 필요 ' + rows + '행 — ' +
+        Object.keys(kinds).map(function (k) { return k + ' ' + kinds[k] + '건'; }).join(', ') +
+        ' <span class="banner-ids">(예: ' + esc(ids.slice(0, 5).join(', ')) + (ids.length > 5 ? ' 외' : '') + ')</span></div>'
+      : '';
   }
   function renderChrome() {
     var page = pageOf();
