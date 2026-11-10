@@ -495,8 +495,7 @@
         return '<button class="v-btn" data-vcheck="1" title="검증 상세 보기">' +
           (msgs.err.length ? TRI + '<span class="check-err">' + msgs.err.length + '</span>' : '') +
           (msgs.info.length ? '<span class="chain-mark">🔗</span>' : '') + '</button>';
-      case 'id': return '<span class="disabled-field">' + esc(it.id) + '</span>' +
-        (it.srcId ? '<div class="src-id">원본 ' + esc(it.srcId) + '</div>' : '');
+      case 'id': return '<span class="disabled-field">' + esc(it.id) + '</span>';
       case 'status': var s = statusOf(it); return '<span class="st ' + STATUS_CLS[s] + '">' + s + '</span>';
       case 'sys': return '<select class="txt-input" data-k="system"' + dis + '>' + opts(sysNames(), v) + '</select>';
       case 'sub': return '<select class="txt-input" data-k="subsystem"' + dis + '>' + opts(subsOf(it.system), v) + '</select>';
@@ -618,7 +617,7 @@
       base = [
         { k: 'system', label: '시스템', t: 'sel', f: 'system', src: sysNames() },
         { k: 'subsystem', label: '서브시스템', t: 'sel', f: 'subsystem', src: allSubs() },
-        { k: 'id', label: 'ID', t: 'txt', f: 'id', ph: '예: SCR-2026' },
+        { k: 'id', label: 'ID', t: 'txt', f: 'id', ph: '예: UI_QPM_0001' },
         { k: 'name', label: page.nameLabel, t: 'txt', f: 'name', ph: '검색' },
         { k: 'type', label: '처리유형', t: 'sel', f: 'type', src: S.master.types[t] },
         { k: 'status', label: '진행상태', t: 'sel', f: 'status', src: ['지연', '진행중', '미착수', '완료'] },
@@ -631,14 +630,14 @@
       }
       adv.push({ k: 'reqId', label: '요구사항ID', t: 'txt', f: 'reqIds', ph: 'RF_CCM' });
       if (t !== 'analysis') adv.push({ k: 'physId', label: '물리ID', t: 'txt', f: 'physIds', ph: 'LTRA' });
-      if (t === 'dev') adv.push({ k: 'designRef', label: '설계ID', t: 'txt', f: 'designRef', ph: 'SCR' });
+      if (t === 'dev') adv.push({ k: 'designRef', label: '설계ID', t: 'txt', f: 'designRef', ph: 'UI_QPM' });
       adv.push({ k: 'planFrom', label: '계획기간(시작)', t: 'from', f: 'wPlanStart' });
       adv.push({ k: 'planTo', label: '계획기간(종료)', t: 'to', f: 'wPlanEnd' });
     } else {
       base = [
-        { k: 'id', label: 'ID', t: 'txt', f: 'id', ph: 'TU- / TI-' },
+        { k: 'id', label: 'ID', t: 'txt', f: 'id', ph: 'UI_QPM / IT-' },
         { k: 'name', label: '테스트명', t: 'txt', f: 'name', ph: '검색' },
-        { k: 'linked', label: '연결 개발ID', t: 'txt', f: 'linked', ph: 'DEV' },
+        { k: 'linked', label: '연결 개발ID', t: 'txt', f: 'linked', ph: 'UI_QPM' },
         { k: 'result', label: '결과', t: 'sel', f: 'result', src: ['미실행', 'PASS', 'FAIL'] },
         { k: 'worker', label: '담당자', t: 'sel', f: 'worker', src: S.master.workers }
       ];

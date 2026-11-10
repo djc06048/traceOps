@@ -2,7 +2,7 @@
   "stage": "design",
   "items": [
     {
-      "id": "DS-0001",
+      "id": "UI_QPM_0001",
       "srcId": "UI_QPM_0002",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -35,11 +35,11 @@
       "pActStart": "2026-04-18",
       "pActEnd": "2026-04-20",
       "analysisRef": [
-        "AN-0001"
+        "UI_QPM_0001"
       ]
     },
     {
-      "id": "DS-0002",
+      "id": "UI_QPM_0002",
       "srcId": "UI_QPM_0005",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -72,11 +72,11 @@
       "pActStart": "2026-04-13",
       "pActEnd": "2026-04-15",
       "analysisRef": [
-        "AN-0002"
+        "UI_QPM_0002"
       ]
     },
     {
-      "id": "DS-0003",
+      "id": "UI_QPM_0003",
       "srcId": "UI_QPM_0012",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -109,11 +109,11 @@
       "pActStart": "2026-03-21",
       "pActEnd": "2026-03-23",
       "analysisRef": [
-        "AN-0003"
+        "UI_QPM_0003"
       ]
     },
     {
-      "id": "DS-0004",
+      "id": "IF_QPM_0001",
       "srcId": "IF_QPM_0001",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -146,11 +146,11 @@
       "pActStart": "2026-04-18",
       "pActEnd": "2026-04-20",
       "analysisRef": [
-        "AN-0004"
+        "IF_QPM_0001"
       ]
     },
     {
-      "id": "DS-0005",
+      "id": "IF_QPM_0002",
       "srcId": "IF_QPM_0002",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -183,11 +183,11 @@
       "pActStart": "2026-04-18",
       "pActEnd": "2026-04-20",
       "analysisRef": [
-        "AN-0005"
+        "IF_QPM_0002"
       ]
     },
     {
-      "id": "DS-0006",
+      "id": "IF_QPM_0003",
       "srcId": "IF_QPM_0004",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -220,11 +220,11 @@
       "pActStart": "2026-04-18",
       "pActEnd": "2026-04-20",
       "analysisRef": [
-        "AN-0006"
+        "IF_QPM_0003"
       ]
     },
     {
-      "id": "DS-0007",
+      "id": "BT_QPM_0001",
       "srcId": "BT_H031",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -263,11 +263,11 @@
       "pActStart": "2026-11-10",
       "pActEnd": "2026-11-10",
       "analysisRef": [
-        "AN-0007"
+        "BT_QPM_0001"
       ]
     },
     {
-      "id": "DS-0008",
+      "id": "BT_QPM_0002",
       "srcId": "BT_LH062",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -306,11 +306,11 @@
       "pActStart": "2026-11-10",
       "pActEnd": "2026-11-10",
       "analysisRef": [
-        "AN-0008"
+        "BT_QPM_0002"
       ]
     },
     {
-      "id": "DS-0009",
+      "id": "PG_QPM_0001",
       "srcId": "PG_QPM_0001",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -343,11 +343,11 @@
       "pActStart": "2026-03-14",
       "pActEnd": "2026-03-16",
       "analysisRef": [
-        "AN-0009"
+        "PG_QPM_0001"
       ]
     },
     {
-      "id": "DS-0010",
+      "id": "PG_QPM_0002",
       "srcId": "PG_QPM_0015",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -380,11 +380,11 @@
       "pActStart": "2026-03-14",
       "pActEnd": "2026-03-16",
       "analysisRef": [
-        "AN-0010"
+        "PG_QPM_0002"
       ]
     },
     {
-      "id": "DS-0011",
+      "id": "PG_QPM_0003",
       "srcId": "PG_QPM_0016",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -417,11 +417,11 @@
       "pActStart": "2026-03-14",
       "pActEnd": "2026-03-16",
       "analysisRef": [
-        "AN-0011"
+        "PG_QPM_0003"
       ]
     },
     {
-      "id": "DS-0012",
+      "id": "PG_QPM_0004",
       "srcId": "PG_QPM_0017",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -454,11 +454,11 @@
       "pActStart": "2026-03-21",
       "pActEnd": "2026-03-23",
       "analysisRef": [
-        "AN-0012"
+        "PG_QPM_0004"
       ]
     },
     {
-      "id": "DS-0013",
+      "id": "PG_QPM_0005",
       "srcId": "PG_QPM_0018",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -491,7 +491,7 @@
       "pActStart": "2026-03-21",
       "pActEnd": "2026-03-23",
       "analysisRef": [
-        "AN-0013"
+        "PG_QPM_0005"
       ]
     }
   ]

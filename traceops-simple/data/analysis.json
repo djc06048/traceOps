@@ -2,7 +2,7 @@
   "stage": "analysis",
   "items": [
     {
-      "id": "AN-0001",
+      "id": "UI_QPM_0001",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
       "type": "현황업무분석",
@@ -31,7 +31,7 @@
       "srcId": "UI_QPM_0001"
     },
     {
-      "id": "AN-0002",
+      "id": "UI_QPM_0002",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
       "type": "현황업무분석",
@@ -60,7 +60,7 @@
       "srcId": "UI_QPM_0002"
     },
     {
-      "id": "AN-0003",
+      "id": "UI_QPM_0003",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
       "type": "현황업무분석",
@@ -89,7 +89,7 @@
       "srcId": "UI_QPM_0003"
     },
     {
-      "id": "AN-0004",
+      "id": "IF_QPM_0001",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
       "type": "현황업무분석",
@@ -118,7 +118,7 @@
       "srcId": "IF_QPM_0001"
     },
     {
-      "id": "AN-0005",
+      "id": "IF_QPM_0002",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
       "type": "현황업무분석",
@@ -147,7 +147,7 @@
       "srcId": "IF_QPM_0002"
     },
     {
-      "id": "AN-0006",
+      "id": "IF_QPM_0003",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
       "type": "현황업무분석",
@@ -176,7 +176,7 @@
       "srcId": "IF_QPM_0003"
     },
     {
-      "id": "AN-0007",
+      "id": "BT_QPM_0001",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
       "type": "현황업무분석",
@@ -211,7 +211,7 @@
       "srcId": "BT_QPM_0001"
     },
     {
-      "id": "AN-0008",
+      "id": "BT_QPM_0002",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
       "type": "현황업무분석",
@@ -246,7 +246,7 @@
       "srcId": "BT_QPM_0002"
     },
     {
-      "id": "AN-0009",
+      "id": "PG_QPM_0001",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
       "type": "현황업무분석",
@@ -275,7 +275,7 @@
       "srcId": "PG_QPM_0001"
     },
     {
-      "id": "AN-0010",
+      "id": "PG_QPM_0002",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
       "type": "현황업무분석",
@@ -304,7 +304,7 @@
       "srcId": "PG_QPM_0002"
     },
     {
-      "id": "AN-0011",
+      "id": "PG_QPM_0003",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
       "type": "현황업무분석",
@@ -333,7 +333,7 @@
       "srcId": "PG_QPM_0003"
     },
     {
-      "id": "AN-0012",
+      "id": "PG_QPM_0004",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
       "type": "현황업무분석",
@@ -362,7 +362,7 @@
       "srcId": "PG_QPM_0004"
     },
     {
-      "id": "AN-0013",
+      "id": "PG_QPM_0005",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
       "type": "현황업무분석",
