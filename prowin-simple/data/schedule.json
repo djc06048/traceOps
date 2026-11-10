@@ -1,13 +1,13 @@
 {
   "items": [
-    { "id": "SC-001", "title": "RFP 리뷰", "start": "2026-11-02", "end": "2026-11-03", "kind": "review", "owner": "황피엠", "status": "완료" },
-    { "id": "SC-002", "title": "원가 산출 검토", "start": "2026-11-05", "end": "2026-11-07", "kind": "write", "owner": "박민수", "status": "진행중" },
-    { "id": "SC-003", "title": "제안서 작성", "start": "2026-11-09", "end": "2026-11-12", "kind": "write", "owner": "황금빛", "status": "진행중" },
-    { "id": "SC-004", "title": "입찰설명회", "start": "2026-11-10", "end": "2026-11-10", "kind": "deadline", "owner": "황피엠", "status": "예정" },
-    { "id": "SC-005", "title": "위험검토회의", "start": "2026-11-13", "end": "2026-11-14", "kind": "meeting", "owner": "김철수", "status": "예정" },
-    { "id": "SC-006", "title": "제안서 리뷰(1차)", "start": "2026-11-15", "end": "2026-11-17", "kind": "review", "owner": "황피엠", "status": "예정" },
-    { "id": "SC-007", "title": "2차 리뷰", "start": "2026-11-20", "end": "2026-11-21", "kind": "review", "owner": "황피엠", "status": "예정" },
-    { "id": "SC-008", "title": "제안 마감", "start": "2026-11-27", "end": "2026-11-27", "kind": "deadline", "owner": "박민수", "status": "예정" },
-    { "id": "SC-009", "title": "제안 발표", "start": "2026-11-28", "end": "2026-11-28", "kind": "deadline", "owner": "황피엠", "status": "예정" }
+    { "id": "SC-001", "title": "RFP 리뷰", "start": "2026-11-02", "end": "2026-11-03", "color": "c-rv", "owner": "황피엠", "status": "완료" },
+    { "id": "SC-002", "title": "원가 산출 검토", "start": "2026-11-05", "end": "2026-11-07", "color": "c-wr", "owner": "박민수", "status": "진행중" },
+    { "id": "SC-003", "title": "제안서 작성", "start": "2026-11-09", "end": "2026-11-12", "color": "c-wr", "owner": "황금빛", "status": "진행중" },
+    { "id": "SC-004", "title": "★입찰설명회", "start": "2026-11-10", "end": "2026-11-10", "color": "c-dl", "owner": "황피엠", "status": "예정" },
+    { "id": "SC-005", "title": "위험검토회의", "start": "2026-11-13", "end": "2026-11-14", "color": "c-mt", "owner": "김철수", "status": "예정" },
+    { "id": "SC-006", "title": "제안서 리뷰(1차)", "start": "2026-11-15", "end": "2026-11-17", "color": "c-rv", "owner": "황피엠", "status": "예정" },
+    { "id": "SC-007", "title": "2차 리뷰", "start": "2026-11-20", "end": "2026-11-21", "color": "c-rv", "owner": "황피엠", "status": "예정" },
+    { "id": "SC-008", "title": "★제안 마감", "start": "2026-11-27", "end": "2026-11-27", "color": "c-dl", "owner": "박민수", "status": "예정" },
+    { "id": "SC-009", "title": "★제안 발표", "start": "2026-11-28", "end": "2026-11-28", "color": "c-dl", "owner": "황피엠", "status": "예정" }
   ]
 }

@@ -1,28 +1,29 @@
 {
-  "me": "황금빛",
-  "pm": "황피엠",
+  "me": { "writer": "황금빛", "pm": "황피엠", "sales": "조은지" },
   "project": {
     "name": "한화손해보험 장기 차세대 가입설계 구축",
     "client": "한화손해보험",
     "summary": "장기보험 가입설계 기능을 차세대 시스템으로 재구축하는 제안",
+    "start": "2026-10-20",
     "deadline": "2026-11-27",
-    "presentation": "2026-11-28"
+    "presentation": "2026-11-28",
+    "team": { "pm": "황피엠", "biz": "박민수", "sales": "조은지" }
   },
   "members": [
     { "name": "황금빛", "title": "제안 PL(기술)", "role": "writer" },
     { "name": "황피엠", "title": "PM", "role": "pm" },
     { "name": "박민수", "title": "사업관리", "role": "pm" },
-    { "name": "조은지", "title": "영업대표", "role": "writer" },
+    { "name": "조은지", "title": "영업대표", "role": "sales" },
     { "name": "홍길동", "title": "작성자(사업개요)", "role": "writer" },
     { "name": "김철수", "title": "작성자(기술)", "role": "writer" },
     { "name": "김영희", "title": "작성자(관리)", "role": "writer" }
   ],
   "perms": {
-    "home": "pm",
-    "comm": "writer",
-    "schedule": "pm",
-    "qna": "writer",
-    "refs": "writer",
-    "guide": "pm"
+    "home": { "writer": "view", "sales": "view" },
+    "comm": { "writer": "edit", "sales": "view" },
+    "schedule": { "writer": "view", "sales": "view" },
+    "board-1": { "writer": "edit", "sales": "view" },
+    "board-2": { "writer": "edit", "sales": "view" },
+    "guide": { "writer": "view", "sales": "view" }
   }
 }

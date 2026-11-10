@@ -13,8 +13,9 @@
   <div class="role-switch">
     <span class="lbl" id="roleTag"></span>
     <div class="seg">
-      <button id="btnWriter" class="active">작성자</button>
-      <button id="btnPM">PM</button>
+      <button id="btnWriter" class="active" data-role="writer">작성자</button>
+      <button id="btnPM" data-role="pm">PM</button>
+      <button id="btnSales" data-role="sales">영업대표</button>
     </div>
   </div>
 </div>
@@ -25,6 +26,7 @@
     <div class="crumb" id="crumb"></div>
     <div class="page-hd">
       <div><h1 id="title"></h1><p id="desc"></p></div>
+      <button class="btn ghost sm" id="btnInfo">ⓘ 화면 정보</button>
     </div>
     <div class="data-bar">
       <span id="dataState"></span>
