@@ -31,7 +31,9 @@
           "file": "UI_QPM_0001_설계서.docx"
         }
       ],
-      "remarks": []
+      "remarks": [],
+      "pActStart": "2026-04-18",
+      "pActEnd": "2026-04-20"
     },
     {
       "id": "UI_QPM_0002",
@@ -63,7 +65,9 @@
           "file": "UI_QPM_0002_설계서.docx"
         }
       ],
-      "remarks": []
+      "remarks": [],
+      "pActStart": "2026-04-13",
+      "pActEnd": "2026-04-15"
     },
     {
       "id": "UI_QPM_0003",
@@ -95,7 +99,9 @@
           "file": "UI_QPM_0003_설계서.docx"
         }
       ],
-      "remarks": []
+      "remarks": [],
+      "pActStart": "2026-03-21",
+      "pActEnd": "2026-03-23"
     },
     {
       "id": "IF_QPM_0001",
@@ -127,7 +133,9 @@
           "file": "IF_QPM_0001_설계서.docx"
         }
       ],
-      "remarks": []
+      "remarks": [],
+      "pActStart": "2026-04-18",
+      "pActEnd": "2026-04-20"
     },
     {
       "id": "IF_QPM_0002",
@@ -159,7 +167,9 @@
           "file": "IF_QPM_0002_설계서.docx"
         }
       ],
-      "remarks": []
+      "remarks": [],
+      "pActStart": "2026-04-18",
+      "pActEnd": "2026-04-20"
     },
     {
       "id": "IF_QPM_0003",
@@ -191,7 +201,9 @@
           "file": "IF_QPM_0003_설계서.docx"
         }
       ],
-      "remarks": []
+      "remarks": [],
+      "pActStart": "2026-04-18",
+      "pActEnd": "2026-04-20"
     },
     {
       "id": "BT_QPM_0001",
@@ -199,7 +211,7 @@
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
       "type": "프로그램설계(배치)",
-      "name": "청약오라자로 전송",
+      "name": "청약완료 전송",
       "worker": "이학수",
       "wPlanStart": "2026-10-06",
       "wPlanEnd": "2026-11-20",
@@ -269,7 +281,9 @@
           "file": "PG_QPM_0001_설계서.docx"
         }
       ],
-      "remarks": []
+      "remarks": [],
+      "pActStart": "2026-03-14",
+      "pActEnd": "2026-03-16"
     },
     {
       "id": "PG_QPM_0002",
@@ -301,7 +315,9 @@
           "file": "PG_QPM_0002_설계서.docx"
         }
       ],
-      "remarks": []
+      "remarks": [],
+      "pActStart": "2026-03-14",
+      "pActEnd": "2026-03-16"
     },
     {
       "id": "PG_QPM_0003",
@@ -333,7 +349,9 @@
           "file": "PG_QPM_0003_설계서.docx"
         }
       ],
-      "remarks": []
+      "remarks": [],
+      "pActStart": "2026-03-14",
+      "pActEnd": "2026-03-16"
     },
     {
       "id": "PG_QPM_0004",
@@ -365,7 +383,9 @@
           "file": "PG_QPM_0004_설계서.docx"
         }
       ],
-      "remarks": []
+      "remarks": [],
+      "pActStart": "2026-03-21",
+      "pActEnd": "2026-03-23"
     },
     {
       "id": "PG_QPM_0005",
@@ -397,7 +417,9 @@
           "file": "PG_QPM_0005_설계서.docx"
         }
       ],
-      "remarks": []
+      "remarks": [],
+      "pActStart": "2026-03-21",
+      "pActEnd": "2026-03-23"
     }
   ]
 }

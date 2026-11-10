@@ -111,6 +111,7 @@
     } else {
       if (!arr(it.linked).length) m.push(page.multi ? '연계 개발ID 미지정' : '개발ID 미연결');
       if (it.result === 'FAIL' && !arr(it.evidence).length) m.push('FAIL 증적 필요');
+      if (page.multi && !arr(it.units).length) m.push('묶인 단위테스트 없음');
     }
     return m;
   }
@@ -157,6 +158,7 @@
       c.push({ k: 'id', label: 'ID', kind: 'id' });
       c.push({ k: 'name', label: '테스트명', kind: 'text', edit: 'pl', w: 170 });
       c.push({ k: 'linked', label: '연결 개발ID', kind: 'chips', src: 'devIds', max: page.multi ? 0 : 1, edit: 'pl', g: 'mapping' });
+      if (page.multi) c.push({ k: 'units', label: '묶인 단위테스트', kind: 'chips', src: 'unitIds', edit: 'pl', g: 'mapping' });
       c.push({ k: 'reqIds', label: '요구사항ID', kind: 'chips', src: 'reqIds', edit: 'pl', g: 'mapping' });
       c.push({ k: 'expected', label: '기대결과', kind: 'text', edit: 'pl', w: 200 });
       c.push({ k: 'round', label: '테스트 차수', kind: 'select', opts: ['1차', '2차'], edit: 'pl' });
@@ -209,6 +211,7 @@
     if (src === 'reqIds') return S.master.reqIds.map(function (v) { return { id: v, label: v }; });
     if (src === 'physIds') return S.master.physIds.map(function (v) { return { id: v, label: v }; });
     if (src === 'designIds') return S.data.design.items.map(function (x) { return { id: x.id, label: x.id + ' · ' + x.name }; });
+    if (src === 'unitIds') return S.data.unit.items.map(function (x) { return { id: x.id, label: x.id + ' · ' + x.name }; });
     if (src === 'devIds') return S.data.dev.items.map(function (x) { return { id: x.id, label: x.id + ' · ' + x.name }; });
     return [];
   }

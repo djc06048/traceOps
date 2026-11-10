@@ -3,64 +3,111 @@
   "items": [
     {
       "id": "TI-2026-0001",
-      "name": "가입설계 화면 연계",
+      "name": "계약 등록·삭제 연계 흐름",
       "linked": [
         "UI_QPM_0001",
-        "UI_QPM_0002",
-        "UI_QPM_0003"
+        "IF_QPM_0001",
+        "PG_QPM_0001"
       ],
-      "reqIds": [],
-      "expected": "",
+      "units": [
+        "TU-2026-0001",
+        "TU-2026-0002",
+        "TU-2026-0003",
+        "TU-2026-0004",
+        "TU-2026-0013",
+        "TU-2026-0018"
+      ],
+      "reqIds": [
+        "RF_LTR_001",
+        "RF_LTR_002",
+        "RF_LTR_005"
+      ],
+      "expected": "묶인 단위테스트가 모두 통과하고 연계 데이터 흐름이 끊기지 않는다",
       "round": "1차",
-      "worker": "",
-      "result": "미실행",
+      "worker": "정현규",
+      "execDate": "2026-10-02",
+      "result": "PASS",
       "evidence": [],
       "remarks": []
     },
     {
       "id": "TI-2026-0002",
-      "name": "가입설계 인터페이스 연계",
+      "name": "검색·인수심사 연계 흐름",
       "linked": [
-        "IF_QPM_0001",
+        "UI_QPM_0002",
         "IF_QPM_0002",
-        "IF_QPM_0003"
+        "IF_QPM_0003",
+        "PG_QPM_0003"
       ],
-      "reqIds": [],
-      "expected": "",
+      "units": [
+        "TU-2026-0005",
+        "TU-2026-0006",
+        "TU-2026-0007",
+        "TU-2026-0008",
+        "TU-2026-0014",
+        "TU-2026-0015",
+        "TU-2026-0020"
+      ],
+      "reqIds": [
+        "RF_LTR_001",
+        "RF_LTR_002",
+        "RF_LTR_005"
+      ],
+      "expected": "묶인 단위테스트가 모두 통과하고 연계 데이터 흐름이 끊기지 않는다",
       "round": "1차",
-      "worker": "",
-      "result": "미실행",
+      "worker": "장윤나",
+      "execDate": "2026-08-26",
+      "result": "PASS",
       "evidence": [],
       "remarks": []
     },
     {
       "id": "TI-2026-0003",
-      "name": "청약 배치 연계",
+      "name": "장기보험 요청·신용정보 연계 흐름",
       "linked": [
-        "BT_QPM_0001",
-        "BT_QPM_0002"
+        "UI_QPM_0003",
+        "PG_QPM_0004"
       ],
-      "reqIds": [],
-      "expected": "",
+      "units": [
+        "TU-2026-0009",
+        "TU-2026-0010",
+        "TU-2026-0011",
+        "TU-2026-0012",
+        "TU-2026-0021"
+      ],
+      "reqIds": [
+        "RF_LTR_004",
+        "RF_LTR_005"
+      ],
+      "expected": "묶인 단위테스트가 모두 통과하고 연계 데이터 흐름이 끊기지 않는다",
       "round": "1차",
-      "worker": "",
-      "result": "미실행",
+      "worker": "이외화",
+      "execDate": "2026-09-21",
+      "result": "PASS",
       "evidence": [],
       "remarks": []
     },
     {
       "id": "TI-2026-0004",
-      "name": "공통 프로그램 연계",
+      "name": "청약완료 전송 연계 흐름",
       "linked": [
-        "PG_QPM_0001",
-        "PG_QPM_0002",
-        "PG_QPM_0003",
-        "PG_QPM_0004"
+        "BT_QPM_0001",
+        "BT_QPM_0002",
+        "PG_QPM_0002"
       ],
-      "reqIds": [],
-      "expected": "",
+      "units": [
+        "TU-2026-0016",
+        "TU-2026-0017",
+        "TU-2026-0019"
+      ],
+      "reqIds": [
+        "RF_LTR_003",
+        "RF_LTR_005"
+      ],
+      "expected": "묶인 단위테스트가 모두 통과하고 연계 데이터 흐름이 끊기지 않는다",
       "round": "1차",
-      "worker": "",
+      "worker": "이학수",
+      "execDate": "",
       "result": "미실행",
       "evidence": [],
       "remarks": []
