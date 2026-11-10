@@ -125,6 +125,7 @@
   }
   // 반환: { err: 입력·매핑 필요 항목, info: 하위 연결 특이사항 } — 각 항목은 {t: 문제, h: 해결 방법, f: 수정할 칸, g: 이동할 화면}
   function checkItem(page, it, all) {
+    if (it.stopped) return { err: [], info: [], stopped: true };
     var err = [], info = [], st = page.kind === 'stage', ty = page.typesKey;
     if (st) {
       if (!it.name) err.push({ t: '명 미입력', h: '명칭을 입력하세요.', f: 'name' });
@@ -154,6 +155,9 @@
     var ch = CHAIN[page.file];
     if (ch && chainCount(page.file, it) === 0) {
       info.push({ t: (st ? '하위 ' : '') + ch.label + ' 미등록', h: ch.label + ' 항목을 추가하고 이 항목과 연결하세요.', g: ch.to });
+    }
+    if (it.recheck) {
+      info.push({ t: '재검증 필요', h: '상위의 요구사항·물리ID·설계 연결이 바뀌었습니다. 결과와 실적을 확인한 뒤 "재검증 완료"를 누르세요.', f: null, rc: true });
     }
     return { err: err, info: info };
   }
@@ -198,12 +202,13 @@
   }
   /* ---------- 연관 영향 안내 (연결 변경·삭제 전 미리보기) ---------- */
   var IMPACT_FILES = ['analysis', 'design', 'dev', 'unit', 'integration'];
-  var IMPACT_FIELDS = ['reqIds', 'physIds', 'designRef', 'analysisRef', 'linked', 'units', 'result', 'execDate', 'evidence'];
-  var IMPACT_LABEL = { reqIds: '요구사항ID', physIds: '물리ID', designRef: '설계ID', analysisRef: '분석ID', linked: '개발ID', units: '단위테스트', result: '결과', execDate: '수행일', evidence: '증적' };
+  var IMPACT_FIELDS = ['reqIds', 'physIds', 'designRef', 'analysisRef', 'linked', 'units', 'result', 'execDate', 'evidence', 'stopped', 'recheck'];
+  var IMPACT_LABEL = { reqIds: '요구사항ID', physIds: '물리ID', designRef: '설계ID', analysisRef: '분석ID', linked: '개발ID', units: '단위테스트', result: '결과', execDate: '수행일', evidence: '증적', stopped: '사용중지', recheck: '재검증 필요' };
   var FILE_LABEL = { analysis: '분석', design: '설계', dev: '개발', unit: '단위테스트', integration: '통합테스트' };
   function snapData() { return JSON.parse(JSON.stringify(S.data)); }
   function restoreData(snap) { Object.keys(snap).forEach(function (k) { S.data[k] = snap[k]; }); }
   function fmt(k, v) {
+    if (typeof v === 'boolean') return v ? '예' : '아니오';
     if (k === 'evidence') return arr(v).length + '건';
     if (Array.isArray(v)) return v.length ? v.join(', ') : '없음';
     return v === '' || v == null ? '없음' : String(v);
@@ -227,14 +232,34 @@
     return out;
   }
   // mutate: 실제 변경 함수. 먼저 임시 적용해 영향을 계산한 뒤 원복하고, 확인 후 다시 적용한다.
-  function withImpact(title, mutate) {
+  // 내용(요구사항·물리ID·설계·분석 연결)이 바뀐 하위 항목에 재검증 표시. 직접 바꾼 소유 항목은 제외.
+  function recheckFlags(diff, source) {
+    var out = [];
+    diff.forEach(function (d) {
+      if (d.removed) return;
+      var hit = d.changes.some(function (c) {
+        if (c.k === 'designRef' || c.k === 'analysisRef') return true;
+        if (c.k === 'reqIds' || c.k === 'physIds') return !(source && source.id === d.id);
+        return false;
+      });
+      if (hit) out.push({ f: d.f, id: d.id });
+    });
+    return out;
+  }
+  function applyRecheck(flags) {
+    (flags || []).forEach(function (r) {
+      var it = S.data[r.f].items.filter(function (x) { return x.id === r.id; })[0];
+      if (it) it.recheck = true;
+    });
+  }
+  function withImpact(title, mutate, source) {
     var before = snapData();
     mutate();
     syncDown();
     var diff = diffData(before);
     restoreData(before);
     if (!diff.length) { mutate(); syncDown(); renderTable(); return; }
-    S.impact = { title: title, diff: diff, mutate: mutate };
+    S.impact = { title: title, diff: diff, mutate: mutate, flags: recheckFlags(diff, source) };
     renderImpact();
     $('impactModal').classList.add('open');
   }
@@ -332,7 +357,9 @@
     if (!it) return;
     var r = checkItem(v.page, it, items(v.page));
     var card = function (x, ic, cls) {
-      var act = x.g
+      var act = x.rc
+        ? '<button class="btn sm" data-clear-recheck="1">재검증 완료</button>'
+        : x.g
         ? '<button class="btn sm" data-goto="' + x.g + '">' + PAGE_NAME[x.g] + ' 화면에서 등록 →</button>'
         : (x.f ? '<button class="btn sm" data-focus="' + x.f + '">해당 칸으로 이동</button>'
                : '<span class="vi-note">이 항목은 화면에서 직접 수정할 수 없습니다</span>');
@@ -340,7 +367,7 @@
         '<div class="vi-hint">' + esc(x.h) + '</div><div class="vi-act">' + act + '</div></div>';
     };
     var body = r.err.map(function (x) { return card(x, TRI, 'is-err'); })
-      .concat(r.info.map(function (x) { return card(x, '🔗', 'is-info'); })).join('');
+      .concat(r.info.map(function (x) { return card(x, x.rc ? '🔁' : '🔗', 'is-info'); })).join('');
     $('vBox').innerHTML =
       '<div class="modal-hd"><div><h3>검증 상세</h3><p>' + esc(v.id) + ' · ' + esc(it.name || '') + '</p>' +
       '<p class="vi-legend">' + TRI + ' 입력·매핑 필요 ' + r.err.length + '건 · 🔗 하위 연결 ' + r.info.length + '건</p></div>' +
@@ -517,10 +544,12 @@
     var ed = canEdit(c), dis = ed ? '' : ' disabled', k = c.k, v = it[k];
     switch (c.kind) {
       case 'v':
+        if (msgs.stopped) return '<button class="v-btn" data-vcheck="1" title="사용중지 항목">⏸ 사용중지</button>';
         if (!msgs.err.length && !msgs.info.length) return '<span class="check-ok">✓</span>';
         return '<button class="v-btn" data-vcheck="1" title="검증 상세 보기">' +
           (msgs.err.length ? TRI + '<span class="check-err">' + msgs.err.length + '</span>' : '') +
-          (msgs.info.length ? '<span class="chain-mark">🔗</span>' : '') + '</button>';
+          (msgs.info.some(function (x) { return x.rc; }) ? '<span class="chain-mark">🔁</span>' : '') +
+          (msgs.info.some(function (x) { return !x.rc; }) ? '<span class="chain-mark">🔗</span>' : '') + '</button>';
       case 'id': return '<span class="disabled-field">' + esc(it.id) + '</span>';
       case 'status': var s = statusOf(it); return '<span class="st ' + STATUS_CLS[s] + '">' + s + '</span>';
       case 'sys': return '<select class="txt-input" data-k="system"' + dis + '>' + opts(sysNames(), v) + '</select>';
@@ -537,7 +566,10 @@
         }
         return v ? esc(v) : '<span class="mono">-</span>';
       case 'chips': return chipsHTML(c, it, ed);
-      case 'del': return S.mode === 'pl' ? '<button class="btn ghost sm" data-rowdel="1">삭제</button>' : '';
+      case 'del': return S.mode === 'pl'
+        ? '<button class="btn ghost sm" data-stoptoggle="1">' + (it.stopped ? '재개' : '사용중지') + '</button> ' +
+          '<button class="btn ghost sm" data-rowdel="1">삭제</button>'
+        : '';
       case 'evidence': return badge(page, it, 'evidence');
       case 'remark': return badge(page, it, 'remarks');
     }
@@ -576,7 +608,7 @@
     $('tbody').innerHTML = list.length
       ? list.map(function (it) {
           var msgs = checkItem(page, it, all);
-          return '<tr data-id="' + esc(it.id) + '">' + cols.map(function (c) {
+          return '<tr data-id="' + esc(it.id) + '"' + (it.stopped ? ' class="stopped"' : '') + '>' + cols.map(function (c) {
             return '<td class="' + (c.kind === 'date' ? 'mono' : '') + needClass(c, it) + '">' + cell(c, it, page, msgs) + '</td>';
           }).join('') + '</tr>';
         }).join('')
@@ -1143,6 +1175,12 @@
         else openChips(page, id, ck);
         return;
       }
+      if ((x = t.closest('[data-stoptoggle]'))) {
+        withImpact((find(page, id).stopped ? '재개' : '사용중지') + ': ' + id, function () {
+          var si = find(page, id); if (si) si.stopped = !si.stopped;
+        }, { f: page.file, id: id });
+        return;
+      }
       if ((x = t.closest('[data-rowdel]'))) { deleteRow(page, id); return; }
       if ((x = t.closest('[data-vcheck]'))) { openVCheck(page, id); return; }
       if ((x = t.closest('[data-worker]'))) { openWorkerPick(page, id); return; }
@@ -1169,7 +1207,7 @@
             pit[p.col.k] = p.sel.slice();
             if (p.page.file === 'unit' && p.col.k === 'linked' && prev !== JSON.stringify(pit.linked)) resetResult(pit);
           }
-        });
+        }, { f: p.page.file, id: p.id });
       }
     });
     $('pickBox').addEventListener('input', function (e) {
@@ -1203,9 +1241,12 @@
       var t = e.target;
       if (t === this || t.hasAttribute('data-imp-cancel')) { closeImpact(); return; }
       if (t.hasAttribute('data-imp-ok')) {
-        var m = S.impact && S.impact.mutate;
+        var I = S.impact;
         closeImpact();
-        if (m) { m(); syncDown(); renderTable(); showToast('반영했습니다. 저장 버튼으로 확정하세요'); }
+        if (I && I.mutate) {
+          I.mutate(); syncDown(); applyRecheck(I.flags); renderTable();
+          showToast('반영했습니다. 저장 버튼으로 확정하세요');
+        }
       }
     });
     // 값 모달 (여러 값 셀)
@@ -1227,7 +1268,7 @@
           var prev = JSON.stringify(arr(it[c.k]));
           it[c.k] = arr(it[c.k]).filter(function (v) { return v !== rmv; });
           if (c.page.file === 'unit' && c.k === 'linked' && prev !== JSON.stringify(it.linked)) resetResult(it);
-        });
+        }, { f: c.page.file, id: c.id });
         return;
       }
       if (t.hasAttribute('data-chip-add') || t.closest('[data-chip-add]')) {
@@ -1240,6 +1281,13 @@
       var t = e.target, x;
       if (t === this) { closeVCheck(); return; }
       if (t.hasAttribute('data-close')) { closeVCheck(); return; }
+      if (t.hasAttribute('data-clear-recheck')) {
+        var rv = S.vpop; closeVCheck();
+        if (rv) withImpact('재검증 완료 처리', function () {
+          var ri = find(rv.page, rv.id); if (ri) ri.recheck = false;
+        }, { f: rv.page.file, id: rv.id });
+        return;
+      }
       if ((x = t.closest('[data-focus]'))) {
         var v = S.vpop; closeVCheck();
         if (v) focusCell(v.id, x.getAttribute('data-focus'));
