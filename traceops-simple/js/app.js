@@ -42,7 +42,7 @@
   };
   var TRI = '<svg class=\"tri\" width=\"14\" height=\"13\" viewBox=\"0 0 14 13\" aria-label=\"오류\"><path d=\"M7 .8 L13.4 12.2 H.6 Z\" fill=\"#D64545\"/><rect x=\"6.15\" y=\"4.3\" width=\"1.7\" height=\"4.3\" rx=\".8\" fill=\"#fff\"/><rect x=\"6.15\" y=\"9.5\" width=\"1.7\" height=\"1.7\" rx=\".85\" fill=\"#fff\"/></svg>';
   // 값 셀 클릭 시 이동: 대상 화면과 조회 조건 키
-  var NAV = { designRef: ['design', 'id'], analysisRef: ['analysis', 'id'], reqIds: ['analysis', 'reqId'], physIds: ['design', 'physId'], linked: ['dev', 'id'], units: ['unit', 'id'] };
+  var NAV = { designRef: ['design', 'id'], analysisRef: ['analysis', 'id'], reqIds: ['__ext', 'requirementsUrl'], physIds: ['design', 'physId'], linked: ['dev', 'id'], units: ['unit', 'id'] };
   var PAGE_NAME = { analysis: '분석', design: '설계', dev: '개발', unit: '단위테스트', integration: '통합테스트' };
   // 실적 날짜: 오늘 이후 입력 불가
   var ACTUAL_KEYS = ['wActStart', 'wActEnd', 'pActStart', 'pActEnd', 'execDate'];
@@ -157,6 +157,58 @@
     }
     return { err: err, info: info };
   }
+  function uniq(list) { return list.filter(function (x, i) { return list.indexOf(x) === i; }); }
+  function syncDown() {
+    var A = {}, D = {}, V = {};
+    S.data.analysis.items.forEach(function (x) { A[x.id] = x; });
+    S.data.design.items.forEach(function (x) { D[x.id] = x; });
+    S.data.dev.items.forEach(function (x) { V[x.id] = x; });
+    S.data.design.items.forEach(function (d) {
+      var a = A[arr(d.analysisRef)[0]];
+      if (a) d.reqIds = arr(a.reqIds).slice();
+    });
+    S.data.dev.items.forEach(function (v) {
+      var d = D[arr(v.designRef)[0]];
+      if (!d) return;
+      v.reqIds = arr(d.reqIds).slice();
+      v.physIds = uniq(arr(d.physIds).concat(arr(v.physIdsAdd)));
+    });
+    S.data.unit.items.forEach(function (u) {
+      var v = V[arr(u.linked)[0]];
+      if (!v) return;
+      u.reqIds = arr(v.reqIds).slice();
+      u.physIds = arr(v.physIds).slice();
+    });
+    S.data.integration.items.forEach(function (t) {
+      var rs = [], ps = [];
+      arr(t.linked).forEach(function (l) {
+        var v = V[l];
+        if (!v) return;
+        arr(v.reqIds).forEach(function (r) { if (rs.indexOf(r) < 0) rs.push(r); });
+        arr(v.physIds).forEach(function (p) { if (ps.indexOf(p) < 0) ps.push(p); });
+      });
+      t.reqIds = rs; t.physIds = ps;
+    });
+  }
+  function dependentsOf(file, it) {
+    var ch = CHAIN[file], out = [];
+    if (ch) S.data[ch.to].items.forEach(function (x) { if (arr(x[ch.key]).indexOf(it.id) >= 0) out.push(x.id); });
+    if (file === 'dev') S.data.integration.items.forEach(function (x) { if (arr(x.linked).indexOf(it.id) >= 0) out.push(x.id); });
+    return out;
+  }
+  function deleteRow(page, id) {
+    var list = items(page), it = find(page, id);
+    if (!it) return;
+    var dep = dependentsOf(page.file, it);
+    if (dep.length) {
+      showToast('하위 항목이 연결되어 있어 삭제할 수 없습니다: ' + dep.slice(0, 3).join(', ') + (dep.length > 3 ? ' 외 ' + (dep.length - 3) + '건' : ''), true);
+      return;
+    }
+    if (!confirm('"' + id + '" 항목을 삭제할까요?')) return;
+    list.splice(list.indexOf(it), 1);
+    renderTable();
+    showToast('삭제했습니다. 저장 버튼으로 반영하세요');
+  }
   function chainCount(file, it) {
     var ch = CHAIN[file];
     if (!ch) return 0;
@@ -242,10 +294,11 @@
       c.push({ k: 'reqIds', label: '요구사항ID', kind: 'chips', src: 'reqIds', edit: t === 'analysis' ? 'pl' : 'none', g: 'mapping' });
       if (t !== 'analysis') c.push({ k: 'physIds', label: '물리ID', kind: 'chips', src: 'physIds', edit: 'pl', g: 'mapping' });
       c.push({ k: 'remark', label: '비고', kind: 'remark' });
+      c.push({ k: 'del', label: '', kind: 'del', edit: 'pl', plOnly: true });
     } else {
       c.push({ k: 'id', label: 'ID', kind: 'id' });
       c.push({ k: 'name', label: '테스트명', kind: 'text', edit: 'pl', w: 170 });
-      c.push({ k: 'linked', label: '연결 개발ID', kind: 'chips', src: 'devIds', max: page.multi ? 0 : 1, edit: page.multi ? 'pl' : 'none', g: 'mapping' });
+      c.push({ k: 'linked', label: '연결 개발ID', kind: 'chips', src: 'devIds', max: page.multi ? 0 : 1, edit: 'pl', g: 'mapping' });
       if (page.multi) c.push({ k: 'units', label: '묶인 단위테스트', kind: 'chips', src: 'unitIds', edit: 'pl', g: 'mapping' });
       c.push({ k: 'reqIds', label: '요구사항ID', kind: 'chips', src: 'reqIds', edit: 'none', g: 'mapping' });
       c.push({ k: 'physIds', label: '물리ID', kind: 'chips', src: 'physIds', edit: 'none', g: 'mapping' });
@@ -256,6 +309,7 @@
       c.push({ k: 'result', label: '결과', kind: 'select', opts: ['미실행', 'PASS', 'FAIL'], edit: 'worker' });
       c.push({ k: 'evidence', label: '증적', kind: 'evidence' });
       c.push({ k: 'remark', label: '비고', kind: 'remark' });
+      c.push({ k: 'del', label: '', kind: 'del', edit: 'pl', plOnly: true });
     }
     return c;
   }
@@ -318,10 +372,12 @@
     var vals = arr(it[c.k]);
     if (!vals.length) return ed ? '<button class="search-btn" data-pick="' + c.k + '">🔍 검색</button>' : '<span class="mono">-</span>';
     var more = vals.length > 1 ? ' 외 ' + (vals.length - 1) + '건' : '';
-    return '<button class="chip-sum" data-chips="' + c.k + '" title="전체 보기">' + esc(vals[0]) + more + '</button>';
+    return '<button class="chip-sum" data-chips="' + c.k + '" title="값 클릭: 조회' + (vals.length > 1 ? ' 목록' : '') + '">' + esc(vals[0]) + more + '</button>' +
+      (ed ? ' <button class="chip-edit" data-chips-edit="' + c.k + '" title="추가·변경·제외">✎</button>' : '');
   }
   // 값 클릭: 1건이고 수정 불가면 바로 해당 화면 조회, 그 외에는 전체 목록 모달
   function goFilter(page, key, val) {
+    if (page === '__ext') { location.href = S.master[key] + '?reqId=' + encodeURIComponent(val); return; }
     var target = '#' + page + '?' + key + '=' + encodeURIComponent(val);
     if (location.hash === target) route(); else location.hash = target;
   }
@@ -329,6 +385,8 @@
     var it = find(page, id), c = columnsOf(page).filter(function (x) { return x.k === k; })[0];
     if (!it || !c) return;
     var ed = canEdit(c), vals = arr(it[k]), nav = NAV[k];
+    var inh = (page.file === 'dev' && k === 'physIds')
+      ? arr((S.data.design.items.filter(function (d) { return d.id === arr(it.designRef)[0]; })[0] || {}).physIds) : [];
     var label = {};
     srcOptions(c.src).forEach(function (o) { label[o.id] = o.label; });
     S.chips = { page: page, id: id, k: k };
@@ -336,7 +394,7 @@
       return '<div class="ci">' +
         (nav ? '<button class="ci-go" data-nav-page="' + nav[0] + '" data-nav-key="' + nav[1] + '" data-nav-val="' + esc(v) + '">' +
           esc(label[v] || v) + ' <span class="ci-arrow">→ 조회</span></button>' : '<span>' + esc(label[v] || v) + '</span>') +
-        (ed ? '<button class="x-btn" data-chip-rm="' + esc(v) + '">✕ 제외</button>' : '') + '</div>';
+        (inh.indexOf(v) >= 0 ? '<em class="inh">상속</em>' : (ed ? '<button class="x-btn" data-chip-rm="' + esc(v) + '">✕ 제외</button>' : '')) + '</div>';
     }).join('');
     $('chipBox').innerHTML =
       '<div class="modal-hd"><div><h3>' + esc(c.label) + ' (' + vals.length + '건)</h3><p>' + esc(id) + ' · 항목을 누르면 해당 화면에서 조회합니다</p></div>' +
@@ -372,6 +430,7 @@
         }
         return v ? esc(v) : '<span class="mono">-</span>';
       case 'chips': return chipsHTML(c, it, ed);
+      case 'del': return S.mode === 'pl' ? '<button class="btn ghost sm" data-rowdel="1">삭제</button>' : '';
       case 'evidence': return badge(page, it, 'evidence');
       case 'remark': return badge(page, it, 'remarks');
     }
@@ -397,6 +456,7 @@
     return '<tr>' + r1 + '</tr><tr>' + r2 + '</tr>';
   }
   function renderTable() {
+    syncDown();
     var page = pageOf(), all = items(page), cols = visibleCols(page);
     var list = all.filter(function (it) { return passes(it, S.applied); });
     if (page.kind === 'stage') {
@@ -566,7 +626,9 @@
   function openPicker(page, id, k) {
     var it = find(page, id);
     var c = columnsOf(page).filter(function (x) { return x.k === k; })[0];
-    S.pick = { page: page, id: id, col: c, sel: arr(it[k]).slice() };
+    var inh = (page.file === 'dev' && k === 'physIds')
+      ? arr((S.data.design.items.filter(function (d) { return d.id === arr(it.designRef)[0]; })[0] || {}).physIds) : [];
+    S.pick = { page: page, id: id, col: c, sel: arr(it[k]).slice(), inh: inh };
     $('pickBox').innerHTML =
       '<div class="modal-hd"><div><h3>' + esc(c.label) + ' 선택</h3><p>' + esc(id) +
       (c.max === 1 ? ' · 1건 선택' : ' · 여러 건 선택 가능') + '</p></div>' +
@@ -590,8 +652,9 @@
       return !ql || o.label.toLowerCase().indexOf(ql) >= 0;
     }).map(function (o) {
       var on = p.sel.indexOf(o.id) >= 0;
+      var inh = p.inh.indexOf(o.id) >= 0;
       return '<label class="pick-row"><input type="' + (single ? 'radio' : 'checkbox') + '" name="pk" value="' +
-        esc(o.id) + '"' + (on ? ' checked' : '') + '><span>' + esc(o.label) + '</span></label>';
+        esc(o.id) + '"' + (on ? ' checked' : '') + (inh ? ' disabled' : '') + '><span>' + esc(o.label) + (inh ? ' <em class="inh">상속</em>' : '') + '</span></label>';
     }).join('');
     $('pickList').innerHTML = h || '<div class="empty">검색 결과가 없습니다.</div>';
   }
@@ -936,6 +999,7 @@
         renderTable();
         return;
       }
+      if ((x = t.closest('[data-chips-edit]'))) { openChips(page, id, x.getAttribute('data-chips-edit')); return; }
       if ((x = t.closest('[data-chips]'))) {
         var ck = x.getAttribute('data-chips'), cit = find(page, id), cc = columnsOf(page).filter(function (q) { return q.k === ck; })[0];
         var cv = arr(cit && cit[ck]);
@@ -943,6 +1007,7 @@
         else openChips(page, id, ck);
         return;
       }
+      if ((x = t.closest('[data-rowdel]'))) { deleteRow(page, id); return; }
       if ((x = t.closest('[data-vcheck]'))) { openVCheck(page, id); return; }
       if ((x = t.closest('[data-worker]'))) { openWorkerPick(page, id); return; }
       if ((x = t.closest('[data-pick]'))) { openPicker(page, id, x.getAttribute('data-pick')); return; }
@@ -956,8 +1021,9 @@
       if (e.target.hasAttribute('data-close')) closePick();
       else if (id === 'pickClear') { S.pick.sel = []; renderPickList($('pickQ').value); }
       else if (id === 'pickApply') {
-        var p = S.pick;
-        find(p.page, p.id)[p.col.k] = p.sel.slice();
+        var p = S.pick, pit = find(p.page, p.id);
+        if (p.page.file === 'dev' && p.col.k === 'physIds') pit.physIdsAdd = p.sel.filter(function (x) { return p.inh.indexOf(x) < 0; });
+        else pit[p.col.k] = p.sel.slice();
         closePick();
         renderTable();
       }
