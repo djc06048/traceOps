@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProWin · 통합 데모</title>
+<style>
+  :root{
+    --hw:#F37321; --hw70:#F89B6C; --hw50:#FBB584; --wash:#FDF1E9; --hwline:#F5D5C0;
+    --ink:#1A1A18; --ink2:#4A4844; --ink3:#8B8981;
+    --bg:#F1F0EC; --card:#FFF; --line:#E7E5E0; --line2:#DAD8D2;
+    --ok:#2F9E6B; --okbg:#E7F4EC; --okink:#1E7049;
+    --dg:#DB5B47; --dgbg:#FBEAE6; --dgink:#AE3B2B;
+    --bl:#3D6FB0; --blbg:#EAF0F8; --pp:#7A5AF0; --ppbg:#F0ECFB;
+    --gbg:#F1F0ED; --gink:#7C7A73;
+    --r:12px; --mono:ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input,select{font-family:inherit}
+  .mono{font-family:var(--mono)}
+  .mark{flex:none}.mark svg{display:block}
+
+  #login{position:fixed;inset:0;background:linear-gradient(135deg,#1A1A18,#2C2A26);display:flex;align-items:center;justify-content:center;z-index:50;transition:opacity .5s}
+  #login.hide{opacity:0;pointer-events:none}
+  .lcard{width:360px;background:#fff;border-radius:16px;padding:38px 34px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+  .lcard .b{display:flex;align-items:center;gap:11px;margin-bottom:26px}
+  .lcard h1{font-size:15px;font-weight:700}.lcard .sub{font-size:12px;color:var(--ink3)}
+  .fld{margin-bottom:14px}.fld label{display:block;font-size:12px;color:var(--ink2);margin-bottom:6px;font-weight:600}
+  .fld input{width:100%;padding:11px 13px;border:1px solid var(--line2);border-radius:9px;font-size:14px;background:#FBFAF8}
+  .fld input:focus{outline:none;border-color:var(--hw);background:#fff}
+  .bprimary{width:100%;padding:12px;background:var(--hw);color:#fff;border-radius:9px;font-weight:700}
+  .bprimary:hover{background:#DE6417}.lnote{margin-top:16px;font-size:11px;color:var(--ink3);text-align:center}
+
+  #shell{display:none;flex-direction:column;height:100vh}#shell.show{display:flex}
+  .rolebar{background:var(--ink);color:#fff;padding:8px 20px;display:flex;align-items:center;gap:10px;font-size:12px;flex:none}
+  .rolebar .lb{color:#B9B7B0}
+  .rolebar .rb{display:flex;gap:6px}
+  .rolebar button{padding:5px 12px;border-radius:20px;background:#33312C;color:#D8D6D0;font-size:11.5px;font-weight:600}
+  .rolebar button.on{background:var(--hw);color:#fff}
+  .rolebar .tag{margin-left:auto;font-size:11px;color:#B9B7B0}
+
+  #app{display:flex;flex:1;overflow:hidden}
+  .sb{width:250px;flex:none;background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;padding:14px 10px;overflow-y:auto}
+  .sbb{display:flex;align-items:center;gap:10px;padding:6px 8px 12px}
+  .sbb .nm{font-size:15px;font-weight:700}.sbb .ctx{font-size:11px;color:var(--ink3)}
+  .sbcr{display:flex;align-items:center;justify-content:center;gap:6px;background:var(--hw);color:#fff;padding:10px;border-radius:9px;font-weight:700;font-size:13px;margin-bottom:10px}
+  .sbcr:hover{background:#DE6417}
+  .sbsec{font-size:10px;font-weight:700;letter-spacing:.4px;color:var(--ink3);text-transform:uppercase;padding:12px 10px 5px}
+  .nav{display:flex;align-items:center;gap:9px;width:100%;text-align:left;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--ink2);font-weight:500}
+  .nav .ic{width:16px;text-align:center;opacity:.7;flex:none}
+  .nav:hover{background:#F6F5F2}
+  .nav.on{background:var(--wash);color:var(--hw);font-weight:700}.nav.on .ic{opacity:1}
+  .nav .p2{margin-left:auto;font-size:9px;font-weight:700;padding:1px 6px;border-radius:20px;background:var(--ppbg);color:var(--pp)}
+  .sbsp{flex:1}
+  .sbu{display:flex;align-items:center;gap:9px;padding:8px;border-radius:9px;margin-top:6px}.sbu:hover{background:#F6F5F2}
+  .av{width:28px;height:28px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;background:var(--hw)}
+  .av.g{background:#8B8981}.av.k{background:var(--bl)}.av.l{background:var(--pp)}.av.h{background:#D98C3A}.av.p{background:#6C63A8}
+  .sbu .n{font-size:12.5px;font-weight:600;line-height:1.3}.sbu .e{font-size:10px;color:var(--ink3)}
+
+  .main{flex:1;overflow-y:auto;background:var(--bg)}
+  .top{position:sticky;top:0;background:rgba(241,240,236,.92);backdrop-filter:blur(6px);z-index:5;padding:15px 26px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .crumb{font-size:12px;color:var(--ink3)}.crumb b{color:var(--ink2)}
+  .top h2{font-size:18px;font-weight:700}
+  .top .p2b{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--ppbg);color:var(--pp);align-self:center}
+  .top .p1b{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--okbg);color:var(--okink);align-self:center}
+  .projsw{font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid var(--line2);background:#fff;color:var(--ink2)}
+  .acts{margin-left:auto;display:flex;gap:7px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:5px;padding:8px 12px;border-radius:8px;font-size:12.5px;font-weight:600;border:1px solid var(--line2);background:#fff;color:var(--ink2)}
+  .btn:hover{border-color:var(--ink3)}.btn.acc{background:var(--hw);color:#fff;border-color:var(--hw)}.btn.acc:hover{background:#DE6417}
+  .btn.soon,.btn[disabled]{opacity:.45;cursor:not-allowed}
+  .btn.dirty{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .cont{padding:20px 26px 70px}
+  .scr{display:none;animation:fade .25s}.scr.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--r)}
+  .sect{font-size:13px;font-weight:700;color:var(--ink2);margin:24px 4px 11px}
+  .chip{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px}
+  .chip.doing{background:var(--wash);color:#C25A16}.chip.done{background:var(--okbg);color:var(--okink)}
+  .chip.todo{background:var(--gbg);color:var(--gink)}.chip.fix{background:var(--dgbg);color:var(--dgink)}
+  .idot{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--line);color:var(--ink3);font-size:10px;font-weight:700;cursor:pointer;font-style:italic}
+  .idot:hover{background:var(--hw);color:#fff}
+  .deny{padding:40px;text-align:center;color:var(--ink3)}
+  .deny .ic{font-size:30px;margin-bottom:10px}
+  .deny h3{color:var(--ink2);font-size:15px;margin-bottom:6px}
+
+  table.tbl{width:100%;border-collapse:collapse;font-size:13px}
+  table.tbl th{text-align:left;font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;padding:11px 14px;border-bottom:1px solid var(--line);background:#FBFAF8}
+  table.tbl td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+  table.tbl tr:last-child td{border-bottom:none}
+  .prow{cursor:pointer}.prow:hover{background:#FBFAF8}
+  .pbar{width:90px;height:6px;background:#EDEBE6;border-radius:6px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:8px}
+  .pbar span{display:block;height:100%;background:linear-gradient(90deg,var(--hw),var(--hw70))}
+  .st{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+  .st.doing{background:var(--wash);color:#C25A16}.st.done{background:var(--okbg);color:var(--okink)}.st.prep{background:var(--gbg);color:var(--gink)}
+
+  .hgrid{display:grid;grid-template-columns:1fr 320px;gap:16px}
+  .kv{display:flex;gap:8px;font-size:13px;padding:6px 0}.kv .k{color:var(--ink3);width:70px;flex:none}
+  .todo-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .todo-item:last-child{border:none}.todo-item .dt{margin-left:auto;font-size:11px;color:var(--ink3)}
+  .lt{width:8px;height:8px;border-radius:2px;flex:none}
+  .delay .todo-item{color:var(--dgink)}.delay .lt{background:var(--dg)}
+
+  .cal{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+  .cal .head{display:grid;grid-template-columns:repeat(7,1fr);background:#FBFAF8;border-bottom:1px solid var(--line)}
+  .cal .head div{padding:8px;font-size:11px;font-weight:700;color:var(--ink3);text-align:center}
+  .cal .head div:first-child{color:var(--dg)}.cal .head div:last-child{color:var(--bl)}
+  .week{position:relative;border-bottom:1px solid var(--line)}.week:last-child{border:none}
+  .days{display:grid;grid-template-columns:repeat(7,1fr);min-height:104px}
+  .day{border-right:1px solid var(--line);padding:5px 6px;position:relative}.day:last-child{border:none}
+  .day .n{font-size:11px;color:var(--ink2);font-weight:600}.day.out .n{color:#C9C7C0}
+  .day.today .n{background:var(--dg);color:#fff;border-radius:50%;width:19px;height:19px;display:inline-flex;align-items:center;justify-content:center}
+  .bars{position:absolute;left:0;right:0;top:22px;pointer-events:none}
+  .bar{position:absolute;height:18px;border-radius:4px;font-size:10px;font-weight:600;color:#fff;padding:1px 7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:16px;pointer-events:auto;cursor:pointer}
+  .c-wr{background:#5FA97E}.c-rv{background:#5B87C0}.c-mt{background:var(--hw70)}.c-dl{background:#D9604E}.c-gy{background:#A7A59E}
+
+  .file{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--line);border-radius:10px}
+  .file .ic{width:36px;height:36px;border-radius:8px;background:var(--dgbg);color:var(--dgink);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px}
+  .req{display:flex;gap:12px;padding:11px 14px;border-bottom:1px solid var(--line);cursor:pointer}
+  .req:hover{background:#FBFAF8}.req.sel{background:var(--wash)}
+  .req:last-child{border:none}.req .c{font-family:var(--mono);font-size:11px;color:var(--hw);font-weight:700;width:42px;flex:none}
+  .req .t{font-weight:600}.req .d{font-size:12px;color:var(--ink3)}
+
+  .acard2{padding:12px;border:1px solid var(--line);border-radius:9px;margin-bottom:8px}
+  .acard2 .ti{font-weight:600;font-size:12.5px}.acard2 .mt{font-size:11px;color:var(--ink3);margin-top:3px}
+  .acard2 .pg{font-family:var(--mono);font-size:10px;color:var(--hw);margin-top:5px}
+
+  table.toc{width:100%;border-collapse:collapse;font-size:12px}
+  table.toc th{background:#FBFAF8;font-size:10.5px;font-weight:700;color:var(--ink3);padding:8px 10px;text-align:left;border:1px solid var(--line);position:sticky;top:0}
+  table.toc td{padding:7px 10px;border:1px solid var(--line)}
+  table.toc .l1{font-weight:700;background:#FCF6F0}
+  .who{font-size:10px;color:#fff;border-radius:5px;padding:1px 6px;font-weight:700}
+  .who.g{background:#8B8981}.who.k{background:var(--bl)}.who.l{background:var(--pp)}.who.o{background:var(--hw)}.who.h{background:#D98C3A}
+
+  .edt{display:grid;grid-template-columns:290px 1fr;gap:16px}
+  .tnode{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;cursor:pointer;font-size:12.5px}
+  .tnode:hover{background:#F6F5F2}.tnode.sel{background:var(--wash)}
+  .tnode.grp{font-weight:700;margin-top:3px}.tnode.ch{padding-left:20px;color:var(--ink2)}.tnode.ch2{padding-left:34px;font-size:12px;color:var(--ink3)}
+  .dt2{width:8px;height:8px;border-radius:50%;flex:none}
+  .dt2.todo{background:#C9C7C0}.dt2.doing{background:var(--hw)}.dt2.done{background:var(--ok)}.dt2.fix{background:var(--dg)}
+  .tnode .w{margin-left:auto;font-size:9px;color:#fff;background:var(--ink3);border-radius:5px;padding:1px 5px;font-weight:700}
+  .slide{aspect-ratio:16/9;margin:14px;background:#fff;border:1px solid var(--line);border-radius:6px;padding:16px 20px;box-shadow:0 2px 8px rgba(0,0,0,.04);display:flex;flex-direction:column}
+  .slide .stt{font-size:14px;font-weight:700;border-bottom:2px solid var(--hw);display:inline-block;padding-bottom:4px;margin-bottom:8px}
+  .slide ul{list-style:none;font-size:11.5px;color:var(--ink2)}
+  .slide li{padding:2px 0 2px 14px;position:relative}
+  .slide li:before{content:"";position:absolute;left:0;top:9px;width:5px;height:5px;border-radius:50%;background:var(--hw70)}
+  .slide .pg{margin-top:auto;text-align:right;font-size:10px;color:var(--ink3)}
+  .flow{display:flex;align-items:center;gap:6px;margin:6px 0 10px}
+  .fbox{flex:1;background:var(--wash);border:1px solid var(--hwline);border-radius:6px;padding:6px 4px;text-align:center;font-size:10px;font-weight:600;color:#8a4a1c}
+  .farr{color:var(--hw);font-size:13px;flex:none}
+  .pvtop{display:flex;align-items:center;gap:8px;padding:9px 13px;border-bottom:1px solid var(--line);background:#fff;border-radius:10px 10px 0 0}
+  .pvtop .lb{font-size:11px;color:var(--ink3);font-weight:600}
+  .pvtop .wn{margin-left:auto;font-size:10px;font-weight:700;color:#C25A16;background:var(--wash);padding:3px 8px;border-radius:20px}
+  .tgl{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink2);cursor:pointer;user-select:none}
+  .tk{width:34px;height:19px;border-radius:20px;background:var(--line2);position:relative;transition:.2s;flex:none}
+  .tk:after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;transition:.2s}
+  .tgl.on .tk{background:var(--hw)}.tgl.on .tk:after{transform:translateX(15px)}
+  .cmt{display:flex;gap:10px;margin-bottom:12px}.cmt .av{width:26px;height:26px;font-size:10px}
+  .cmt .nm{font-size:12px;font-weight:700}.cmt .nm span{font-weight:500;color:var(--ink3);font-size:10px;margin-left:6px;font-family:var(--mono)}
+  .cmt .tx{font-size:12.5px;color:var(--ink2)}
+  .cadd{display:flex;gap:8px;margin-top:6px}
+  .cadd input{flex:1;padding:9px 12px;border:1px solid var(--line2);border-radius:8px;font-size:12.5px}
+  .cadd input:focus{outline:none;border-color:var(--hw)}.cadd button{padding:0 15px;background:var(--ink);color:#fff;border-radius:8px;font-size:12.5px;font-weight:600}
+
+  table.mx{border-collapse:collapse;width:100%;font-size:12px}
+  table.mx th,table.mx td{border:1px solid var(--line);padding:7px 8px}
+  table.mx th{background:#FBFAF8;font-weight:700;color:var(--ink2);font-size:10.5px}
+  table.mx td.y{text-align:center;font-weight:700;color:var(--ok)}
+  table.mx td.n{text-align:center;color:var(--ink3)}
+
+  .git{display:grid;grid-template-columns:1fr 330px;gap:16px}
+  .brs{display:flex;gap:8px;padding:8px 12px 14px}
+  .br{font-size:12px;font-weight:700;padding:5px 11px;border-radius:20px;border:1px solid var(--line2);background:#fff}
+  .br.cur{border-color:var(--hw);color:var(--hw);background:var(--wash)}
+  .cm{display:flex;gap:14px;padding:0 10px;cursor:pointer}
+  .rail{width:16px;flex:none;position:relative;display:flex;justify-content:center}
+  .rail:before{content:"";position:absolute;top:0;bottom:0;width:2px;background:var(--line2)}
+  .cm:first-child .rail:before{top:20px}.cm:last-child .rail:before{bottom:auto;height:20px}
+  .knob{width:13px;height:13px;border-radius:50%;background:#fff;border:2.5px solid var(--hw);margin-top:15px;z-index:1}
+  .cm.tag .knob{border-color:var(--pp)}.cm.sel .knob{background:var(--hw);box-shadow:0 0 0 4px var(--wash)}
+  .cb{flex:1;padding:12px 0 14px;border-bottom:1px solid var(--line)}.cm:last-child .cb{border:none}
+  .cb .msg{font-size:13.5px;font-weight:600}
+  .tg{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:5px;margin-left:7px}
+  .tg.br{background:var(--wash);color:var(--hw)}.tg.tag{background:var(--ppbg);color:var(--pp)}.tg.head{background:var(--okbg);color:var(--okink)}
+  .cmeta{font-size:11px;color:var(--ink3);margin-top:5px;display:flex;align-items:center;gap:7px}
+  .cmeta .hash{font-family:var(--mono);background:#F1F0ED;padding:1px 6px;border-radius:4px}
+  .cmeta .av{width:18px;height:18px;font-size:8px}
+  .diffp{padding:16px;position:sticky;top:16px;align-self:start}
+  .diffp .h{font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:4px}
+  .diffp .h .hash{font-family:var(--mono);color:var(--hw);font-size:11px}
+  .dl{font-family:var(--mono);font-size:11.5px;padding:4px 10px;border-radius:5px;margin-bottom:3px;display:flex;gap:8px}
+  .dl.add{background:#EAF6EF;color:#1E7049}.dl.del{background:#FBEBE7;color:#AE3B2B}.dl.mod{background:var(--wash);color:#C25A16}
+  .dl .s{font-weight:700;flex:none}
+  .dsec{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;margin:13px 0 6px;letter-spacing:.3px}
+
+  .ov{position:fixed;inset:0;background:rgba(20,18,16,.45);display:none;align-items:center;justify-content:center;z-index:60}
+  .ov.on{display:flex}
+  .modal{width:560px;max-width:92vw;max-height:88vh;overflow-y:auto;background:#fff;border-radius:14px;box-shadow:0 30px 70px rgba(0,0,0,.3)}
+  .mh{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
+  .mh h3{font-size:15px;font-weight:700}.mh .x{margin-left:auto;font-size:20px;color:var(--ink3);line-height:1;padding:2px 6px;border-radius:6px;cursor:pointer}
+  .mh .x:hover{background:#F1F0ED}
+  .mb{padding:18px 20px}
+  .gate{border:1px solid var(--line);border-radius:9px;padding:12px;margin-bottom:10px;display:flex;align-items:center;gap:10px}
+  .gate.ok{background:var(--okbg);border-color:#CDE8D8}.gate.warn{background:var(--wash);border-color:var(--hwline)}
+  .gate .tt{font-weight:600;font-size:13px}.gate .ss{font-size:11.5px;color:var(--ink3)}
+  .gate .cta{margin-left:auto;display:flex;gap:6px}
+  .thumb{width:52px;height:34px;flex:none;border:1.5px dashed var(--line2);border-radius:5px;background:#FBFAF8;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--ink3)}
+  .diffrow{display:flex;gap:8px;font-family:var(--mono);font-size:11.5px;padding:3px 0}
+  .mf{padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end}
+  .mrow{display:flex;gap:8px;margin-bottom:10px;align-items:center}
+  .mrow label{width:80px;font-size:12px;color:var(--ink2);flex:none}
+  .mrow input,.mrow select{flex:1;padding:8px 10px;border:1px solid var(--line2);border-radius:7px;font-size:13px}
+
+  .pop{position:fixed;z-index:70;width:300px;background:#fff;border:1px solid var(--line);border-radius:11px;box-shadow:0 14px 40px rgba(0,0,0,.15);display:none}
+  .pop.on{display:block}
+  .pop .ph{display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid var(--line)}
+  .pop .ph b{font-size:12.5px}.pop .ph .x{margin-left:auto;font-size:16px;color:var(--ink3);line-height:1;cursor:pointer;padding:1px 5px;border-radius:5px}
+  .pop .ph .x:hover{background:#F1F0ED}
+  .pop .pc{padding:12px 14px;font-size:12px;color:var(--ink2);line-height:1.6}
+  .pop .pc .ph2{font-weight:700;color:var(--hw);font-size:11px;margin-top:8px}
+
+  table.fin{width:100%;border-collapse:collapse;font-size:11.5px}
+  table.fin th{background:#FBFAF8;font-size:10px;font-weight:700;color:var(--ink3);padding:7px 8px;border:1px solid var(--line);text-align:center}
+  table.fin td{padding:3px;border:1px solid var(--line);text-align:center}
+  table.fin input{width:100%;border:1px solid transparent;background:transparent;padding:5px 6px;font-size:11.5px;text-align:center;border-radius:5px;font-family:inherit}
+  table.fin input:focus{outline:none;border-color:var(--hw);background:#FFFDFB}
+  table.fin td.l input{text-align:left}
+  table.fin tr.tot td{background:#EDEBE6;font-weight:700}
+  .rmv{color:var(--dg);font-weight:700;cursor:pointer;padding:2px 7px;border-radius:5px}.rmv:hover{background:var(--dgbg)}
+  .fintab{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+  .fintab button{padding:7px 13px;border-radius:8px;font-size:12.5px;font-weight:600;border:1px solid var(--line2);background:#fff;color:var(--ink2)}
+  .fintab button.on{background:var(--hw);color:#fff;border-color:var(--hw)}
+  .sumcard{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+  .sc{padding:14px;border:1px solid var(--line);border-radius:10px}
+  .sc .l{font-size:11px;color:var(--ink3)}.sc .v{font-size:18px;font-weight:700;margin-top:4px}
+  .sc.hl{background:var(--wash);border-color:var(--hwline)}
+  .addrow{margin-top:10px}
+
+  .post{padding:14px 16px;border-bottom:1px solid var(--line)}.post:last-child{border:none}
+  .post .pt{font-weight:700;font-size:13.5px}.post .pd{font-size:11px;color:var(--ink3);margin-top:2px}
+  .post .pbd{font-size:12.5px;color:var(--ink2);margin-top:7px;white-space:pre-line}
+  .atag{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--dgink);background:var(--dgbg);padding:3px 9px;border-radius:6px;margin-top:8px}
+  .fold{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);font-size:13px}
+  .fold:last-child{border:none}.fold .ic{opacity:.6}
+  .fold .actx{margin-left:auto;display:flex;gap:6px}
+  .perm{width:100%;border-collapse:collapse;font-size:12px}
+  .perm th,.perm td{border:1px solid var(--line);padding:8px 10px;text-align:center}
+  .perm th{background:#FBFAF8;font-size:11px;color:var(--ink3)}.perm td:first-child,.perm th:first-child{text-align:left}
+  .yes{color:var(--ok);font-weight:700}.no{color:var(--dg)}
+  .gsec{margin-bottom:20px}.gsec h4{font-size:14px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .gsec .num{width:22px;height:22px;border-radius:6px;background:var(--wash);color:var(--hw);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .gsec p{font-size:13px;color:var(--ink2);margin-bottom:5px}
+  .rule{background:var(--wash);border:1px solid var(--hwline);border-radius:9px;padding:12px 14px;font-size:12.5px;color:#8a4a1c}
+  .swtoggle{position:relative;width:40px;height:22px;border-radius:20px;background:var(--line2);flex:none;cursor:pointer}
+  .swtoggle:after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+  .swtoggle.on{background:var(--ok)}.swtoggle.on:after{transform:translateX(18px)}
+
+  .note{position:fixed;bottom:14px;right:16px;font-size:11px;color:var(--ink2);background:#fff;border:1.5px solid var(--hwline);padding:7px 14px 7px 8px;border-radius:20px;z-index:20;box-shadow:0 6px 18px rgba(243,115,33,.14);cursor:pointer;display:flex;align-items:center;gap:7px;font-weight:600;transition:transform .12s,box-shadow .12s,border-color .12s}
+  .note .ico{width:19px;height:19px;border-radius:50%;background:var(--hw);color:#fff;font-style:normal;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+  .note:hover{border-color:var(--hw);box-shadow:0 8px 22px rgba(243,115,33,.24);transform:translateY(-1px)}
+  .note:active{transform:translateY(0)}
+  @media(max-width:960px){.edt,.git,.hgrid{grid-template-columns:1fr}.sb{width:210px}}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="lcard">
+    <div class="b"><span class="mark" id="mk1"></span><div><h1>ProWin</h1><div class="sub">제안 통합 · 온프레미스</div></div></div>
+    <div class="fld"><label>사번 / ID</label><input value="201803176" disabled style="color:var(--ink3)"></div>
+    <div class="fld"><label>비밀번호</label><input type="password" value="········" disabled></div>
+    <button class="bprimary" id="loginBtn">황금빛으로 로그인</button>
+    <div class="lnote">자체 DB 계정 · 사내 인사정보 연동은 추후(Step 3)</div>
+  </div>
+</div>
+
+<div id="shell">
+  <div class="rolebar">
+    <span class="lb">데모 전용 · 보는 역할 전환</span>
+    <div class="rb">
+      <button class="on" data-role="writer">황금빛 (작성자)</button>
+      <button data-role="pm">황피엠 (PM)</button>
+      <button data-role="admin">시스템관리자</button>
+    </div>
+    <span class="tag" id="roleTag">실제 로그인: 황금빛 · 화면은 역할별로 이렇게 보입니다</span>
+  </div>
+  <div id="app">
+    <aside class="sb">
+      <div class="sbb"><span class="mark" id="mk2"></span><div><div class="nm">ProWin</div><div class="ctx" id="sbCtx">OO화재 장기보험 차세대</div></div></div>
+      <button class="sbcr" data-s="proposals">＋ 새 제안</button>
+
+      <div class="sbsec">전역</div>
+      <button class="nav on" data-s="proposals"><span class="ic">▦</span>제안 현황</button>
+      <button class="nav" data-s="assets"><span class="ic">▤</span>자산 라이브러리<span class="p2">S2</span></button>
+
+      <div class="sbsec">제안 워크스페이스</div>
+      <button class="nav" data-s="home"><span class="ic">⌂</span>제안서 홈</button>
+      <button class="nav" data-s="comm"><span class="ic">✉</span>커뮤니케이션<span class="p2">S2</span></button>
+      <button class="nav" data-s="schedule"><span class="ic">▧</span>제안 일정</button>
+      <button class="nav" data-s="rfp"><span class="ic">▣</span>RFP / 요구사항</button>
+      <button class="nav" data-s="toc"><span class="ic">≡</span>목차</button>
+      <button class="nav" data-s="review"><span class="ic">▤</span>제안서 검토</button>
+      <button class="nav" data-s="versions"><span class="ic">⑂</span>제안서 관리</button>
+      <button class="nav" data-s="matrix"><span class="ic">▥</span>조견표</button>
+      <button class="nav" data-s="workspace"><span class="ic">▢</span>워크스페이스 관리<span class="p2">S2</span></button>
+      <button class="nav" data-s="wsperm"><span class="ic">◔</span>제안 권한관리</button>
+      <div id="dynBoards"></div>
+      <button class="nav" data-s="expense"><span class="ic">₩</span>제안 경비 관리<span class="p2">S2</span></button>
+      <button class="nav" data-s="effort"><span class="ic">◷</span>수행 공수 관리<span class="p2">S2</span></button>
+
+      <div class="sbsec">ProWin 관리</div>
+      <button class="nav" data-s="sysperm"><span class="ic">⛨</span>시스템 접근 권한관리</button>
+      <button class="nav" data-s="guide"><span class="ic">?</span>사용 가이드<span class="p2">S2</span></button>
+
+      <div class="sbsp"></div>
+      <button class="sbu"><span class="av">황</span><div><div class="n">황금빛</div><div class="e">제안 PL · 기술파트</div></div></button>
+    </aside>
+
+    <main class="main">
+      <div class="top">
+        <div><div class="crumb"><b id="crumbProj">OO화재 장기보험 차세대</b> · 기술제안서</div><h2 id="scT">제안 현황</h2></div>
+        <span id="scStep"></span>
+        <select class="projsw" id="projSw" style="display:none">
+          <option>OO화재 장기보험 차세대</option>
+          <option>OO생명 언더라이팅 고도화</option>
+          <option>OO손해보험 지급심사 시스템</option>
+          <option>△△생명 계약관리 재구축</option>
+        </select>
+        <div class="acts" id="scA"></div>
+      </div>
+      <div class="cont" id="cont"></div>
+    </main>
+  </div>
+</div>
+
+<div class="ov" id="ov"><div class="modal" id="modal"></div></div>
+<div class="pop" id="pop"><div class="ph"><b id="popT"></b><span class="x" id="popX">×</span></div><div class="pc" id="popC"></div></div>
+<button class="note" id="disclaimer"><span class="ico">i</span>데모 프로토타입 · 데이터 전부 변조 · 실제 아님</button>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,r){return (r||document).querySelector(s);};
+function el(h){var d=document.createElement('div');d.innerHTML=h.trim();return d.firstChild;}
+function esc(s){return String(s).replace(/</g,'&lt;');}
+
+var MARK='<svg width="30" height="26" viewBox="0 0 40 34" fill="none"><ellipse cx="14" cy="17" rx="11" ry="9" stroke="#F37321" stroke-width="3.4" transform="rotate(-18 14 17)"/><ellipse cx="22" cy="15" rx="10" ry="8" stroke="#F89B6C" stroke-width="3.2" transform="rotate(-18 22 15)"/><ellipse cx="27" cy="19" rx="8.5" ry="7" stroke="#FBB584" stroke-width="3" transform="rotate(-18 27 19)"/></svg>';
+$('#mk1').innerHTML=MARK;$('#mk2').innerHTML=MARK;
+
+$('#loginBtn').addEventListener('click',function(){$('#login').classList.add('hide');$('#shell').classList.add('show');});
+
+/* ---------------- role state ---------------- */
+var ROLE='writer';
+var ROLE_LABEL={writer:'황금빛(작성자)',pm:'황피엠(PM)',admin:'시스템관리자'};
+document.querySelectorAll('.rolebar [data-role]').forEach(function(b){
+  b.addEventListener('click',function(){
+    ROLE=b.getAttribute('data-role');
+    document.querySelectorAll('.rolebar [data-role]').forEach(function(x){x.classList.toggle('on',x===b);});
+    $('#roleTag').textContent='실제 로그인: 황금빛 · 지금 보는 시점: '+ROLE_LABEL[ROLE];
+    go(CUR);
+  });
+});
+function canManage(){return ROLE==='pm'||ROLE==='admin';}
+function canSystem(){return ROLE==='admin';}
+
+/* ---------------- project switch (label only, prototype) ---------------- */
+var GLOBAL_SCREENS={proposals:1,assets:1,guide:1,sysperm:1};
+$('#projSw').addEventListener('change',function(){
+  var v=this.value;$('#crumbProj').textContent=v;$('#sbCtx').textContent=v;
+});
+
+/* ---------------- data ---------------- */
+var TITLES={proposals:'제안 현황',home:'제안서 홈',comm:'커뮤니케이션',schedule:'제안 일정',rfp:'RFP / 요구사항',toc:'목차',review:'제안서 검토',versions:'제안서 관리',matrix:'조견표',workspace:'워크스페이스 관리',wsperm:'제안 권한관리',expense:'제안 경비 관리',effort:'수행 공수 관리',assets:'자산 라이브러리',sysperm:'시스템 접근 권한관리',guide:'사용 가이드'};
+var PHASE={proposals:1,home:1,schedule:1,rfp:1,toc:1,review:1,versions:1,matrix:1,wsperm:1,sysperm:1,comm:2,workspace:2,expense:2,effort:2,assets:2,guide:2};
+var REQINFO={
+ proposals:{req:'기간별 제안 진행현황을 한눈에 파악(카드가 아닌 목록형, PM/사업관리/영업대표 노출)',phase:'Step 1 · 꼭 필요'},
+ home:{req:'제안 개요 + 오늘 할 일(일정 연동) + 지연 항목 가시화',phase:'Step 1 · 꼭 필요'},
+ schedule:{req:'짧은 제안 일정(2~3주)의 다일 일정 등록/수정/삭제, 색상 구분 · <b>PM·사업관리 편집 / 그 외 조회</b>',phase:'Step 1 · 꼭 필요'},
+ rfp:{req:'RFP 업로드/다운로드 및 요구사항 정리 한눈',phase:'Step 1 · 꼭 필요<br>└ 자동추출·유사사례 추천은 <b>Step 2</b>'},
+ toc:{req:'제안서 전체 목차 = 진척 마스터(담당·상태·예상장수), 엑셀 다운로드',phase:'Step 1 · 꼭 필요'},
+ review:{req:'슬라이드 보기 · 설명회 지정 · 리뷰 코멘트(회의록 대체)',phase:'Step 1 · 꼭 필요<br>└ 원본 이미지 렌더는 <b>Step 3</b>'},
+ versions:{req:'업로드=커밋(제목 대조 게이트) · 합본=불변 스냅샷(PM/사업관리 권한)',phase:'Step 1 · 꼭 필요<br>└ 시각적 diff는 <b>Step 3</b><br>└ 표준 템플릿 <b>디자인 통일</b>은 <b>Step 3</b>(도형 재구성 자동화 · 버전 모델에 흡수 — 입력 스냅샷→새 스냅샷)'},
+ matrix:{req:'최종 취합본(스냅샷) 기준 요구사항↔목차/페이지 매핑 — 대분류~세부사항은 <b>RFP 발췌(읽기전용, [RFP/요구사항] 소유)</b>, 수용여부(수용/부분수용/미수용)·해당목차(드롭다운)·page는 <b>사람이 매핑</b>. 행 추가/삭제 없음(RFP가 행을 결정)',phase:'Step 1 · 꼭 필요<br>└ AI 자동 매핑은 <b>Step 3</b>(RFP 자동추출(Step 2)과 별개의 더 어려운 문제)'},
+ comm:{req:'제안팀 공지·공유 게시판',phase:'Step 2 · 컨셉 강화'},
+ workspace:{req:'제안별 자유 게시판(폴더) 추가/수정/삭제',phase:'Step 2 · 컨셉 강화'},
+ wsperm:{req:'제안 단위 멤버·권한 관리(PM/사업관리 전용)',phase:'Step 1 · 꼭 필요'},
+ expense:{req:'자사/외주 인건비·디자인·인쇄비 통합 관리, 그리드 편집 — PM·사업관리만 화면 접근·편집 가능(작성자는 접근 차단)',phase:'Step 2 · 컨셉 강화'},
+ effort:{req:'투입 M/M·직급별 공수 관리, 그리드 편집 — PM·사업관리만 화면 접근·편집 가능(작성자는 접근 차단)',phase:'Step 2 · 컨셉 강화'},
+ assets:{req:'과거 제안서 페이지 단위 적재(Step 1) + 의미 기반 검색(Step 2)',phase:'Step 1(적재) / Step 2(검색)'},
+ sysperm:{req:'프로젝트에 종속되지 않는 시스템 마스터 권한(전체 프로젝트 접근) 관리',phase:'Step 1 · 꼭 필요(관리 인프라)'},
+ guide:{req:'사이트 사용법 통합 가이드',phase:'Step 2 · 컨셉 강화'}
+};
+var ACTS={
+  proposals:'<button class="btn acc" data-act="newp">＋ 새 제안</button>',
+  home:'<button class="btn">제안 정보 수정</button>',
+  schedule:'<button class="btn acc" data-act="ev-add">＋ 일정 추가</button>',
+  rfp:'<button class="btn">RFP 업로드</button><button class="btn soon" title="Step 2">요구사항 자동추출 · Step 2</button>',
+  toc:'<button class="btn" data-act="i-toc">목차 규칙 <span style="font-style:italic">i</span></button><button class="btn acc">엑셀 다운로드</button>',
+  review:'<span style="font-size:12px;color:var(--ink3);align-self:center">읽기 전용 · 업로드는 [제안서 관리]에서</span>',
+  versions:'<button class="btn" data-act="upload">pptx 업로드(커밋)</button><button class="btn soon" title="Step 3 예정 — 표준 템플릿 디자인 통일(과거 외주의 도형·레이아웃 재구성 자동화). 원칙2의 유일한 예외인 생성 엔진이 필요한 고난도 R&D. 별도 파생 파일이 아니라 버전 모델에 흡수 — 입력 스냅샷 → 도형 표준화 → 새 스냅샷 생성(합본과 동일 메커니즘).">디자인 통일(표준화) · Step 3</button>',
+  matrix:'<button class="btn" id="saveMatrix" disabled>저장</button><button class="btn soon" title="Step 3 예정 — RFP 자동추출(Step 2)과 별개로, 이번 제안서 자체 내용을 이해해야 하는 더 어려운 문제라 P3로 분리">AI 자동 매핑 · Step 3</button><button class="btn acc">엑셀 출력</button>',
+  expense:'', /* 동적 렌더 — go()에서 canManage()로 분기 (아래 참고) */
+  effort:'', /* 동적 렌더 — go()에서 canManage()로 분기 */
+  assets:'<button class="btn acc">자산 업로드</button>',
+  wsperm:'<button class="btn acc" data-act="mem-add">＋ 멤버 추가</button>',
+  workspace:'<button class="btn acc" data-act="board-add">＋ 게시판 추가</button>'
+};
+
+/* ---------------- screens ---------------- */
+var R={};
+
+R.proposals=function(){
+  var rows=[
+    ['진행중','doing','OO화재 장기보험 차세대 구축','기술·사업·원가','2026-06-30 ~ 07-15','황피엠','박민수','조은지',62],
+    ['제출완료','done','OO생명 언더라이팅 고도화','기술·사업','2026-04-10 ~ 05-02','황피엠','박민수','조은지',100],
+    ['준비중','prep','OO손해보험 지급심사 시스템 제안','RFP 검토','2026-07-20 ~ 08-05','황피엠','박민수','—',8],
+    ['제출완료','done','△△생명 계약관리 재구축','기술·사업·원가','2026-02-01 ~ 02-20','황피엠','박민수','조은지',100]
+  ];
+  var h='<div class="card"><table class="tbl"><thead><tr><th>상태</th><th>제안명</th><th>구성</th><th>제안 기간</th><th>PM</th><th>사업관리</th><th>영업대표</th><th>진척</th></tr></thead><tbody>';
+  rows.forEach(function(r){
+    h+='<tr class="prow" data-open="1"><td><span class="st '+r[1]+'">'+r[0]+'</span></td><td style="font-weight:700">'+r[2]+'</td><td style="color:var(--ink3)">'+r[3]+'</td><td>'+r[4]+'</td><td>'+r[5]+'</td><td>'+r[6]+'</td><td>'+r[7]+'</td><td><span class="pbar"><span style="width:'+r[8]+'%"></span></span>'+r[8]+'%</td></tr>';
+  });
+  h+='</tbody></table></div><p style="font-size:12px;color:var(--ink3);margin:12px 4px">기간별 제안 진행 현황 · 행 클릭 시 제안서 홈으로 이동 · 추가/삭제는 이 화면에서만</p>';
+  return h;
+};
+
+R.home=function(){
+  return '<div class="hgrid"><div>'
+    +'<div class="card" style="padding:18px"><h3 style="font-size:16px;font-weight:700;margin-bottom:10px">OO화재 장기보험 차세대 구축</h3>'
+    +'<div class="kv"><span class="k">발주처</span>OO화재해상보험</div><div class="kv"><span class="k">제안 기간</span>2026-06-30 ~ 07-15 · 마감 D-7</div>'
+    +'<div class="kv"><span class="k">PM</span>황피엠</div><div class="kv"><span class="k">사업관리</span>박민수</div><div class="kv"><span class="k">영업대표</span>조은지</div>'
+    +'<div class="kv"><span class="k">진척</span><span class="pbar" style="width:200px"><span style="width:62%"></span></span> 62% (완료 8 · 진행 6 · 보완 2)</div></div>'
+    +'<div class="sect">최근 업데이트</div><div class="card"><div style="padding:4px 14px">'
+    +up('⑂','v1.2 스냅샷 · PL 리뷰 반영','14분 전')+up('▤','2.2 MSA 전환 방안 · 슬라이드 3장 업로드','39분 전')
+    +up('▥','조견표 · 수용여부 갱신','1시간 전')+up('₩','경비 · 외주 인건비 견적 갱신','3시간 전')+'</div></div></div>'
+    +'<div><div class="card" style="padding:16px"><div style="font-weight:700;font-size:13px;margin-bottom:8px">오늘 할 일 <span style="color:var(--ink3);font-weight:500">· 7/8(수)</span></div>'
+    +ti('c-mt','제안전략 검토(2차)')+ti('c-rv','2.3 데이터 이관 보완')+ti('c-wr','3.2 품질관리 초안')+'</div>'
+    +'<div class="card delay" style="padding:16px;margin-top:14px;border-color:var(--hwline)"><div style="font-weight:700;font-size:13px;margin-bottom:8px;color:var(--dgink)">⚠ 지연 항목</div>'
+    +ti('','2.3 데이터 이관 (마감 7/5)')+ti('','3.1 사업관리 미착수 (마감 7/8)')+'</div></div></div>';
+  function up(i,t,d){return '<div class="todo-item"><span style="opacity:.6">'+i+'</span>'+t+'<span class="dt">'+d+'</span></div>';}
+  function ti(c,t){return '<div class="todo-item"><span class="lt '+c+'"></span>'+t+'</div>';}
+};
+
+/* -------- schedule (data-driven, robust) -------- */
+var CAL=[ // 5 weeks x 7 days: [date, outFlag]
+ [[28,1],[29,1],[30,1],[1,0],[2,0],[3,0],[4,0]],
+ [[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0]],
+ [[12,0],[13,0],[14,0],[15,0],[16,0],[17,0],[18,0]],
+ [[19,0],[20,0],[21,0],[22,0],[23,0],[24,0],[25,0]],
+ [[26,0],[27,0],[28,0],[29,0],[30,0],[31,0],[1,1]]
+];
+var EVID=100;
+var EVENTS=[
+ {id:1,title:'RFP 리뷰',day:1,end:2,color:'c-mt'},
+ {id:2,title:'제안서 작성',day:9,end:12,color:'c-wr'},
+ {id:3,title:'★입찰설명회',day:10,end:10,color:'c-dl'},
+ {id:4,title:'위험검토회의',day:13,end:14,color:'c-mt'},
+ {id:5,title:'제안서 리뷰(1차)',day:15,end:17,color:'c-rv'},
+ {id:6,title:'2차 리뷰',day:20,end:21,color:'c-rv'},
+ {id:7,title:'★제안 마감',day:27,end:27,color:'c-dl'},
+ {id:8,title:'제안 발표',day:28,end:28,color:'c-dl'}
+];
+function findWeek(day){
+  for(var w=0;w<CAL.length;w++){for(var c=0;c<7;c++){if(CAL[w][c][0]===day&&!CAL[w][c][1])return w;}}
+  return 1;
+}
+R.schedule=function(){
+  var h='<div class="card" style="padding:16px"><div style="font-size:17px;font-weight:700;margin-bottom:12px">2026년 7월 <span style="font-size:12px;color:var(--ink3);font-weight:500">· 사업관리/PM 편집 · 그 외 조회 · 일정 클릭 시 수정/삭제</span></div>';
+  h+='<div class="cal"><div class="head">'+['일','월','화','수','목','금','토'].map(function(d){return '<div>'+d+'</div>';}).join('')+'</div><div id="calBody"></div></div></div>';
+  return h;
+};
+function paintCal(){
+  var body=$('#calBody');if(!body)return;body.innerHTML='';
+  CAL.forEach(function(wk,wi){
+    var wkEl=el('<div class="week"><div class="days"></div><div class="bars"></div></div>');
+    var daysEl=$('.days',wkEl);
+    wk.forEach(function(d){daysEl.appendChild(el('<div class="day'+(d[1]?' out':'')+(d[0]===8&&!d[1]?' today':'')+'"><span class="n">'+d[0]+'</span></div>'));});
+    // events whose start falls in this week
+    var lane=0;
+    EVENTS.forEach(function(ev){
+      if(findWeek(ev.day)!==wi)return;
+      var sCol=wk.findIndex(function(d){return d[0]===ev.day&&!d[1];});
+      var eDay=Math.min(ev.end,wk[6][0]===ev.end?ev.end:wk.reduce(function(m,d){return !d[1]&&d[0]<=ev.end&&d[0]>=ev.day?d[0]:m;},ev.day));
+      var eCol=wk.findIndex(function(d){return d[0]===eDay&&!d[1];});
+      if(sCol<0)return; if(eCol<sCol)eCol=sCol;
+      var left=(sCol/7*100),w=((eCol-sCol+1)/7*100);
+      var bar=el('<div class="bar '+ev.color+'" style="left:calc('+left+'% + 3px);width:calc('+w+'% - 6px);top:'+(lane*20)+'px" data-ev="'+ev.id+'">'+ev.title+'</div>');
+      $('.bars',wkEl).appendChild(bar);
+      lane++;
+    });
+    body.appendChild(wkEl);
+  });
+  body.querySelectorAll('[data-ev]').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();openEventModal(parseInt(b.getAttribute('data-ev')));});});
+}
+function openEventModal(id){
+  var ro=!canManage();
+  var ev=id?EVENTS.filter(function(e){return e.id===id;})[0]:{title:'',day:8,end:8,color:'c-mt'};
+  var m=$('#modal');
+  var dis=ro?' disabled':'';
+  m.innerHTML='<div class="mh"><h3>'+(ro?'일정 조회':(id?'일정 수정':'일정 추가'))+'</h3><span class="x" id="mx">×</span></div><div class="mb">'
+   +(ro?'<div style="font-size:11.5px;color:var(--ink3);margin-bottom:10px">조회 전용 · 일정 편집은 PM·사업관리만 가능합니다 (현재 보는 역할: '+ROLE_LABEL[ROLE]+').</div>':'')
+   +row('제목','text','evT',ev.title)
+   +row('시작일(7월)','number','evS',ev.day)
+   +row('종료일(7월)','number','evE',ev.end)
+   +'<div class="mrow"><label>색상</label><select id="evC"'+dis+'>'
+   +['c-wr:작성(초록)','c-rv:리뷰(파랑)','c-mt:마일스톤(주황)','c-dl:마감(빨강)','c-gy:기타(회색)'].map(function(o){var p=o.split(':');return '<option value="'+p[0]+'"'+(ev.color===p[0]?' selected':'')+'>'+p[1]+'</option>';}).join('')
+   +'</select></div></div><div class="mf">'
+   +(ro?'<button class="btn" id="mc">닫기</button>'
+       :((id?'<button class="btn" id="evDel" style="color:var(--dgink);border-color:var(--dgbg)">삭제</button>':'')
+         +'<button class="btn" id="mc">취소</button><button class="btn acc" id="evSave">저장</button>'))
+   +'</div>';
+  $('#ov').classList.add('on');
+  $('#mx').addEventListener('click',closeOv);$('#mc').addEventListener('click',closeOv);
+  if(!ro){
+    $('#evSave').addEventListener('click',function(){
+      var t=$('#evT').value.trim()||'제목없음',s=parseInt($('#evS').value)||8,e=parseInt($('#evE').value)||s,c=$('#evC').value;
+      if(id){ev.title=t;ev.day=s;ev.end=e;ev.color=c;}
+      else{EVENTS.push({id:++EVID,title:t,day:s,end:e,color:c});}
+      closeOv();paintCal();
+    });
+    if(id)$('#evDel').addEventListener('click',function(){EVENTS=EVENTS.filter(function(e){return e.id!==id;});closeOv();paintCal();});
+  }
+  function row(lb,type,idn,val){return '<div class="mrow"><label>'+lb+'</label><input type="'+type+'" id="'+idn+'" value="'+esc(val)+'"'+dis+'></div>';}
+}
+
+/* -------- RFP / requirements (dynamic) -------- */
+var REQS=[
+ ['R-01','무중단 이관','서비스 중단 없이 기간계→차세대 데이터 이관'],
+ ['R-02','보안 컴플라이언스','금융 보안 가이드 준수 및 망분리 대응'],
+ ['R-03','성능 SLA','조회 응답 3초 이내, 배치 처리 시간 목표'],
+ ['R-04','MSA 분리 방안','언더라이팅/계약/지급 서비스 독립 배포'],
+ ['R-05','데이터 정합성','복합키 기반 정합성 검증 및 보상 처리'],
+ ['R-06','운영 이관','무중단 운영 전환 및 롤백 시나리오']
+];
+var SIMCASE={
+ 'R-01':[['OO생명 언더라이팅 고도화','기술 · 2026','무중단 이관 아키텍처','32p'],['△△생명 계약관리','기술 · 2025','보상 트랜잭션 설계','44p']],
+ 'R-02':[['OO손해보험 지급심사','사업 · 2025','망분리 보안 대응','9p']],
+ 'R-03':[['OO생명 언더라이팅 고도화','기술 · 2026','조회 성능 최적화','51p']],
+ 'R-04':[['OO생명 언더라이팅 고도화','기술 · 2026','MSA 분리 전략','47p'],['△△생명 계약관리','기술 · 2025','서비스 경계 설계','12p']],
+ 'R-05':[['△△생명 계약관리','기술 · 2025','정합성 검증 로직','29p']],
+ 'R-06':[['OO손해보험 지급심사','사업 · 2025','운영 이관 계획','15p']]
+};
+R.rfp=function(){
+  var h='<div class="card" style="padding:16px;margin-bottom:16px"><div class="file"><span class="ic">PDF</span><div><div style="font-weight:700">OO화재_장기보험_차세대_RFP_v2.pdf</div><div style="font-size:12px;color:var(--ink3)">218페이지 · 2026-06-30 수령</div></div><button class="btn" style="margin-left:auto">다운로드</button></div></div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 300px;gap:16px"><div><div class="sect" style="margin-top:0">요구사항 정리 <span style="font-size:11px;color:var(--pp);font-weight:700;background:var(--ppbg);padding:2px 7px;border-radius:20px">자동추출 Step 2</span></div><div class="card" id="reqList"></div></div>'
+   +'<div><div class="sect" style="margin-top:0">유사 사례 추천 <span style="font-size:11px;color:var(--pp);font-weight:700;background:var(--ppbg);padding:2px 7px;border-radius:20px">Step 2</span></div><div class="card" style="padding:14px" id="simPanel"></div></div></div>';
+  return h;
+};
+function paintRfp(){
+  var list=$('#reqList');if(!list)return;list.innerHTML='';
+  REQS.forEach(function(r,i){
+    var d=el('<div class="req'+(i===0?' sel':'')+'" data-r="'+r[0]+'"><span class="c">'+r[0]+'</span><div><div class="t">'+r[1]+'</div><div class="d">'+r[2]+'</div></div></div>');
+    d.addEventListener('click',function(){list.querySelectorAll('.req').forEach(function(x){x.classList.remove('sel');});d.classList.add('sel');paintSim(r[0]);});
+    list.appendChild(d);
+  });
+  paintSim(REQS[0][0]);
+}
+function paintSim(code){
+  var p=$('#simPanel');if(!p)return;
+  var items=SIMCASE[code]||[];
+  if(!items.length){p.innerHTML='<div style="color:var(--ink3);font-size:12px">유사 사례 없음</div>';return;}
+  p.innerHTML=items.map(function(c){return '<div class="acard2"><div class="ti">'+c[0]+'</div><div class="mt">'+c[1]+' · '+c[2]+'</div><div class="pg">'+c[3]+'</div></div>';}).join('')
+   +'<div style="font-size:11px;color:var(--pp);background:var(--ppbg);padding:8px;border-radius:8px;margin-top:6px">'+code+' 선택 시 자산 라이브러리에서 의미 유사 페이지를 검색(온프레 임베딩, GPU 확보 후)</div>';
+}
+
+R.toc=function(){
+  var rows=[
+    ['l1','I. 제안 개요','','','',''],
+    ['l2','','1.1 추진 배경','홍길동','h','2p','done'],
+    ['l2','','1.2 사업 목표','홍길동','h','2p','done'],
+    ['l2','','1.3 제안 범위','홍길동','h','1p','done'],
+    ['l1','II. 기술 제안','','','',''],
+    ['l2','','2.1 시스템 아키텍처','황금빛','o','4p','done'],
+    ['l2','','2.2 MSA 전환 방안 (1/2)','황금빛','o','3p','doing'],
+    ['l2','','2.2 MSA 전환 방안 (2/2)','황금빛','o','3p','doing'],
+    ['l2','','2.3 데이터 이관','김철수','k','3p','fix'],
+    ['l2','','2.4 성능·보안 방안','김철수','k','2p','doing'],
+    ['l1','III. 관리 방안','','','',''],
+    ['l2','','3.1 사업관리','김영희','l','–','todo'],
+    ['l2','','3.2 품질관리','김영희','l','2p','doing']
+  ];
+  var stx={done:'완료',doing:'진행중',fix:'보완',todo:'미착수'};
+  var h='<div class="card" style="overflow:auto"><table class="toc"><thead><tr><th style="width:34%">목차</th><th>담당</th><th>예상 장수</th><th>상태</th><th>일정</th></tr></thead><tbody>';
+  rows.forEach(function(r,i){
+    if(r[0]==='l1'){h+='<tr class="l1"><td colspan="5">'+r[1]+'</td></tr>';}
+    else{h+='<tr class="l2"><td style="padding-left:16px">'+r[2]+'</td><td><span class="who '+r[4]+'">'+r[3]+'</span></td><td>'+r[5]+'</td><td><span class="chip '+r[6]+'">'+stx[r[6]]+'</span></td><td style="color:var(--ink3)">07-0'+((i%8)+1)+'</td></tr>';}
+  });
+  h+='</tbody></table></div><p style="font-size:12px;color:var(--ink3);margin:10px 4px">전체 목차 = 진척 마스터(담당·상태·장수). 엑셀 다운로드 가능. 여러 장은 (1/2)(2/2) 하위로 분리.</p>';
+  return h;
+};
+
+/* -------- review: flow-diagram slide mockups -------- */
+var NODE={
+ '2.1':{t:'2.1 시스템 아키텍처',s:'done',c:'완료',m:'담당 황금빛 · 예상 4p · 슬라이드 4장 · v1.2',ti:'차세대 시스템 목표 아키텍처',flow:['기간계(모놀리식)','전환 계층','차세대(MSA)'],b:['언더라이팅 가이드라인 서비스 독립 배포 단위 분리','MCI/EAI 연계 표준화 · 트랜잭션 정합성 보장','무중단 이관을 위한 보상 트랜잭션(undo-log) 설계'],pg:'1/1'},
+ '2.2a':{t:'2.2 MSA 전환 방안 (1/2)',s:'doing',c:'진행중',m:'담당 황금빛 · 예상 3p · v1.2',ti:'모놀리식 → MSA 분리 전략',flow:['도메인 식별','서비스 분리','배포 단위'],b:['도메인 경계 기준 서비스 식별(언더라이팅/계약/지급)','tx배치 v6 — 차세대 먼저, 기간계 나중 + 보상','분리 vs 복제 테이블 분류 기준'],pg:'1/2'},
+ '2.2b':{t:'2.2 MSA 전환 방안 (2/2)',s:'doing',c:'진행중',m:'담당 황금빛 · 예상 3p · v1.1',ti:'서비스 간 연계 및 이관 순서',flow:['tx1 조회','tx2 처리','검증'],b:['2-FEP 호출 구조(tx1 순수 read / tx2 분리테이블 CUD)','유지 테이블 사전적재(0번 메서드) 프리페치','단계별 이관 순서 및 검증 지점'],pg:'2/2'},
+ '2.3':{t:'2.3 데이터 이관',s:'fix',c:'보완',m:'담당 김철수 · 예상 3p · v1.1 · 보완 필요',ti:'데이터 이관 및 정합성 방안',flow:['추출','검증','적재'],b:['복합키 기반 정합성 검증(Java Stream EXISTS 대체)','이관 실패 시 롤백/재처리 시나리오','⚠ 성능 SLA 수치 근거 보완 필요(리뷰 지적)'],pg:'1/1'},
+ '3.2':{t:'3.2 품질관리',s:'doing',c:'진행중',m:'담당 김영희 · 예상 2p · v1.2',ti:'품질보증 및 형상관리 방안',flow:['품질게이트','형상관리','테스트'],b:['단계별 품질 게이트 및 산출물 검토','형상관리·변경관리 프로세스','테스트 전략(단위/통합/이관 검증)'],pg:'1/1'}
+};
+R.review=function(){
+  return '<div class="edt"><div class="card" style="padding:8px">'
+   +'<div style="display:flex;padding:8px 8px 10px;font-size:12px;font-weight:700;color:var(--ink2)">목차 (읽기 · 리뷰)<button class="idot" style="margin-left:auto" data-i="review">i</button></div>'
+   +tn('grp','done','I. 제안 개요','')+tn('ch','done','1.1 추진 배경','홍','h')
+   +tn('grp','doing','II. 기술 제안','')
+   +tn('ch sel','done','2.1 시스템 아키텍처','황','','2.1')
+   +tn('grp2','doing','2.2 MSA 전환 방안','')
+   +tn('ch2','doing','(1/2) 분리 전략','황','','2.2a')+tn('ch2','doing','(2/2) 연계·이관','황','','2.2b')
+   +tn('ch','fix','2.3 데이터 이관','김','k','2.3')
+   +tn('grp','todo','III. 관리 방안','')+tn('ch','doing','3.2 품질관리','영','l','3.2')
+   +'</div><div class="card" style="padding:18px" id="det"></div></div>';
+  function tn(cls,st,t,w,wc,node){
+    var isgrp=cls.indexOf('grp')>-1;
+    return '<div class="tnode '+cls+'"'+(node?' data-node="'+node+'"':'')+'><span class="dt2 '+st+'"></span>'+t+(w&&!isgrp?'<span class="w">'+w+'</span>':'')+'</div>';
+  }
+};
+function paintNode(id){
+  var d=NODE[id]||NODE['2.1'];
+  var det=$('#det');if(!det)return;
+  var lis=d.b.map(function(x){return '<li>'+x+'</li>';}).join('');
+  var flow=d.flow.map(function(x,i){return (i>0?'<span class="farr">→</span>':'')+'<div class="fbox">'+x+'</div>';}).join('');
+  det.innerHTML='<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><h3 style="font-size:16px;font-weight:700">'+d.t+'</h3><span class="chip '+d.s+'">'+d.c+'</span></div>'
+   +'<div style="font-size:12px;color:var(--ink3);margin-bottom:14px">'+d.m+'</div>'
+   +'<div style="border:1px solid var(--line);border-radius:10px;background:#FBFAF8;margin-bottom:8px"><div class="pvtop"><span class="lb">슬라이드 미리보기</span><span class="wn">텍스트 기반 · 원본 렌더는 추후 확인 필요(Step 3)</span></div>'
+   +'<div class="slide"><span class="stt">'+d.ti+'</span><div class="flow">'+flow+'</div><ul>'+lis+'</ul><div class="pg">Slide '+d.pg+'</div></div></div>'
+   +'<div style="display:flex;align-items:center;gap:14px;padding:2px 4px 16px"><div class="tgl" id="brf"><span class="tk"></span>설명회용으로 지정</div><span style="font-size:11px;color:var(--ink3)">지정 단위는 렌더 방식 결정 후 확정</span></div>'
+   +'<div style="border-top:1px solid var(--line);padding-top:15px"><div style="font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:12px">리뷰 코멘트 <span style="font-family:var(--mono);font-size:10px;color:var(--hw);background:var(--wash);padding:2px 7px;border-radius:5px">@ v1.2</span> · 회의록 대체</div>'
+   +'<div id="clist"><div class="cmt"><span class="av k">김</span><div><div class="nm">김철수 <span>v1.2</span></div><div class="tx">아키텍처 다이어그램 최신본으로 교체 필요.</div></div></div>'
+   +'<div class="cmt"><span class="av l">영</span><div><div class="nm">김영희(PL) <span>v1.1</span></div><div class="tx">MSA 분리 단위 표현 좋네요. 2.2도 이 기준으로.</div></div></div></div>'
+   +'<div class="cadd"><input id="cin" placeholder="이 노드 · 이 버전에 코멘트 남기기…"><button id="cbtn">등록</button></div></div>';
+  $('#brf').addEventListener('click',function(){this.classList.toggle('on');});
+  $('#cbtn').addEventListener('click',function(){var v=$('#cin').value.trim();if(!v)return;$('#clist').appendChild(el('<div class="cmt"><span class="av">황</span><div><div class="nm">황금빛 <span>v1.2</span></div><div class="tx">'+esc(v)+'</div></div></div>'));$('#cin').value='';});
+}
+
+/* -------- versions (git) -------- */
+var COMMITS=[
+ {h:'a7f2e1',msg:'v1.2 스냅샷 · PL 리뷰 반영',who:'황금빛',wc:'',when:'14분 전',lbl:'<span class="tg head">HEAD → main</span><span class="tg br">v1.2</span>',diff:[['mod','~ 목차','2.2 MSA 전환 · (1/2)(2/2) 하위 분리'],['add','+ 슬라이드','2.2 · 3장 추가'],['add','+ 코멘트','2.1 · 김철수 "다이어그램 교체"'],['mod','~ 상태','2.3 데이터 이관 → 보완']]},
+ {h:'c31b90',msg:'1차 취합 · 파트별 pptx 병합',who:'홍길동',wc:'h',when:'2시간 전',lbl:'<span class="tg br">v1.1</span>',diff:[['add','+ 슬라이드','1.1·2.1 파트 업로드 병합'],['mod','~ 목차','II. 기술 제안 정렬'],['add','+ 담당','2.3 김철수 배정']]},
+ {h:'44de08',msg:'설명회-발췌 브랜치 생성',who:'황금빛',wc:'',when:'3시간 전',tag:1,lbl:'<span class="tg tag">branch: 설명회-발췌</span>',diff:[['mod','~ 브랜치','main에서 분기 — 설명회용 장표 선별']]},
+ {h:'901aa2',msg:'목차 초안 작성 · 담당 배정',who:'황금빛',wc:'',when:'어제',lbl:'',diff:[['add','+ 목차','3개 대분류·9개 하위 제목 등록'],['add','+ 예상장수','노드별 입력'],['add','+ 담당','홍길동/김철수/김영희/황금빛 배정']]},
+ {h:'000init',msg:'프로젝트 생성 · RFP 첨부',who:'황금빛',wc:'',when:'2일 전',lbl:'<span class="tg br">init</span>',diff:[['add','+ 프로젝트','OO화재 워크스페이스'],['add','+ RFP','원문 참고자료 첨부']]}
+];
+R.versions=function(){
+  var mergeBtn=canManage()
+    ?'<button class="btn acc" data-act="merge">합본(스냅샷 생성)</button>'
+    :'<button class="btn" disabled title="PM/사업관리만 가능">합본 — PM/사업관리 전용</button>';
+  return '<div style="margin-bottom:12px">'+mergeBtn+'</div><div class="git"><div class="card" style="padding:6px 4px"><div class="brs"><span class="br cur">⑂ main · 제안 본선</span><span class="br">⑂ 설명회-발췌</span></div><div id="glog"></div></div><div class="card diffp" id="gdiff"></div></div>';
+};
+function paintGit(){
+  var g=$('#glog');if(!g)return;g.innerHTML='';
+  COMMITS.forEach(function(c,i){
+    var n=el('<div class="cm'+(c.tag?' tag':'')+(i===0?' sel':'')+'"><div class="rail"><div class="knob"></div></div><div class="cb"><div class="msg">'+c.msg+'<span>'+c.lbl+'</span></div><div class="cmeta"><span class="av '+c.wc+'">'+c.who.charAt(0)+'</span>'+c.who+' · <span class="hash">'+c.h+'</span> · '+c.when+'</div></div></div>');
+    n.addEventListener('click',function(){g.querySelectorAll('.cm').forEach(function(x){x.classList.remove('sel');});n.classList.add('sel');paintDiff(c);});
+    g.appendChild(n);
+  });
+  paintDiff(COMMITS[0]);
+}
+function paintDiff(c){
+  var h='<div class="h">변경 내역 <span class="hash">'+c.h+'</span></div><div style="font-size:11.5px;color:var(--ink3);margin-bottom:12px">'+c.msg+' · '+c.who+'</div><div class="dsec">이 스냅샷 = 목차 + 합본 + 코멘트</div>';
+  c.diff.forEach(function(d){h+='<div class="dl '+d[0]+'"><span class="s">'+d[1]+'</span><span>'+d[2]+'</span></div>';});
+  $('#gdiff').innerHTML=h;
+}
+
+/* -------- matrix (image-based traceability) -------- */
+/* 대분류~세부사항1/2 = RFP 발췌(읽기전용, 3-2 소유) · 수용여부/해당목차/page = 사람이 매핑(P1) */
+var MXTOC=['1.1 추진 배경','1.2 사업 목표','1.3 제안 범위','2.1 시스템 아키텍처','2.2 MSA 전환 방안 (1/2)','2.2 MSA 전환 방안 (2/2)','2.3 데이터 이관','2.4 성능·보안 방안','3.1 사업관리','3.2 품질관리'];
+var MXROWS=[
+ {rfp:'3',대:'I. 사업개요',중:'1.1 목적/범위',소:'가. 핵심 마케팅 전략 연계',세1:'상품전략 측면 - 통합 가입설계 및 판매 편의성 극대화',세2:'',수용:'수용',목차:'1.1 추진 배경',page:'10'},
+ {rfp:'3',대:'I. 사업개요',중:'1.1 목적/범위',소:'',세1:'2) 신규 심사 체계 도입으로 심사효율 개선',세2:'',수용:'수용',목차:'1.2 사업 목표',page:'13'},
+ {rfp:'4',대:'I. 사업개요',중:'1.2 추진 일정',소:'가. 개발단계별 최적 일정 제시',세1:'',세2:'',수용:'부분수용',목차:'3.1 사업관리',page:'24'},
+ {rfp:'4',대:'II. 기술요건',중:'2.1 시스템 접근성',소:'시스템 접근성 향상',세1:'웹기반 시스템 구축, 인증방식 편의성 강화',세2:'',수용:'수용',목차:'2.1 시스템 아키텍처',page:'66'},
+ {rfp:'5',대:'II. 기술요건',중:'2.2 성능·보안',소:'가. 조회 응답속도 목표',세1:'응답 3초 이내, 배치 야간처리',세2:'',수용:'미수용',목차:'2.1 시스템 아키텍처',page:'109'}
+];
+R.matrix=function(){
+  return '<div id="mxWrap"></div><p style="font-size:12px;color:var(--ink3);margin:10px 4px">최종 취합본(스냅샷) 기준 · <b>대분류~세부사항은 RFP 발췌(읽기전용) · 수용여부/해당목차/page는 사람이 매핑</b>(자동 매핑은 Step 3, 위 액션바 참고) · RFP 요구사항 정리는 [RFP/요구사항] 화면에서 선행</p>';
+};
+function paintMatrix(){
+  var w=$('#mxWrap');if(!w)return;
+  function opt(list,cur){return list.map(function(o){return '<option'+(o===cur?' selected':'')+'>'+o+'</option>';}).join('');}
+  var h='<div class="card" style="overflow:auto"><table class="mx"><thead><tr><th>RFP Page</th><th>대분류</th><th>중분류</th><th>소분류</th><th>세부사항1</th><th>세부사항2</th><th>수용여부</th><th>해당 목차</th><th>page</th></tr></thead><tbody>';
+  MXROWS.forEach(function(r,ri){
+    h+='<tr data-r="'+ri+'">'
+      +'<td class="n">'+r.rfp+'</td><td>'+r.대+'</td><td>'+r.중+'</td><td>'+r.소+'</td>'
+      +'<td style="text-align:left">'+r.세1+'</td><td>'+r.세2+'</td>'
+      +'<td><select class="mxSel" data-f="수용" data-r="'+ri+'">'+opt(['수용','부분수용','미수용'],r.수용)+'</select></td>'
+      +'<td><select class="mxSel" data-f="목차" data-r="'+ri+'">'+opt(MXTOC,r.목차)+'</select></td>'
+      +'<td><input class="mxInp" data-f="page" data-r="'+ri+'" value="'+esc(r.page)+'" style="width:56px;text-align:center;border:1px solid var(--line2);border-radius:6px;padding:5px;background:transparent"></td>'
+      +'</tr>';
+  });
+  h+='</tbody></table></div>';
+  w.innerHTML=h;
+  function markDirty(){var s=$('#saveMatrix');if(s){s.disabled=false;s.classList.add('dirty');}}
+  w.querySelectorAll('.mxSel').forEach(function(sel){sel.addEventListener('change',function(){MXROWS[+sel.getAttribute('data-r')][sel.getAttribute('data-f')]=sel.value;markDirty();});});
+  w.querySelectorAll('.mxInp').forEach(function(inp){inp.addEventListener('input',function(){MXROWS[+inp.getAttribute('data-r')][inp.getAttribute('data-f')]=inp.value;markDirty();});});
+}
+/* -------- workspace boards (add/edit/delete, reflected in sidebar) -------- */
+var BOARDS=[
+ {id:1,name:'RFP Q&A',desc:'발주처 질의응답 정리',posts:[{t:'응답 지연 안내',b:'발주처 회신이 지연되고 있습니다. 확인되는 대로 공유하겠습니다.',by:'박민수',d:'어제'}]},
+ {id:2,name:'참고 자료',desc:'유사 제안·기술 자료',posts:[{t:'유사 사례 링크 모음',b:'과거 유사 제안서 목록을 자산 라이브러리에 정리했습니다.',by:'황금빛',d:'2일 전'}]}
+];
+var BOARDID=10;
+R.workspace=function(){
+  var h='<div class="card">';
+  BOARDS.forEach(function(bd){
+    h+='<div class="fold"><span class="ic">▣</span><div><div style="font-weight:600">'+bd.name+'</div><div style="font-size:11px;color:var(--ink3)">'+bd.desc+' · '+bd.posts.length+'건</div></div><div class="actx">'
+     +'<button class="btn" data-bopen="'+bd.id+'">열기</button><button class="btn" data-bedit="'+bd.id+'">수정</button><button class="btn" data-bdel="'+bd.id+'" style="color:var(--dgink)">삭제</button></div></div>';
+  });
+  h+='</div><p style="font-size:12px;color:var(--ink3);margin:10px 4px">추가한 게시판은 좌측 네비게이션에도 등록됩니다 · 각 게시판은 기본 게시판 구조</p>';
+  return h;
+};
+function paintWorkspace(){
+  document.querySelectorAll('[data-bopen]').forEach(function(b){b.addEventListener('click',function(){go('board-'+b.getAttribute('data-bopen'));});});
+  document.querySelectorAll('[data-bedit]').forEach(function(b){b.addEventListener('click',function(){openBoardModal(parseInt(b.getAttribute('data-bedit')));});});
+  document.querySelectorAll('[data-bdel]').forEach(function(b){b.addEventListener('click',function(){var id=parseInt(b.getAttribute('data-bdel'));BOARDS=BOARDS.filter(function(x){return x.id!==id;});syncBoardNav();go('workspace');});});
+}
+function openBoardModal(id){
+  var bd=id?BOARDS.filter(function(x){return x.id===id;})[0]:{name:'',desc:''};
+  var m=$('#modal');
+  m.innerHTML='<div class="mh"><h3>'+(id?'게시판 수정':'게시판 추가')+'</h3><span class="x" id="mx">×</span></div><div class="mb">'
+   +'<div class="mrow"><label>게시판명</label><input id="bdN" value="'+esc(bd.name)+'"></div>'
+   +'<div class="mrow"><label>설명</label><input id="bdD" value="'+esc(bd.desc)+'"></div>'
+   +'</div><div class="mf"><button class="btn" id="mc">취소</button><button class="btn acc" id="bdSave">저장</button></div>';
+  $('#ov').classList.add('on');$('#mx').addEventListener('click',closeOv);$('#mc').addEventListener('click',closeOv);
+  $('#bdSave').addEventListener('click',function(){
+    var n=$('#bdN').value.trim()||'새 게시판',d=$('#bdD').value.trim();
+    if(id){bd.name=n;bd.desc=d;}else{BOARDS.push({id:++BOARDID,name:n,desc:d,posts:[]});}
+    closeOv();syncBoardNav();go('workspace');
+  });
+}
+function syncBoardNav(){
+  var c=$('#dynBoards');c.innerHTML='';
+  BOARDS.forEach(function(bd){
+    var b=el('<button class="nav" data-s="board-'+bd.id+'"><span class="ic">▣</span>'+bd.name+'</button>');
+    b.addEventListener('click',function(){go('board-'+bd.id);});
+    c.appendChild(b);
+    TITLES['board-'+bd.id]=bd.name;PHASE['board-'+bd.id]=2;
+    REQINFO['board-'+bd.id]={req:'워크스페이스 관리에서 추가한 자유 게시판',phase:'Step 2 · 컨셉 강화'};
+  });
+}
+function renderBoard(id){
+  var bd=BOARDS.filter(function(x){return x.id===id;})[0];
+  if(!bd)return '<div class="deny"><div class="ic">▣</div><h3>삭제된 게시판입니다</h3></div>';
+  var h='<div class="card">';
+  bd.posts.forEach(function(p){h+='<div class="post"><div class="pt">'+p.t+'</div><div class="pd">'+p.by+' · '+p.d+'</div><div class="pbd">'+p.b+'</div></div>';});
+  if(!bd.posts.length)h+='<div class="post" style="color:var(--ink3)">게시글이 없습니다.</div>';
+  h+='</div>';
+  return h;
+}
+
+/* -------- expense / effort (editable grids) -------- */
+function editTable(id,cols,rows,onDirty,locked){
+  var h='<table class="fin" id="'+id+'"><thead><tr>';
+  cols.forEach(function(c){h+='<th>'+c+'</th>';});h+='<th style="width:26px"></th></tr></thead><tbody>';
+  rows.forEach(function(r,ri){h+=rowHtml(r,ri,cols.length);});
+  h+='</tbody></table>';
+  return h;
+  function rowHtml(r,ri,n){
+    var c='<tr data-r="'+ri+'">';
+    for(var i=0;i<n;i++){c+='<td class="l"><input value="'+esc(r[i]!==undefined?r[i]:'')+'" data-c="'+i+'"'+(locked?' readonly disabled':'')+'></td>';}
+    c+='<td>'+(locked?'':'<span class="rmv" data-rm="'+ri+'">×</span>')+'</td></tr>';
+    return c;
+  }
+}
+function bindEditTable(tbl,onDirty){
+  tbl.querySelectorAll('input').forEach(function(inp){inp.addEventListener('input',onDirty);});
+  tbl.querySelectorAll('[data-rm]').forEach(function(x){x.addEventListener('click',function(){x.closest('tr').remove();onDirty();});});
+}
+R.expense=function(){
+  if(!canManage())return '<div class="deny"><div class="ic">⛔</div><h3>접근 권한이 없습니다</h3><p>제안 경비 관리는 PM·사업관리만 접근 가능합니다.<br>상단 역할 전환에서 "황피엠(PM)"으로 바꾸면 확인할 수 있습니다.</p></div>';
+  return '<div class="sumcard">'
+   +sc('통제경비','600,000')+sc('비통제성(인쇄)','1,160,000')+sc('외주비용','11,350,000')+sc('자사 인건비','29,651,300')+sc('합계 (VAT별도)','42,761,300',1)
+   +'</div><div class="fintab"><button class="on" data-f="staff">자사 인건비</button><button data-f="out">외주 인건비(장당)</button><button data-f="design">디자인 경비</button><button data-f="print">인쇄비</button></div><div id="fin"></div>';
+  function sc(l,v,hl){return '<div class="sc'+(hl?' hl':'')+'"><div class="l">'+l+'</div><div class="v">'+v+'<span style="font-size:11px;color:var(--ink3)"> 원</span></div></div>';}
+};
+var EXP={
+ staff:{cols:['역할','이름','직책','소속','투입시작','투입종료','참여공수','직접비'],rows:[
+   ['제안PM','황피엠','부장','금융1팀','06/30','07/15','0.6','7,864,800'],
+   ['사업관리','박민수','부장','금융1팀','06/30','07/15','0.6','7,864,800'],
+   ['아키텍처','김철수','차장','기술1팀','06/30','07/15','0.5','6,120,400'],
+   ['대응개발','김영희','과장','기술2팀','07/01','07/15','0.5','4,065,000']]},
+ out:{cols:['업체명','Page','장단가','비고','금액'],rows:[
+   ['OO시스템 인프라','25','20,000','인프라','500,000'],
+   ['OO시스템 개발','150','20,000','공통·SFA·AI','3,000,000'],
+   ['OO시스템(시연영상)','–','–','UI/UX 시연','2,000,000']]},
+ design:{cols:['구분','Page','장단가','비고','금액'],rows:[['제안서','250','21,000','표준 템플릿 기준','5,250,000'],['발표본','80','–','','–']]},
+ print:{cols:['구분','단가','수량','부수','금액'],rows:[['제안서 컬러출력','500','–','1','–'],['설명회 컬러출력','500','80','20','800,000'],['다과','10,000','1','30','300,000']]}
+};
+function paintExpense(tab){
+  var f=$('#fin');var d=EXP[tab||'staff'];
+  var locked=!canManage();
+  f.innerHTML='<div class="addrow">'+editTable('expTbl',d.cols,d.rows,null,locked)+'</div>'
+    +(locked?'<p style="font-size:11.5px;color:var(--ink3);margin-top:8px">⚠ 경비 데이터 편집은 PM·사업관리만 가능합니다 (현재 보는 역할: '+ROLE_LABEL[ROLE]+').</p>':'');
+  if(!locked){
+    bindEditTable($('#expTbl'),function(){var s=$('#saveExpense');if(s){s.disabled=false;s.classList.add('dirty');}});
+  }
+}
+R.effort=function(){
+  if(!canManage())return '<div class="deny"><div class="ic">⛔</div><h3>접근 권한이 없습니다</h3><p>수행 공수 관리는 PM·사업관리만 접근 가능합니다.<br>상단 역할 전환에서 "황피엠(PM)"으로 바꾸면 확인할 수 있습니다.</p></div>';
+  return '<div id="effWrap"></div>';
+};
+var EFFROWS=[
+ ['프로젝트관리','PM','황피엠','부장','특급','7.0','96,600'],
+ ['프로젝트관리','품질관리','박민수','차장','특급','7.0','96,600'],
+ ['가입설계/심사','PL','홍길동','차장','특급','7.0','96,600'],
+ ['가입설계/심사','개발','김철수','과장','고급','6.0','54,000'],
+ ['영업지원','PL','김영희','부장','특급','7.0','96,600'],
+ ['영업지원','디자인','조은지','대리','중급','2.0','18,000'],
+ ['영업관리','분석/설계','황금빛','차장','고급','6.5','74,100']
+];
+function paintEffort(){
+  var w=$('#effWrap');if(!w)return;
+  w.innerHTML='<div class="addrow">'+editTable('effTbl',['대분류','역할','이름','직급','등급','공수(M/M)','금액(원)'],EFFROWS)+'</div><p style="font-size:12px;color:var(--ink3);margin-top:10px">투입 M/M·직급별 · 제안 종속(경비와 별도 화면) · 데이터 변조</p>';
+  bindEditTable($('#effTbl'),function(){var s=$('#saveEffort');if(s){s.disabled=false;s.classList.add('dirty');}});
+}
+
+R.comm=function(){
+  var posts=[
+   {t:'[7/8(수) 10:00] 제안 작성 관련 체크',d:'황금빛 · 오늘',b:'제안 작성 체크리스트를 워크스페이스 관리 > "참고 자료" 게시판에 두었습니다. 참고 바랍니다.'},
+   {t:'[7/7(화) 20:00] 제안 작성 방향',d:'황피엠(PM) · 어제',b:'3장 제안서 작성 시 검토 사항\n - 업무 분류별 개요 1페이지 작성 후, 기능별 장표 작성 필요\n - 첨부: 수행방안작성_안내_템플릿.pptx 참조',att:'수행방안작성_안내_템플릿.pptx'},
+   {t:'[7/6(월) 09:00] 표준 템플릿 배포',d:'박민수(사업관리) · 3일 전',b:'표준 제안서 템플릿 배포합니다. 제목은 반드시 제목칸(placeholder)에 입력해 주세요 — 목차 자동 인식에 필요합니다.'}
+  ];
+  var h='<div class="card">';
+  posts.forEach(function(p){h+='<div class="post"><div class="pt">'+p.t+'</div><div class="pd">'+p.d+'</div><div class="pbd">'+p.b+'</div>'+(p.att?'<span class="atag">PPT '+p.att+'</span>':'')+'</div>';});
+  h+='</div><p style="font-size:12px;color:var(--ink3);margin:10px 4px">공지·공유 보드 — 리뷰 코멘트(제안서 검토)와 별개로 팀 전체 공지 채널</p>';
+  return h;
+};
+
+/* -------- assets (shared card style with RFP sim panel) -------- */
+R.assets=function(){
+  var cards=[['OO생명 언더라이팅 고도화','기술 · 2026','MSA 분리 전략','47p'],['△△생명 계약관리','기술 · 2025','무중단 이관 아키텍처','32p'],['OO손해보험 지급심사','사업 · 2025','품질관리 방안','18p'],['OO생명 언더라이팅','원가 · 2026','투입 M/M 산정','—']];
+  var h='<div style="display:grid;grid-template-columns:200px 1fr;gap:16px"><div class="card" style="padding:14px"><div style="font-size:12px;font-weight:700;margin-bottom:10px">필터</div><div style="font-size:12px;color:var(--ink2);line-height:2.2">발주처 ▾<br>문서 유형 ▾<br>연도 ▾</div><div style="margin-top:14px;font-size:11px;color:var(--pp);background:var(--ppbg);padding:8px;border-radius:8px">의미(시맨틱) 검색 · 요구사항 기준 페이지 추천은 <b>Step 2</b><br>※ RFP/요구사항 화면의 "유사 사례 추천"이 이 저장소를 검색합니다.</div></div><div>';
+  h+=cards.map(function(c){return '<div class="acard2"><div class="ti">'+c[0]+'</div><div class="mt">'+c[1]+' · '+c[2]+'</div><div class="pg">'+c[3]+'</div></div>';}).join('');
+  h+='</div></div><p style="font-size:12px;color:var(--ink3);margin:12px 4px">과거 제안서 페이지 단위 적재(Step 1 스키마) · 키워드/메타 검색(Step 1) · 시맨틱 추천(Step 2)</p>';
+  return h;
+};
+
+/* -------- 제안 권한관리 (project-scoped, PM/사업관리 only) -------- */
+var MEMBERS=[['황금빛','제안 PL(기술)','o'],['황피엠','PM','k'],['박민수','사업관리','l'],['조은지','영업대표','h'],['홍길동','작성자(사업개요)','h'],['김철수','작성자(기술)','k'],['김영희','작성자(관리)','l']];
+R.wsperm=function(){
+  if(!canManage())return '<div class="deny"><div class="ic">⛔</div><h3>접근 권한이 없습니다</h3><p>제안 권한관리는 PM·사업관리만 접근 가능합니다.<br>상단 역할 전환에서 "황피엠(PM)"으로 바꾸면 확인할 수 있습니다.</p></div>';
+  var h='<div style="display:grid;grid-template-columns:300px 1fr;gap:16px"><div><div class="sect" style="margin-top:0">멤버</div><div class="card" id="memList"></div></div>'
+   +'<div><div class="sect" style="margin-top:0">화면별 접근 권한</div><div class="card" style="overflow:auto"><table class="perm"><thead><tr><th>화면</th><th>PM/사업관리</th><th>작성자</th><th>영업대표</th></tr></thead><tbody>'
+   +pr('제안서 검토·목차','yes','yes','조회')+pr('제안서 관리(합본)','yes','조회','조회')+pr('조견표','yes','yes','조회')
+   +pr('경비 관리','yes','no','no')+pr('공수 관리','yes','no','no')+pr('제안 권한관리','yes','no','no')
+   +'</tbody></table></div></div></div>';
+  return h;
+  function pr(a,b,c,d){function m(x){return x==='yes'?'<span class="yes">●</span>':x==='no'?'<span class="no">×</span>':'<span style="color:var(--ink3);font-size:11px">'+x+'</span>';}return '<tr><td style="text-align:left">'+a+'</td><td>'+m(b)+'</td><td>'+m(c)+'</td><td>'+m(d)+'</td></tr>';}
+};
+function paintWsperm(){
+  var list=$('#memList');if(!list)return;list.innerHTML='';
+  MEMBERS.forEach(function(m,i){
+    list.appendChild(el('<div class="fold"><span class="av '+m[2]+'" style="width:26px;height:26px;font-size:10px">'+m[0].charAt(0)+'</span><div><div style="font-weight:600;font-size:13px">'+m[0]+'</div><div style="font-size:11px;color:var(--ink3)">'+m[1]+'</div></div><button class="btn" style="margin-left:auto;color:var(--dgink)" data-mrm="'+i+'">제외</button></div>'));
+  });
+  list.querySelectorAll('[data-mrm]').forEach(function(b){b.addEventListener('click',function(){MEMBERS.splice(parseInt(b.getAttribute('data-mrm')),1);go('wsperm');});});
+}
+function openMemberModal(){
+  var m=$('#modal');
+  m.innerHTML='<div class="mh"><h3>멤버 추가</h3><span class="x" id="mx">×</span></div><div class="mb">'
+   +'<div class="mrow"><label>이름</label><input id="mN" value="이수현"></div>'
+   +'<div class="mrow"><label>역할</label><select id="mR"><option>작성자(기술)</option><option>작성자(관리)</option><option>사업관리</option><option>영업대표</option></select></div>'
+   +'</div><div class="mf"><button class="btn" id="mc">취소</button><button class="btn acc" id="mSave">추가</button></div>';
+  $('#ov').classList.add('on');$('#mx').addEventListener('click',closeOv);$('#mc').addEventListener('click',closeOv);
+  $('#mSave').addEventListener('click',function(){MEMBERS.push([$('#mN').value.trim()||'신규멤버',$('#mR').value,'g']);closeOv();go('wsperm');});
+}
+
+/* -------- 시스템 접근 권한관리 (system-wide, admin only) -------- */
+var SYSUSERS=[['시스템관리자','전체 시스템 관리',true],['황피엠','전체 프로젝트 열람(팀장 겸직)',true],['박민수','전체 프로젝트 열람',false],['황금빛','소속 제안만 접근',false]];
+R.sysperm=function(){
+  if(!canSystem())return '<div class="deny"><div class="ic">⛨</div><h3>접근 권한이 없습니다</h3><p>시스템 접근 권한관리는 시스템관리자만 접근 가능합니다.<br>상단 역할 전환에서 "시스템관리자"로 바꾸면 확인할 수 있습니다.</p></div>';
+  var h='<p style="font-size:12.5px;color:var(--ink3);margin-bottom:12px">프로젝트 단위(제안 권한관리)가 아닌, <b>시스템 전체</b>에 대한 마스터 권한을 관리합니다. 팀장 등 전체 프로젝트 접근이 필요한 인원을 여기서 지정합니다.</p><div class="card"><table class="perm" style="width:100%"><thead><tr><th style="text-align:left">사용자</th><th style="text-align:left">비고</th><th>전체 프로젝트 접근</th></tr></thead><tbody>';
+  SYSUSERS.forEach(function(u,i){h+='<tr><td style="text-align:left;font-weight:600">'+u[0]+'</td><td style="text-align:left;color:var(--ink3)">'+u[1]+'</td><td><span class="swtoggle'+(u[2]?' on':'')+'" data-sw="'+i+'" style="margin:0 auto"></span></td></tr>';});
+  h+='</tbody></table></div>';
+  return h;
+};
+function paintSysperm(){
+  document.querySelectorAll('[data-sw]').forEach(function(s){s.addEventListener('click',function(){var i=parseInt(s.getAttribute('data-sw'));SYSUSERS[i][2]=!SYSUSERS[i][2];s.classList.toggle('on',SYSUSERS[i][2]);});});
+}
+
+R.guide=function(){
+  return '<div style="max-width:760px"><div class="rule" style="margin-bottom:20px">📌 <b>핵심 규칙</b> — 제안서 슬라이드 제목은 <b>표준 템플릿의 제목칸(placeholder)</b>에 입력하세요. 텍스트박스로 새로 그리면 목차 자동 인식이 되지 않습니다.</div>'
+   +gs('1','제안 목차부터 시작','RFP를 보고 담당 영역의 예상 장수와 제목을 [목차]에 먼저 등록합니다. 목차가 작업의 축입니다.')
+   +gs('2','파워포인트로 작성','작성은 파워포인트에서. 표준 템플릿을 쓰고, 제목은 제목칸에 입력합니다. ProWin에서 편집하지 않습니다.')
+   +gs('3','업로드 = 커밋','[제안서 관리]에서 각자 pptx를 업로드하면 자동으로 버전이 기록됩니다. 제목이 목차와 다르면 확인 창이 뜹니다.')
+   +gs('4','합본 = 스냅샷 (PM/사업관리 전용)','[합본] 버튼을 누르면 각 노드의 최신본이 하나로 묶여 수정 불가능한 버전(스냅샷)이 됩니다. 조견표는 이 기준으로 생성됩니다.')
+   +gs('5','리뷰는 코멘트로','[제안서 검토]에서 슬라이드를 보며 코멘트를 남깁니다. 회의록을 대신합니다.')
+   +'</div>';
+  function gs(n,t,p){return '<div class="gsec"><h4><span class="num">'+n+'</span>'+t+'</h4><p>'+p+'</p></div>';}
+};
+
+/* ---------------- nav / render ---------------- */
+var CUR='proposals';
+function go(s){
+  CUR=s;
+  document.querySelectorAll('.nav').forEach(function(n){n.classList.toggle('on',n.getAttribute('data-s')===s);});
+  $('#scT').textContent=TITLES[s]||s;
+  var ph=PHASE[s];
+  $('#scStep').innerHTML=ph===2?'<span class="p2b">Step 2 · 컨셉 강화</span>':(ph===1?'<span class="p1b">Step 1 · 꼭 필요</span>':'');
+  $('#scA').innerHTML=ACTS[s]||'';
+  if(s==='expense'){
+    $('#scA').innerHTML = canManage()
+      ? '<button class="btn" data-act="row-expense">＋ 행 추가</button><button class="btn" id="saveExpense" disabled>저장</button>'
+      : ''; /* 화면 자체가 접근 거부(deny)라 액션바도 노출 안 함 */
+  }
+  if(s==='effort'){
+    $('#scA').innerHTML = canManage()
+      ? '<button class="btn" data-act="row-effort">＋ 행 추가</button><button class="btn" id="saveEffort" disabled>저장</button>'
+      : '';
+  }
+  if(s==='schedule'){
+    $('#scA').innerHTML = canManage()
+      ? '<button class="btn acc" data-act="ev-add">＋ 일정 추가</button>'
+      : '<span style="font-size:12px;color:var(--ink3);align-self:center">조회 전용 · 일정 편집은 PM·사업관리만 가능</span>';
+  }
+  $('#projSw').style.display=GLOBAL_SCREENS[s]?'none':'inline-block';
+  var body='';
+  if(s.indexOf('board-')===0){
+    var bid=parseInt(s.replace('board-',''));body=renderBoard(bid);
+  } else if(s==='wsperm'){
+    body=R.wsperm();
+  } else if(s==='sysperm'){
+    body=R.sysperm();
+  } else {
+    body=(R[s]?R[s]():'<div class="deny">화면 준비중</div>');
+  }
+  $('#cont').innerHTML='<div class="scr on">'+body+'</div>';
+
+  if(s==='review'){paintNode('2.1');document.querySelectorAll('.tnode[data-node]').forEach(function(n){n.addEventListener('click',function(){document.querySelectorAll('.tnode').forEach(function(x){x.classList.remove('sel');});n.classList.add('sel');paintNode(n.getAttribute('data-node'));});});}
+  if(s==='versions')paintGit();
+  if(s==='schedule')paintCal();
+  if(s==='rfp')paintRfp();
+  if(s==='matrix')paintMatrix();
+  if(s==='workspace')paintWorkspace();
+  if(s==='wsperm'&&canManage())paintWsperm();
+  if(s==='sysperm'&&canSystem())paintSysperm();
+  if(s==='expense'&&canManage()){paintExpense('staff');document.querySelectorAll('.fintab button').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.fintab button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');paintExpense(b.getAttribute('data-f'));});});}
+  if(s==='effort'&&canManage())paintEffort();
+  bindActs();
+}
+document.querySelectorAll('.nav[data-s]').forEach(function(n){n.addEventListener('click',function(){go(n.getAttribute('data-s'));});});
+
+function bindActs(){
+  document.querySelectorAll('[data-open]').forEach(function(x){x.addEventListener('click',function(){go('home');});});
+  document.querySelectorAll('[data-act="upload"]').forEach(function(x){x.addEventListener('click',openUpload);});
+  document.querySelectorAll('[data-act="newp"]').forEach(function(x){x.addEventListener('click',function(){go('proposals');});});
+  document.querySelectorAll('[data-act="merge"]').forEach(function(x){x.addEventListener('click',function(){alert('합본 완료 — v1.3 스냅샷이 생성되었습니다. (데모)');});});
+  document.querySelectorAll('[data-act="ev-add"]').forEach(function(x){x.addEventListener('click',function(){openEventModal(null);});});
+  document.querySelectorAll('[data-act="mem-add"]').forEach(function(x){x.addEventListener('click',openMemberModal);});
+  document.querySelectorAll('[data-act="board-add"]').forEach(function(x){x.addEventListener('click',function(){openBoardModal(null);});});
+  document.querySelectorAll('[data-act="i-toc"]').forEach(function(x){x.addEventListener('click',function(e){openPop(e,'목차 · 제목 규칙','제목은 표준 템플릿의 제목칸(placeholder)에 입력해야 목차 자동 인식·조견표 매핑이 정확합니다. 여러 장이면 (1/2)(2/2) 하위 노드로 나뉩니다.');});});
+  document.querySelectorAll('.idot[data-i]').forEach(function(x){x.addEventListener('click',function(e){openPop(e,'제안서 검토 안내','슬라이드를 보며 설명회 지정·리뷰 코멘트를 남기는 화면입니다. 편집·업로드·AI 초안은 없습니다(업로드는 [제안서 관리], 실제 작성은 파워포인트).');});});
+  var se=$('#saveExpense');if(se)se.addEventListener('click',function(){se.disabled=true;se.classList.remove('dirty');toast('경비 데이터가 저장되었습니다.');});
+  var sf=$('#saveEffort');if(sf)sf.addEventListener('click',function(){sf.disabled=true;sf.classList.remove('dirty');toast('공수 데이터가 저장되었습니다.');});
+  var sm=$('#saveMatrix');if(sm)sm.addEventListener('click',function(){sm.disabled=true;sm.classList.remove('dirty');toast('조견표 매핑이 저장되었습니다.');});
+  document.querySelectorAll('[data-act^="row-"]').forEach(function(x){x.addEventListener('click',function(){
+    if(x.getAttribute('data-act')==='row-expense'){if(!canManage())return;var t=$('#expTbl');var n=t.querySelectorAll('thead th').length-1;var tr=el('<tr><td></td></tr>');tr.innerHTML='';for(var i=0;i<n;i++)tr.innerHTML+='<td class="l"><input value="" data-c="'+i+'"></td>';tr.innerHTML+='<td><span class="rmv">×</span></td>';$('tbody',t).appendChild(tr);bindEditTable(t,function(){se.disabled=false;se.classList.add('dirty');});se.disabled=false;se.classList.add('dirty');}
+    if(x.getAttribute('data-act')==='row-effort'){var t2=$('#effTbl');var n2=t2.querySelectorAll('thead th').length-1;var tr2=el('<tr></tr>');for(var j=0;j<n2;j++)tr2.innerHTML+='<td class="l"><input value="" data-c="'+j+'"></td>';tr2.innerHTML+='<td><span class="rmv">×</span></td>';$('tbody',t2).appendChild(tr2);bindEditTable(t2,function(){sf.disabled=false;sf.classList.add('dirty');});sf.disabled=false;sf.classList.add('dirty');}
+  });});
+}
+function toast(msg){var t=el('<div style="position:fixed;bottom:56px;right:16px;background:var(--ink);color:#fff;padding:9px 16px;border-radius:8px;font-size:12.5px;z-index:80;box-shadow:0 8px 24px rgba(0,0,0,.2)">'+msg+'</div>');document.body.appendChild(t);setTimeout(function(){t.remove();},2200);}
+
+/* upload modal: 목차 동기화 게이트 + diff (제안서 관리 전용) */
+function openUpload(){
+  var m=$('#modal');
+  m.innerHTML='<div class="mh"><h3>pptx 업로드 · 목차 대조</h3><span class="x" id="mx">×</span></div><div class="mb">'
+   +'<div style="font-size:12px;color:var(--ink3);margin-bottom:12px">업로드 파일: <b>2.2_MSA전환_홍길동.pptx</b> (담당: 2.2 MSA 전환 방안)</div>'
+   +'<div class="gate ok"><span class="thumb">▤</span><div><div class="tt">✓ 제목 일치 · 3장</div><div class="ss">2.2(1/2), 2.2(2/2) 제목이 목차와 일치 → 자동 반영</div></div></div>'
+   +'<div class="gate warn"><span class="thumb">?</span><div><div class="tt">⚠ 목차에 없는 제목 · 1장</div><div class="ss">"2.2 서비스 연속성 확보" — 새 슬라이드로 감지됨</div></div><div class="cta"><button class="btn" id="asnew">새 노드 추가</button><button class="btn" id="asfix">기존 제목 수정</button></div></div>'
+   +'<div class="dsec" style="margin-top:16px">변경 내역 (렌더 없이 값·구조 기준)</div>'
+   +'<div class="diffrow" style="color:#1E7049"><span>＋ 텍스트</span><span>2.2(1/2) 본문 2곳 수정</span></div>'
+   +'<div class="diffrow" style="color:#C25A16"><span>~ 구조</span><span>슬라이드 1장 추가 · 3↔4 순서 변경</span></div>'
+   +'<div class="diffrow" style="color:#AE3B2B"><span>⟳ 이미지</span><span>아키텍처 도식 1개 교체 (해시 상이)</span></div>'
+   +'<div style="font-size:11px;color:var(--ink3);margin-top:10px">※ 시각 diff(썸네일 비교)는 미리보기 렌더 결정 후(Step 3)</div>'
+   +'</div><div class="mf"><button class="btn" id="mc">취소</button><button class="btn acc" id="mo">업로드 = 커밋</button></div>';
+  $('#ov').classList.add('on');
+  $('#mx').addEventListener('click',closeOv);$('#mc').addEventListener('click',closeOv);$('#mo').addEventListener('click',function(){closeOv();toast('업로드 완료 — 새 커밋이 기록되었습니다.');});
+  $('#asnew').addEventListener('click',function(){this.textContent='✓ 추가됨';this.disabled=true;});
+  $('#asfix').addEventListener('click',function(){this.textContent='제목 수정…';});
+}
+function closeOv(){$('#ov').classList.remove('on');}
+$('#ov').addEventListener('click',function(e){if(e.target===$('#ov'))closeOv();});
+
+/* popover (generic; auto-flips above trigger if near bottom) */
+function openPop(e,title,html){
+  var p=$('#pop');$('#popT').textContent=title;$('#popC').innerHTML=html;
+  var r=e.currentTarget.getBoundingClientRect();
+  p.style.left=Math.min(r.left,window.innerWidth-316)+'px';
+  var estH=140;
+  if(r.bottom+estH>window.innerHeight){p.style.top=(r.top-estH-10)+'px';}
+  else{p.style.top=(r.bottom+8)+'px';}
+  p.classList.add('on');e.stopPropagation();
+}
+$('#popX').addEventListener('click',function(){$('#pop').classList.remove('on');});
+document.addEventListener('click',function(e){var p=$('#pop');if(p.classList.contains('on')&&!p.contains(e.target))p.classList.remove('on');});
+
+/* disclaimer button -> per-screen requirement/phase info */
+$('#disclaimer').addEventListener('click',function(e){
+  var info=REQINFO[CUR]||{req:'정보 없음',phase:''};
+  openPop(e,TITLES[CUR]?TITLES[CUR]+' · 요구사항 안내':'요구사항 안내','<div>'+info.req+'</div><div class="ph2">'+info.phase+'</div><div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line);color:var(--ink3);font-size:11px">데모 프로토타입 · 모든 데이터는 변조되었습니다</div>');
+});
+
+/* init */
+syncBoardNav();
+go('proposals');
+})();
+</script>
+</body>
+</html>
