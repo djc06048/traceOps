@@ -196,18 +196,99 @@
     if (file === 'dev') S.data.integration.items.forEach(function (x) { if (arr(x.linked).indexOf(it.id) >= 0) out.push(x.id); });
     return out;
   }
+  /* ---------- 연관 영향 안내 (연결 변경·삭제 전 미리보기) ---------- */
+  var IMPACT_FILES = ['analysis', 'design', 'dev', 'unit', 'integration'];
+  var IMPACT_FIELDS = ['reqIds', 'physIds', 'designRef', 'analysisRef', 'linked', 'units', 'result', 'execDate', 'evidence'];
+  var IMPACT_LABEL = { reqIds: '요구사항ID', physIds: '물리ID', designRef: '설계ID', analysisRef: '분석ID', linked: '개발ID', units: '단위테스트', result: '결과', execDate: '수행일', evidence: '증적' };
+  var FILE_LABEL = { analysis: '분석', design: '설계', dev: '개발', unit: '단위테스트', integration: '통합테스트' };
+  function snapData() { return JSON.parse(JSON.stringify(S.data)); }
+  function restoreData(snap) { Object.keys(snap).forEach(function (k) { S.data[k] = snap[k]; }); }
+  function fmt(k, v) {
+    if (k === 'evidence') return arr(v).length + '건';
+    if (Array.isArray(v)) return v.length ? v.join(', ') : '없음';
+    return v === '' || v == null ? '없음' : String(v);
+  }
+  function diffData(before) {
+    var out = [];
+    IMPACT_FILES.forEach(function (f) {
+      var prev = {}, cur = {};
+      before[f].items.forEach(function (x) { prev[x.id] = x; });
+      S.data[f].items.forEach(function (x) { cur[x.id] = x; });
+      Object.keys(prev).forEach(function (id) {
+        if (!cur[id]) { out.push({ f: f, id: id, name: prev[id].name, removed: true, changes: [] }); return; }
+        var ch = [];
+        IMPACT_FIELDS.forEach(function (k) {
+          var a = JSON.stringify(prev[id][k] == null ? null : prev[id][k]), b = JSON.stringify(cur[id][k] == null ? null : cur[id][k]);
+          if (a !== b) ch.push({ k: k, from: fmt(k, prev[id][k]), to: fmt(k, cur[id][k]) });
+        });
+        if (ch.length) out.push({ f: f, id: id, name: cur[id].name, removed: false, changes: ch });
+      });
+    });
+    return out;
+  }
+  // mutate: 실제 변경 함수. 먼저 임시 적용해 영향을 계산한 뒤 원복하고, 확인 후 다시 적용한다.
+  function withImpact(title, mutate) {
+    var before = snapData();
+    mutate();
+    syncDown();
+    var diff = diffData(before);
+    restoreData(before);
+    if (!diff.length) { mutate(); syncDown(); renderTable(); return; }
+    S.impact = { title: title, diff: diff, mutate: mutate };
+    renderImpact();
+    $('impactModal').classList.add('open');
+  }
+  function renderImpact() {
+    var I = S.impact, del = I.diff.filter(function (d) { return d.removed; }).length;
+    var rows = I.diff.map(function (d) {
+      var tagc = d.removed ? 'del' : 'chg';
+      var head = '<div class="im-h"><span class="im-tag ' + tagc + '">' + (d.removed ? '삭제' : '변경') + '</span> ' +
+        FILE_LABEL[d.f] + ' · <b>' + esc(d.id) + '</b> ' + esc(d.name || '') + '</div>';
+      var body = d.removed
+        ? '<div class="im-b">연결 기준에 따라 함께 삭제됩니다</div>'
+        : d.changes.map(function (c) {
+            return '<div class="im-b">' + IMPACT_LABEL[c.k] + ': ' + esc(c.from) + ' → <b>' + esc(c.to) + '</b></div>';
+          }).join('');
+      return '<div class="im">' + head + body + '</div>';
+    }).join('');
+    $('impactBox').innerHTML =
+      '<div class="modal-hd"><div><h3>' + esc(I.title) + '</h3>' +
+      '<p>연관 항목 ' + I.diff.length + '건이 함께 바뀝니다' + (del ? ' (삭제 ' + del + '건)' : '') + '</p></div>' +
+      '<button class="modal-close" data-imp-cancel="1">✕</button></div>' +
+      '<div class="modal-list">' + rows + '</div>' +
+      '<div class="modal-input"><div class="row"><span class="imp-note">진행하면 저장 전까지 임시 반영됩니다. 저장 버튼으로 확정하세요.</span>' +
+      '<span class="pick-btns"><button class="btn ghost sm" data-imp-cancel="1">취소</button>' +
+      '<button class="btn sm" data-imp-ok="1">진행</button></span></div></div>';
+  }
+  function closeImpact() { S.impact = null; $('impactModal').classList.remove('open'); }
+  // 연결이 바뀐 단위테스트는 수행 결과가 무효이므로 초기화
+  function resetResult(it) { it.result = '미실행'; it.execDate = ''; it.evidence = []; }
+  // 삭제: 하위(설계→개발→단위)는 함께 삭제, 통합테스트는 묶음에서만 제외
+  function collectCascade(file, id, out) {
+    out[file] = out[file] || [];
+    if (out[file].indexOf(id) >= 0) return;
+    out[file].push(id);
+    var ch = CHAIN[file];
+    if (!ch || ch.to === 'integration') return;
+    S.data[ch.to].items.forEach(function (x) {
+      if (arr(x[ch.key]).indexOf(id) >= 0) collectCascade(ch.to, x.id, out);
+    });
+  }
+  function cascadeDelete(file, id) {
+    var t = {};
+    collectCascade(file, id, t);
+    Object.keys(t).forEach(function (f) {
+      S.data[f].items = S.data[f].items.filter(function (x) { return t[f].indexOf(x.id) < 0; });
+    });
+    S.data.integration.items.forEach(function (g) {
+      g.units = arr(g.units).filter(function (u) { return arr(t.unit).indexOf(u) < 0; });
+      g.linked = arr(g.linked).filter(function (l) { return arr(t.dev).indexOf(l) < 0; });
+    });
+  }
+
   function deleteRow(page, id) {
-    var list = items(page), it = find(page, id);
-    if (!it) return;
-    var dep = dependentsOf(page.file, it);
-    if (dep.length) {
-      showToast('하위 항목이 연결되어 있어 삭제할 수 없습니다: ' + dep.slice(0, 3).join(', ') + (dep.length > 3 ? ' 외 ' + (dep.length - 3) + '건' : ''), true);
-      return;
-    }
-    if (!confirm('"' + id + '" 항목을 삭제할까요?')) return;
-    list.splice(list.indexOf(it), 1);
-    renderTable();
-    showToast('삭제했습니다. 저장 버튼으로 반영하세요');
+    if (!find(page, id)) return;
+    withImpact('"' + id + '" 삭제', function () { cascadeDelete(page.file, id); });
   }
   function chainCount(file, it) {
     var ch = CHAIN[file];
@@ -1021,11 +1102,19 @@
       if (e.target.hasAttribute('data-close')) closePick();
       else if (id === 'pickClear') { S.pick.sel = []; renderPickList($('pickQ').value); }
       else if (id === 'pickApply') {
-        var p = S.pick, pit = find(p.page, p.id);
-        if (p.page.file === 'dev' && p.col.k === 'physIds') pit.physIdsAdd = p.sel.filter(function (x) { return p.inh.indexOf(x) < 0; });
-        else pit[p.col.k] = p.sel.slice();
+        var p = S.pick;
         closePick();
-        renderTable();
+        withImpact(p.col.label + ' 변경', function () {
+          var pit = find(p.page, p.id);
+          if (!pit) return;
+          if (p.page.file === 'dev' && p.col.k === 'physIds') {
+            pit.physIdsAdd = p.sel.filter(function (x) { return p.inh.indexOf(x) < 0; });
+          } else {
+            var prev = JSON.stringify(arr(pit[p.col.k]));
+            pit[p.col.k] = p.sel.slice();
+            if (p.page.file === 'unit' && p.col.k === 'linked' && prev !== JSON.stringify(pit.linked)) resetResult(pit);
+          }
+        });
       }
     });
     $('pickBox').addEventListener('input', function (e) {
@@ -1054,6 +1143,16 @@
         }
       }
     });
+    // 연관 영향 안내 팝업
+    $('impactModal').addEventListener('click', function (e) {
+      var t = e.target;
+      if (t === this || t.hasAttribute('data-imp-cancel')) { closeImpact(); return; }
+      if (t.hasAttribute('data-imp-ok')) {
+        var m = S.impact && S.impact.mutate;
+        closeImpact();
+        if (m) { m(); syncDown(); renderTable(); showToast('반영했습니다. 저장 버튼으로 확정하세요'); }
+      }
+    });
     // 값 모달 (여러 값 셀)
     $('chipModal').addEventListener('click', function (e) {
       var t = e.target, x;
@@ -1065,10 +1164,15 @@
       }
       if ((x = t.closest('[data-chip-rm]'))) {
         var c = S.chips; if (!c) return;
-        var it = find(c.page, c.id);
-        it[c.k] = arr(it[c.k]).filter(function (v) { return v !== x.getAttribute('data-chip-rm'); });
-        openChips(c.page, c.id, c.k);
-        renderTable();
+        var rmv = x.getAttribute('data-chip-rm');
+        closeChips();
+        withImpact(IMPACT_LABEL[c.k] + ' 제외: ' + rmv, function () {
+          var it = find(c.page, c.id);
+          if (!it) return;
+          var prev = JSON.stringify(arr(it[c.k]));
+          it[c.k] = arr(it[c.k]).filter(function (v) { return v !== rmv; });
+          if (c.page.file === 'unit' && c.k === 'linked' && prev !== JSON.stringify(it.linked)) resetResult(it);
+        });
         return;
       }
       if (t.hasAttribute('data-chip-add') || t.closest('[data-chip-add]')) {
