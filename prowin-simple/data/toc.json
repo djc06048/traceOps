@@ -1,0 +1,18 @@
+{
+  "rows": [
+    { "id": "T-01", "lv": 1, "title": "I. 제안 개요" },
+    { "id": "T-02", "lv": 2, "title": "1.1 추진 배경", "owner": "홍길동", "pages": "2p", "status": "done" },
+    { "id": "T-03", "lv": 2, "title": "1.2 사업 목표", "owner": "홍길동", "pages": "2p", "status": "done" },
+    { "id": "T-04", "lv": 2, "title": "1.3 제안 범위", "owner": "홍길동", "pages": "1p", "status": "done" },
+    { "id": "T-05", "lv": 1, "title": "II. 기술 제안" },
+    { "id": "T-06", "lv": 2, "title": "2.1 시스템 아키텍처", "owner": "황금빛", "pages": "4p", "status": "done" },
+    { "id": "T-07", "lv": 2, "title": "2.2 MSA 전환 방안 (1/2)", "owner": "황금빛", "pages": "3p", "status": "doing" },
+    { "id": "T-08", "lv": 2, "title": "2.2 MSA 전환 방안 (2/2)", "owner": "황금빛", "pages": "3p", "status": "doing" },
+    { "id": "T-09", "lv": 2, "title": "2.3 데이터 이관", "owner": "김철수", "pages": "3p", "status": "fix" },
+    { "id": "T-10", "lv": 2, "title": "2.4 성능·보안 방안", "owner": "김철수", "pages": "2p", "status": "doing" },
+    { "id": "T-11", "lv": 1, "title": "III. 관리 방안" },
+    { "id": "T-12", "lv": 2, "title": "3.1 사업관리", "owner": "김영희", "pages": "–", "status": "todo" },
+    { "id": "T-13", "lv": 2, "title": "3.2 품질관리", "owner": "김영희", "pages": "2p", "status": "doing" }
+  ],
+  "statusLabel": { "done": "완료", "doing": "진행중", "fix": "보완", "todo": "미착수" }
+}

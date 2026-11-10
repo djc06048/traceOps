@@ -1,29 +1,44 @@
-/* ProWin 단순 버전 — 데모의 기본 기능을 옮긴 프로토타입 (DB 없음)
+/* ProWin 단순 버전 — 로그인(데모), 역할별 권한, 변경 이력, 소프트 삭제, 데모 화면 이식 (DB 없음)
  * 데이터: data/*.json. 편집은 브라우저 임시저장, 저장 시 변경 확인, 내보내기로 파일 교체.
  */
 (function () {
   'use strict';
 
-  var FILES = { master: 'data/master.json', schedule: 'data/schedule.json', boards: 'data/boards.json', comm: 'data/comm.json', guide: 'data/guide.json' };
-  var FILE_LABEL = { master: '제안 기본정보·권한', schedule: '제안 일정', boards: '게시판·워크스페이스', comm: '커뮤니케이션', guide: '사용 가이드' };
-  var KEY = 'prowin-simple-v1:';
-  var ROLES = [{ v: 'writer', l: '작성자' }, { v: 'pm', l: 'PM' }, { v: 'sales', l: '영업대표' }];
-  var ROLE_NAME = { writer: '작성자', pm: 'PM·사업관리', sales: '영업대표' };
-  var COLORS = [{ v: 'c-wr', l: '작성 (초록)' }, { v: 'c-rv', l: '리뷰 (파랑)' }, { v: 'c-mt', l: '마일스톤 (주황)' }, { v: 'c-dl', l: '마감 (빨강)' }, { v: 'c-gy', l: '기타 (회색)' }];
+  var FILES = {
+    master: 'data/master.json', proposals: 'data/proposals.json', schedule: 'data/schedule.json', comm: 'data/comm.json',
+    boards: 'data/boards.json', rfp: 'data/rfp.json', toc: 'data/toc.json', review: 'data/review.json',
+    versions: 'data/versions.json', matrix: 'data/matrix.json', expense: 'data/expense.json', effort: 'data/effort.json',
+    assets: 'data/assets.json', guide: 'data/guide.json', history: 'data/history.json'
+  };
+  var KEY = 'prowin-simple-v2:';
+  var SESSION = 'prowin-simple-session';
+  var LEVEL_LABEL = { none: '없음', view: '조회', edit: '편집' };
   var SCHED_STATUS = ['예정', '진행중', '완료'];
   var QA_STATUS = ['답변대기', '답변완료'];
-  var LEVELS = [{ v: 'none', l: '없음' }, { v: 'view', l: '조회' }, { v: 'edit', l: '편집' }];
+  var COLORS = [{ v: 'c-wr', l: '작성 (초록)' }, { v: 'c-rv', l: '리뷰 (파랑)' }, { v: 'c-mt', l: '마일스톤 (주황)' }, { v: 'c-dl', l: '마감 (빨강)' }, { v: 'c-gy', l: '기타 (회색)' }];
+  var KIND_COLOR = { c_wr: 'c-wr' };
   var INFO = {
+    proposals: { req: '기간별 제안 진행 현황을 목록으로 파악', phase: 'Step 1 · 꼭 필요' },
     home: { req: '제안 개요 + 오늘 할 일(일정 연동) + 지연 항목 가시화', phase: 'Step 1 · 꼭 필요' },
     comm: { req: '제안팀 공지·공유 게시판', phase: 'Step 2 · 컨셉 강화' },
     schedule: { req: '짧은 제안 일정(2~3주)의 다일 일정 등록/수정/삭제, 색상 구분 · PM·사업관리 편집 / 그 외 조회', phase: 'Step 1 · 꼭 필요' },
+    rfp: { req: 'RFP 업로드/다운로드 및 요구사항 정리 한눈 · 유사 사례 추천', phase: 'Step 1 · 꼭 필요 (자동추출·유사사례는 Step 2)' },
+    toc: { req: '제안서 전체 목차 = 진척 마스터(담당·상태·예상장수), 엑셀 다운로드', phase: 'Step 1 · 꼭 필요' },
+    review: { req: '슬라이드 보기 · 설명회 지정 · 리뷰 코멘트(회의록 대체)', phase: 'Step 1 · 꼭 필요' },
+    versions: { req: '업로드=커밋 · 합본=불변 스냅샷(PM/사업관리 권한)', phase: 'Step 1 · 꼭 필요' },
+    matrix: { req: '최종 취합본 기준 요구사항↔목차/페이지 매핑', phase: 'Step 1 · 꼭 필요' },
     board: { req: '워크스페이스 관리에서 추가한 자유 게시판', phase: 'Step 2 · 컨셉 강화' },
+    workspace: { req: '제안별 자유 게시판(폴더) 추가/수정/삭제', phase: 'Step 2 · 컨셉 강화' },
+    wsperm: { req: '제안 단위 멤버·권한 관리(PM/사업관리 전용)', phase: 'Step 1 · 꼭 필요' },
+    expense: { req: '자사/외주 인건비·디자인·인쇄비 통합 관리, 그리드 편집 (PM·사업관리)', phase: 'Step 2 · 컨셉 강화' },
+    effort: { req: '투입 M/M·직급별 공수 관리, 그리드 편집 (PM·사업관리)', phase: 'Step 2 · 컨셉 강화' },
+    assets: { req: '과거 제안서 페이지 단위 적재(Step 1) + 의미 기반 검색(Step 2)', phase: 'Step 2 · 컨셉 강화' },
+    sysperm: { req: '프로젝트에 종속되지 않는 시스템 마스터 권한 관리', phase: 'Step 2 · 컨셉 강화' },
     guide: { req: '사이트 사용법 통합 가이드', phase: 'Step 2 · 컨셉 강화' },
-    ws: { req: '제안별 자유 게시판(폴더) 추가/수정/삭제', phase: 'Step 2 · 컨셉 강화' },
-    wsperm: { req: '제안 단위 멤버·권한 관리(PM/사업관리 전용)', phase: 'Step 1 · 꼭 필요' }
+    history: { req: '추가·수정·삭제 이력 (감사 대응)', phase: '공통 기능' }
   };
 
-  var S = { role: 'writer', data: {}, base: {}, draft: {}, route: 'home', modal: null, cal: null };
+  var S = { user: null, data: {}, base: {}, draft: {}, route: 'home', modal: null, cal: null, rv: '2.1', commit: 'a7f2e1', rfpReq: 'R-01', expTab: 'staff' };
 
   /* ---------- 공통 유틸 ---------- */
   function $(id) { return document.getElementById(id); }
@@ -35,31 +50,17 @@
   function p2(n) { return String(n).padStart(2, '0'); }
   function isoOf(d) { return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()); }
   function todayISO() { return isoOf(new Date()); }
+  function nowText() { var d = new Date(); return isoOf(d) + ' ' + p2(d.getHours()) + ':' + p2(d.getMinutes()); }
   function addDays(iso, n) { var d = new Date(iso + 'T00:00:00'); d.setDate(d.getDate() + n); return isoOf(d); }
   function daysBetween(a, b) { return Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / 86400000); }
   function snap() { return JSON.parse(JSON.stringify(S.data)); }
-  function me() { return S.data.master.me[S.role]; }
-  function level(k) {
-    if (S.role === 'pm') return 'edit';
-    var p = S.data.master.perms[k] || {};
-    return p[S.role] || 'none';
-  }
-  function canView(k) {
-    var s = scr(k);
-    if (s && s.pm) return S.role === 'pm';
-    return level(k) !== 'none';
-  }
-  function canEdit(k) {
-    var s = scr(k);
-    if (s && s.pm) return S.role === 'pm';
-    return level(k) === 'edit';
-  }
-  function canEditPost(k, p) { return S.role === 'pm' || (canEdit(k) && p.by === me()); }
-  function nextId(prefix, list) {
+  function alive(list) { return list.filter(function (x) { return !x.deleted; }); }
+  function nextNum(prefix, list) {
     var max = 0;
     list.forEach(function (x) { var n = parseInt(String(x.id).split('-').pop(), 10); if (n > max) max = n; });
     return prefix + '-' + String(max + 1).padStart(3, '0');
   }
+  function roleName(r) { return S.data.master.roles[r] || r; }
   var timer;
   function toast(msg, err) {
     var t = $('toast');
@@ -69,25 +70,45 @@
     clearTimeout(timer);
     timer = setTimeout(function () { t.classList.remove('show'); }, 2400);
   }
-
-  /* ---------- 화면 목록 (게시판은 워크스페이스 관리에 따라 동적) ---------- */
-  function screens() {
-    var list = [
-      { k: 'home', label: '제안서 홈', grp: 'ws' },
-      { k: 'comm', label: '커뮤니케이션', grp: 'ws' },
-      { k: 'schedule', label: '제안 일정', grp: 'ws' }
-    ];
-    S.data.boards.boards.forEach(function (b) { list.push({ k: 'board-' + b.id, label: b.name, grp: 'ws', board: b.id }); });
-    list.push({ k: 'guide', label: '사용 가이드', grp: 'etc' });
-    list.push({ k: 'ws', label: '워크스페이스 관리', grp: 'adm', pm: true });
-    list.push({ k: 'wsperm', label: '제안 권한관리', grp: 'adm', pm: true });
-    return list;
+  function logH(action, target, detail) {
+    var h = S.data.history;
+    h.nextId = (h.nextId || 1);
+    h.items.unshift({ id: 'H-' + String(h.nextId).padStart(4, '0'), at: nowText(), who: S.user ? S.user.name : '-', action: action, target: target, detail: detail || '' });
+    h.nextId++;
   }
-  function scr(k) { return screens().filter(function (x) { return x.k === k; })[0]; }
+
+  /* ---------- 권한 ---------- */
+  function role() { return S.user ? S.user.role : 'writer'; }
+  function level(k) {
+    var p = S.data.master.perms[k] || {};
+    return p[role()] || 'none';
+  }
+  function canView(k) { return level(k) !== 'none'; }
+  function canEdit(k) { return level(k) === 'edit'; }
+  function canEditPost(k, p) { return canEdit(k) && (role() === 'pm' || p.by === S.user.name); }
+
+  /* ---------- 화면 목록 ---------- */
   function boardOf(k) {
     var id = parseInt(String(k).replace('board-', ''), 10);
     return S.data.boards.boards.filter(function (b) { return b.id === id; })[0];
   }
+  function screens() {
+    var list = [
+      { k: 'proposals', label: '제안 현황', grp: 'global' },
+      { k: 'assets', label: '자산 라이브러리', grp: 'global' },
+      { k: 'home', label: '제안서 홈', grp: 'ws' },
+      { k: 'comm', label: '커뮤니케이션', grp: 'ws' },
+      { k: 'schedule', label: '제안 일정', grp: 'ws' },
+      { k: 'rfp', label: 'RFP / 요구사항', grp: 'ws' }
+    ];
+    alive(S.data.boards.boards).forEach(function (b) { list.push({ k: 'board-' + b.id, label: b.name, grp: 'ws', board: true }); });
+    list.push({ k: 'toc', label: '목차', grp: 'ws' }, { k: 'review', label: '제안서 검토', grp: 'ws' }, { k: 'versions', label: '제안서 관리', grp: 'ws' },
+      { k: 'matrix', label: '조견표', grp: 'ws' }, { k: 'workspace', label: '워크스페이스 관리', grp: 'ws' }, { k: 'wsperm', label: '제안 권한관리', grp: 'ws' },
+      { k: 'expense', label: '제안 경비 관리', grp: 'ws' }, { k: 'effort', label: '수행 공수 관리', grp: 'ws' });
+    list.push({ k: 'sysperm', label: '시스템 접근 권한관리', grp: 'adm' }, { k: 'guide', label: '사용 가이드', grp: 'adm' }, { k: 'history', label: '변경 이력', grp: 'adm' });
+    return list;
+  }
+  function scr(k) { return screens().filter(function (x) { return x.k === k; })[0]; }
 
   /* ---------- 모달 ---------- */
   function openForm(title, fields, vals, onSave, onDelete, validate) {
@@ -103,8 +124,7 @@
       else h += '<input type="' + (f.type || 'text') + '" data-f="' + f.k + '" value="' + esc(v) + '">';
       h += '</label>';
     });
-    h += '</div><div class="modal-input"><div class="row"><span>' +
-      (onDelete ? '<button class="btn ghost sm" data-del="1">삭제</button>' : '') +
+    h += '</div><div class="modal-input"><div class="row"><span>' + (onDelete ? '<button class="btn ghost sm" data-del="1">삭제</button>' : '') +
       '</span><span class="pick-btns"><button class="btn ghost sm" data-x="1">취소</button><button class="btn sm" data-save="1">저장</button></span></div></div>';
     $('modalBox').innerHTML = h;
     S.modal = { fields: fields, onSave: onSave, onDelete: onDelete, validate: validate };
@@ -113,113 +133,123 @@
     if (first) first.focus();
   }
   function openView(title, rows) {
-    var h = '<div class="modal-hd"><div><h3>' + esc(title) + '</h3></div><button class="modal-close" data-x="1">✕</button></div><div class="modal-list">' +
+    $('modalBox').innerHTML = '<div class="modal-hd"><div><h3>' + esc(title) + '</h3></div><button class="modal-close" data-x="1">✕</button></div><div class="modal-list">' +
       rows.map(function (r) { return '<div class="fld"><span>' + esc(r[0]) + '</span><div style="font-size:14px;white-space:pre-wrap">' + esc(r[1]) + '</div></div>'; }).join('') +
       '</div><div class="modal-input"><div class="row"><span></span><span class="pick-btns"><button class="btn sm" data-x="1">닫기</button></span></div></div>';
-    $('modalBox').innerHTML = h;
     S.modal = null;
     $('modal').classList.add('open');
   }
   function closeModal() { S.modal = null; $('modal').classList.remove('open'); }
+  // 삭제: 사유 필수, 실제로는 지우지 않고 '삭제됨'으로 표시 + 이력
+  function askDelete(label, target, onOk) {
+    openForm('삭제 · ' + label, [{ k: 'reason', label: '삭제 사유', type: 'textarea', req: true }], {}, function (v) {
+      S.lastReason = v.reason;
+      logH('삭제', target, v.reason);
+      onOk();
+    }, null, null);
+    $('modalBox').querySelector('[data-save]').textContent = '삭제 확인';
+  }
+  function markDeleted(item, reason) { item.deleted = { at: nowText(), by: S.user.name, reason: reason }; }
   function openInfo() {
     var k = S.route, s = scr(k), key = s && s.board ? 'board' : k, info = INFO[key] || { req: '정보 없음', phase: '' };
     openView('화면 정보 · ' + (s ? s.label : ''), [['요구사항', info.req], ['단계', info.phase]]);
   }
 
-  /* ---------- 화면: 제안서 홈 ---------- */
+  /* ---------- 화면: 제안 현황 ---------- */
   function progress() {
-    var items = S.data.schedule.items, t = todayISO();
+    var items = alive(S.data.schedule.items), t = todayISO();
     var done = items.filter(function (x) { return x.status === '완료'; }).length;
-    var late = items.filter(function (x) { return x.end < t && x.status !== '완료'; }).length;
     var doing = items.filter(function (x) { return x.status === '진행중'; }).length;
-    var todo = items.length - done - doing;
-    return { total: items.length, done: done, doing: doing, todo: todo, late: late, pct: items.length ? Math.round(done / items.length * 100) : 0 };
+    var late = items.filter(function (x) { return x.end < t && x.status !== '완료'; }).length;
+    return { total: items.length, done: done, doing: doing, todo: items.length - done - doing, late: late, pct: items.length ? Math.round(done / items.length * 100) : 0 };
   }
+  function viewProposals() {
+    var rows = alive(S.data.proposals.items), pg = progress();
+    var h = canEdit('proposals') ? '<div style="margin-bottom:12px"><button class="btn sm" data-prop-add="1">＋ 새 제안</button></div>' : '';
+    h += '<div class="card" style="padding:0"><table><thead><tr><th>상태</th><th>제안명</th><th>구성</th><th>제안 기간</th><th>PM</th><th>사업관리</th><th>영업대표</th><th>진척</th>' + (canEdit('proposals') ? '<th></th>' : '') + '</tr></thead><tbody>';
+    rows.forEach(function (r) {
+      var pct = r.id === 'P-001' ? pg.pct : r.pct;
+      h += '<tr class="prow" data-go-home="1"><td><span class="st ' + esc(r.cls) + '">' + esc(r.status) + '</span></td><td style="font-weight:700">' + esc(r.name) + '</td>' +
+        '<td style="color:var(--ink3)">' + esc(r.scope) + '</td><td>' + esc(r.start) + ' ~ ' + esc(r.end) + '</td><td>' + esc(r.pm) + '</td><td>' + esc(r.biz) + '</td><td>' + esc(r.sales) + '</td>' +
+        '<td><span class="pbar"><span style="width:' + pct + '%"></span></span> ' + pct + '%</td>' +
+        (canEdit('proposals') ? '<td><button class="btn ghost sm" data-prop-del="' + esc(r.id) + '">삭제</button></td>' : '') + '</tr>';
+    });
+    h += '</tbody></table></div><p class="muted" style="margin:12px 4px">행을 누르면 제안서 홈으로 이동합니다. 추가와 삭제는 이 화면에서만 합니다.</p>';
+    return h;
+  }
+
+  /* ---------- 화면: 제안서 홈 ---------- */
   function activity() {
     var a = [];
-    S.data.schedule.items.forEach(function (x) { a.push({ d: x.start, t: '일정 · ' + x.title + ' (' + x.status + ')', by: x.owner }); });
-    S.data.comm.posts.forEach(function (p) { a.push({ d: p.date, t: '커뮤니케이션 · ' + p.title, by: p.by }); });
-    S.data.boards.boards.forEach(function (b) {
-      b.posts.forEach(function (p) { a.push({ d: p.date, t: b.name + ' · ' + p.title, by: p.by }); });
-    });
+    alive(S.data.schedule.items).forEach(function (x) { a.push({ d: x.start, t: '일정 · ' + x.title + ' (' + x.status + ')', by: x.owner }); });
+    alive(S.data.comm.posts).forEach(function (p) { a.push({ d: p.date, t: '커뮤니케이션 · ' + p.title, by: p.by }); });
+    S.data.boards.boards.forEach(function (b) { alive(b.posts).forEach(function (p) { a.push({ d: p.date, t: b.name + ' · ' + p.title, by: p.by }); }); });
     return a.sort(function (x, y) { return x.d < y.d ? 1 : -1; }).slice(0, 6);
   }
   function listSched(list, empty) {
     if (!list.length) return '<div class="empty">' + empty + '</div>';
+    var t = todayISO();
     return '<table><tbody>' + list.map(function (x) {
-      var late = x.end < todayISO() && x.status !== '완료';
+      var late = x.end < t && x.status !== '완료';
       return '<tr class="' + (late ? 'late' : '') + '"><td>' + esc(x.title) + '</td><td class="muted">' + esc(x.start) + ' ~ ' + esc(x.end) +
-        '</td><td class="muted">' + esc(x.owner) + '</td><td><span class="st ' + (late ? 'late' : x.status === '진행중' ? 'doing' : 'todo') + '">' +
-        (late ? '지연' : esc(x.status)) + '</span></td></tr>';
+        '</td><td class="muted">' + esc(x.owner) + '</td><td><span class="st ' + (late ? 'late' : x.status === '진행중' ? 'doing' : 'todo') + '">' + (late ? '지연' : esc(x.status)) + '</span></td></tr>';
     }).join('') + '</tbody></table>';
   }
   function viewHome() {
-    var m = S.data.master, p = m.project, t = todayISO(), pg = progress();
-    var dday = daysBetween(t, p.deadline);
-    var today = S.data.schedule.items.filter(function (x) { return x.start <= t && t <= x.end && x.status !== '완료'; });
-    var late = S.data.schedule.items.filter(function (x) { return x.end < t && x.status !== '완료'; });
+    var p = S.data.master.project, t = todayISO(), pg = progress(), dday = daysBetween(t, p.deadline);
+    var today = alive(S.data.schedule.items).filter(function (x) { return x.start <= t && t <= x.end && x.status !== '완료'; });
+    var late = alive(S.data.schedule.items).filter(function (x) { return x.end < t && x.status !== '완료'; });
+    var tm = S.data.master.members;
     var h = '<div class="grid2"><div>';
     h += '<div class="card"><h3>' + esc(p.name) + (canEdit('home') ? '<button class="btn ghost sm" data-proj-edit="1">수정</button>' : '') + '</h3>' +
       '<div class="kv"><div class="k">발주처</div><div>' + esc(p.client) + '</div>' +
       '<div class="k">제안 기간</div><div>' + esc(p.start) + ' ~ ' + esc(p.deadline) + ' · ' + (dday >= 0 ? '마감 D-' + dday : '마감 지남') + '</div>' +
-      '<div class="k">PM</div><div>' + esc(p.team.pm) + '</div>' +
-      '<div class="k">사업관리</div><div>' + esc(p.team.biz) + '</div>' +
+      '<div class="k">PM</div><div>' + esc(p.team.pm) + '</div><div class="k">사업관리</div><div>' + esc(p.team.biz) + '</div>' +
       '<div class="k">영업대표</div><div>' + esc(p.team.sales) + '</div>' +
       '<div class="k">진척</div><div><span class="pbar"><span style="width:' + pg.pct + '%"></span></span> ' + pg.pct + '% (완료 ' + pg.done + ' · 진행 ' + pg.doing + ' · 예정 ' + pg.todo + ' · 지연 ' + pg.late + ')</div>' +
       '<div class="k">개요</div><div>' + esc(p.summary) + '</div></div></div>';
     h += '<div class="card"><h3>최근 업데이트</h3>' + activity().map(function (a) {
       return '<div class="act"><span>' + esc(a.t) + '</span><span class="d">' + esc(a.by) + ' · ' + esc(a.d) + '</span></div>';
-    }).join('') + '</div>';
-    h += '</div><div>';
+    }).join('') + '</div></div><div>';
     h += '<div class="card"><h3>오늘 할 일 <span class="muted">' + esc(t) + '</span></h3>' + listSched(today, '오늘 할 일이 없습니다.') + '</div>';
     h += '<div class="card"><h3>⚠ 지연 항목 <span class="muted">마감 지남 · 미완료</span></h3>' + listSched(late, '지연 항목이 없습니다.') + '</div>';
-    h += '</div></div>';
-    return h;
+    h += '<div class="card"><h3>팀 <span class="muted">' + tm.length + '명</span></h3><table><tbody>' + tm.map(function (x) {
+      return '<tr><td><b>' + esc(x.name) + '</b></td><td class="muted">' + esc(x.title) + '</td><td><span class="tag">' + esc(roleName(x.role)) + '</span></td></tr>';
+    }).join('') + '</tbody></table></div>';
+    return h + '</div></div>';
   }
   function projectFields() {
-    var mem = S.data.master.members.map(function (x) { return x.name; });
+    var mem = alive(S.data.master.members).map(function (x) { return x.name; });
     return [
-      { k: 'name', label: '사업명', req: true }, { k: 'client', label: '발주처', req: true },
-      { k: 'summary', label: '개요', type: 'textarea' },
-      { k: 'start', label: '제안 시작', type: 'date' }, { k: 'deadline', label: '제안 마감', type: 'date' },
-      { k: 'presentation', label: '제안 발표', type: 'date' },
-      { k: 'pm', label: 'PM', type: 'select', opts: mem }, { k: 'biz', label: '사업관리', type: 'select', opts: mem },
-      { k: 'sales', label: '영업대표', type: 'select', opts: mem }
+      { k: 'name', label: '사업명', req: true }, { k: 'client', label: '발주처', req: true }, { k: 'summary', label: '개요', type: 'textarea' },
+      { k: 'start', label: '제안 시작', type: 'date' }, { k: 'deadline', label: '제안 마감', type: 'date' }, { k: 'presentation', label: '제안 발표', type: 'date' },
+      { k: 'pm', label: 'PM', type: 'select', opts: mem }, { k: 'biz', label: '사업관리', type: 'select', opts: mem }, { k: 'sales', label: '영업대표', type: 'select', opts: mem }
     ];
   }
 
-  /* ---------- 화면: 커뮤니케이션 / 게시판 (공통 글 목록) ---------- */
+  /* ---------- 화면: 커뮤니케이션 / 게시판 ---------- */
   function postsOf(k) { return k === 'comm' ? S.data.comm.posts : boardOf(k).posts; }
   function postFields(k) {
     var f = [{ k: 'title', label: '제목', req: true }, { k: 'body', label: '내용', type: 'textarea' }];
     if (k === 'comm') f.push({ k: 'att', label: '첨부 파일명' });
-    if (k !== 'comm' && boardOf(k) && boardOf(k).kind === 'qna') {
-      f.push({ k: 'status', label: '상태', type: 'select', opts: QA_STATUS });
-      f.push({ k: 'answer', label: '답변', type: 'textarea' });
-    }
-    if (k !== 'comm' && boardOf(k) && boardOf(k).kind === 'ref') f.push({ k: 'link', label: '자료 위치 (파일명·경로)' });
+    var b = k === 'comm' ? null : boardOf(k);
+    if (b && b.kind === 'qna') { f.push({ k: 'status', label: '상태', type: 'select', opts: QA_STATUS }); f.push({ k: 'answer', label: '답변', type: 'textarea' }); }
+    if (b && b.kind === 'ref') f.push({ k: 'link', label: '자료 위치 (파일명·경로)' });
     return f;
   }
-  function viewPosts(k, title) {
-    var list = postsOf(k).slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; });
+  function viewPosts(k) {
+    var list = alive(postsOf(k)).slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; });
     var b = k === 'comm' ? null : boardOf(k);
     var h = canEdit(k) ? '<div style="margin-bottom:12px"><button class="btn sm" data-post-add="' + k + '">＋ 새 글</button></div>' : '';
     if (!list.length) h += '<div class="card"><div class="empty">글이 없습니다.</div></div>';
     h += '<div class="card">';
     list.forEach(function (p) {
-      var can = canEditPost(k, p);
-      h += '<div class="post"><div class="pt">' + esc(p.title) + '</div><div class="pm">' + esc(p.by) + ' · ' + esc(p.date) + '</div>' +
-        '<div class="pb">' + esc(p.body) + '</div>';
+      h += '<div class="post"><div class="pt">' + esc(p.title) + '</div><div class="pm">' + esc(p.by) + ' · ' + esc(p.date) + '</div><div class="pb">' + esc(p.body) + '</div>';
       if (p.att) h += '<span class="att">PPT ' + esc(p.att) + '</span>';
-      if (b && b.kind === 'qna') {
-        h += '<div style="margin-top:8px"><span class="st ' + (p.status === '답변완료' ? 'done' : 'wait') + '">' + esc(p.status || '답변대기') + '</span>' +
-          (p.answer ? '<div class="pb" style="margin-top:6px">↳ 답변: ' + esc(p.answer) + '</div>' : '') + '</div>';
-      }
+      if (b && b.kind === 'qna') h += '<div style="margin-top:8px"><span class="st ' + (p.status === '답변완료' ? 'done' : 'wait') + '">' + esc(p.status || '답변대기') + '</span>' +
+        (p.answer ? '<div class="pb" style="margin-top:6px">↳ 답변: ' + esc(p.answer) + '</div>' : '') + '</div>';
       if (b && b.kind === 'ref' && p.link) h += '<span class="att">📎 ' + esc(p.link) + '</span>';
-      if (can) {
-        h += '<div style="margin-top:8px"><button class="btn ghost sm" data-post-edit="' + k + '|' + esc(p.id) + '">수정</button> ' +
-          '<button class="btn ghost sm" data-post-del="' + k + '|' + esc(p.id) + '">삭제</button></div>';
-      }
+      if (canEditPost(k, p)) h += '<div style="margin-top:8px"><button class="btn ghost sm" data-post-edit="' + k + '|' + esc(p.id) + '">수정</button> <button class="btn ghost sm" data-post-del="' + k + '|' + esc(p.id) + '">삭제</button></div>';
       h += '</div>';
     });
     return h + '</div>';
@@ -227,54 +257,37 @@
 
   /* ---------- 화면: 제안 일정 (달력 + 목록) ---------- */
   function monthCells(y, m) {
-    var first = new Date(y, m, 1), off = first.getDay(), days = new Date(y, m + 1, 0).getDate();
-    var total = Math.ceil((off + days) / 7) * 7, cells = [];
-    for (var i = 0; i < total; i++) {
-      var d = new Date(y, m, 1 - off + i);
-      cells.push({ iso: isoOf(d), inMonth: d.getMonth() === m, num: d.getDate() });
-    }
+    var off = new Date(y, m, 1).getDay(), days = new Date(y, m + 1, 0).getDate(), total = Math.ceil((off + days) / 7) * 7, cells = [];
+    for (var i = 0; i < total; i++) { var d = new Date(y, m, 1 - off + i); cells.push({ iso: isoOf(d), inMonth: d.getMonth() === m, num: d.getDate() }); }
     return cells;
   }
   function calHTML() {
-    var c = S.cal, cells = monthCells(c.y, c.m), t = todayISO(), items = S.data.schedule.items, h = '';
-    var weeks = cells.length / 7;
-    for (var w = 0; w < weeks; w++) {
+    var c = S.cal, cells = monthCells(c.y, c.m), t = todayISO(), items = alive(S.data.schedule.items), h = '';
+    for (var w = 0; w < cells.length / 7; w++) {
       var wk = cells.slice(w * 7, w * 7 + 7), ws = wk[0].iso, we = wk[6].iso;
       var segs = items.filter(function (x) { return x.end >= ws && x.start <= we; }).map(function (x) {
         var s = x.start > ws ? x.start : ws, e = x.end < we ? x.end : we;
-        var c1 = wk.findIndex(function (q) { return q.iso === s; }), c2 = wk.findIndex(function (q) { return q.iso === e; });
-        return { it: x, c1: c1, c2: c2 };
+        return { it: x, c1: wk.findIndex(function (q) { return q.iso === s; }), c2: wk.findIndex(function (q) { return q.iso === e; }) };
       }).sort(function (a, b) { return a.c1 - b.c1 || b.c2 - a.c2; });
       var lanes = [];
-      segs.forEach(function (sg) {
-        var ln = 0;
-        while (lanes[ln] !== undefined && lanes[ln] >= sg.c1) ln++;
-        lanes[ln] = sg.c2; sg.lane = ln;
-      });
-      var minH = 30 + lanes.length * 22 + 6;
-      h += '<div class="week" style="min-height:' + minH + 'px">' +
-        wk.map(function (q) {
-          return '<div class="day' + (q.inMonth ? '' : ' out') + '"' + (q.iso === t ? ' style="background:var(--accent-bg)"' : '') + '><span class="n' + (q.iso === t ? '' : '') + '">' + q.num + '</span></div>';
-        }).join('') +
-        segs.map(function (sg) {
-          return '<div class="bar ' + esc(sg.it.color) + '" data-ev="' + esc(sg.it.id) + '" title="' + esc(sg.it.title) + ' (' + esc(sg.it.start) + ' ~ ' + esc(sg.it.end) + ')" ' +
-            'style="left:calc(' + (sg.c1 / 7 * 100) + '% + 3px);width:calc(' + ((sg.c2 - sg.c1 + 1) / 7 * 100) + '% - 6px);top:' + (28 + sg.lane * 22) + 'px">' + esc(sg.it.title) + '</div>';
-        }).join('') + '</div>';
+      segs.forEach(function (sg) { var ln = 0; while (lanes[ln] !== undefined && lanes[ln] >= sg.c1) ln++; lanes[ln] = sg.c2; sg.lane = ln; });
+      h += '<div class="week" style="min-height:' + (30 + lanes.length * 22 + 6) + 'px">' + wk.map(function (q) {
+        return '<div class="day' + (q.inMonth ? '' : ' out') + '"' + (q.iso === t ? ' style="background:var(--accent-bg)"' : '') + '><span class="n">' + q.num + '</span></div>';
+      }).join('') + segs.map(function (sg) {
+        return '<div class="bar ' + esc(sg.it.color) + '" data-ev="' + esc(sg.it.id) + '" title="' + esc(sg.it.title) + ' (' + esc(sg.it.start) + ' ~ ' + esc(sg.it.end) + ')" ' +
+          'style="left:calc(' + (sg.c1 / 7 * 100) + '% + 3px);width:calc(' + ((sg.c2 - sg.c1 + 1) / 7 * 100) + '% - 6px);top:' + (28 + sg.lane * 22) + 'px">' + esc(sg.it.title) + '</div>';
+      }).join('') + '</div>';
     }
-    var head = '<div class="cal-head">' + ['일', '월', '화', '수', '목', '금', '토'].map(function (d) { return '<div>' + d + '</div>'; }).join('') + '</div>';
     return '<div class="cal-bar"><button class="btn ghost sm" data-cal="prev">‹</button><span class="ttl">' + c.y + '년 ' + (c.m + 1) + '월</span>' +
       '<button class="btn ghost sm" data-cal="next">›</button><button class="btn ghost sm" data-cal="today">오늘</button></div>' +
-      head + h +
+      '<div class="cal-head">' + ['일', '월', '화', '수', '목', '금', '토'].map(function (d) { return '<div>' + d + '</div>'; }).join('') + '</div>' + h +
       '<div class="legend"><span class="c-wr">작성</span><span class="c-rv">리뷰</span><span class="c-mt">마일스톤</span><span class="c-dl">마감</span><span class="c-gy">기타</span></div>';
   }
   function schedFields() {
-    var mem = S.data.master.members.map(function (x) { return x.name; });
     return [
-      { k: 'title', label: '제목', req: true },
-      { k: 'start', label: '시작일', type: 'date', req: true },
-      { k: 'end', label: '종료일', type: 'date', req: true },
+      { k: 'title', label: '제목', req: true }, { k: 'start', label: '시작일', type: 'date', req: true }, { k: 'end', label: '종료일', type: 'date', req: true },
       { k: 'color', label: '색상', type: 'select', opts: COLORS },
-      { k: 'owner', label: '담당', type: 'select', opts: mem },
+      { k: 'owner', label: '담당', type: 'select', opts: alive(S.data.master.members).map(function (x) { return x.name; }) },
       { k: 'status', label: '상태', type: 'select', opts: SCHED_STATUS }
     ];
   }
@@ -282,124 +295,241 @@
   function openSched(id) {
     var it = S.data.schedule.items.filter(function (x) { return x.id === id; })[0];
     if (!it) return;
-    if (!canEdit('schedule')) {
-      openView('일정 조회', [['제목', it.title], ['기간', it.start + ' ~ ' + it.end], ['담당', it.owner], ['상태', it.status]]);
-      return;
-    }
-    openForm('일정 수정', schedFields(), it, function (v) { Object.assign(it, v); }, function () {
-      S.data.schedule.items = S.data.schedule.items.filter(function (x) { return x.id !== id; });
+    if (!canEdit('schedule')) { openView('일정 조회', [['제목', it.title], ['기간', it.start + ' ~ ' + it.end], ['담당', it.owner], ['상태', it.status]]); return; }
+    openForm('일정 수정', schedFields(), it, function (v) { Object.assign(it, v); logH('수정', '일정 ' + id, v.title); }, function () {
+      askDelete('일정 ' + it.title, '일정 ' + id, function () { markDeleted(it, S.lastReason); });
     }, schedValidate);
   }
   function viewSchedule() {
-    var c = S.cal || (S.cal = { y: new Date().getFullYear(), m: new Date().getMonth() });
-    var can = canEdit('schedule');
-    var h = '<div class="card" style="padding:16px">' + (can ? '<div style="margin-bottom:12px"><button class="btn sm" data-sc-add="1">＋ 일정 추가</button> <span class="muted">일정 막대를 누르면 수정할 수 있습니다</span></div>' : '<div class="muted" style="margin-bottom:10px">조회 전용 · 일정 편집은 PM·사업관리만 가능합니다</div>') + calHTML() + '</div>';
-    var items = S.data.schedule.items.slice().sort(function (a, b) { return a.start < b.start ? -1 : 1; }), t = todayISO();
+    var c = S.cal, can = canEdit('schedule'), t = todayISO();
+    var h = '<div class="card" style="padding:16px">' + (can ? '<div style="margin-bottom:12px"><button class="btn sm" data-sc-add="1">＋ 일정 추가</button> <span class="muted">막대를 누르면 수정할 수 있습니다</span></div>' : '<div class="muted" style="margin-bottom:10px">조회 전용 · 일정 편집은 편집 권한이 있는 역할만 가능합니다</div>') + calHTML() + '</div>';
+    var items = alive(S.data.schedule.items).slice().sort(function (a, b) { return a.start < b.start ? -1 : 1; });
     h += '<div class="card"><h3>일정 목록</h3><table><thead><tr><th>제목</th><th>시작</th><th>종료</th><th>색상</th><th>담당</th><th>상태</th>' + (can ? '<th></th>' : '') + '</tr></thead><tbody>';
     if (!items.length) h += '<tr><td colspan="7" class="empty">등록된 일정이 없습니다.</td></tr>';
     items.forEach(function (x) {
       var late = x.end < t && x.status !== '완료';
       h += '<tr class="' + (late ? 'late' : '') + '"><td>' + esc(x.title) + '</td><td>' + esc(x.start) + '</td><td>' + esc(x.end) + '</td>' +
-        '<td><span class="' + esc(x.color) + '" style="display:inline-block;width:12px;height:12px;border-radius:3px"></span></td>' +
-        '<td>' + esc(x.owner) + '</td><td><span class="st ' + (late ? 'late' : x.status === '완료' ? 'done' : x.status === '진행중' ? 'doing' : 'todo') + '">' + (late ? '지연' : esc(x.status)) + '</span></td>' +
+        '<td><span class="' + esc(x.color) + '" style="display:inline-block;width:12px;height:12px;border-radius:3px"></span></td><td>' + esc(x.owner) + '</td>' +
+        '<td><span class="st ' + (late ? 'late' : x.status === '완료' ? 'done' : x.status === '진행중' ? 'doing' : 'todo') + '">' + (late ? '지연' : esc(x.status)) + '</span></td>' +
         (can ? '<td><button class="btn ghost sm" data-sc-edit="' + esc(x.id) + '">수정</button> <button class="btn ghost sm" data-sc-del="' + esc(x.id) + '">삭제</button></td>' : '') + '</tr>';
     });
     return h + '</tbody></table></div>';
   }
 
-  /* ---------- 화면: 워크스페이스 관리 (게시판 추가·수정·삭제, PM 전용) ---------- */
-  function viewWs() {
-    var h = '<div style="margin-bottom:12px"><button class="btn sm" data-ws-add="1">＋ 게시판 추가</button></div>';
-    h += '<table><thead><tr><th>게시판</th><th>설명</th><th>글 수</th><th>유형</th><th></th></tr></thead><tbody>';
-    S.data.boards.boards.forEach(function (b) {
-      var kindLabel = b.kind === 'qna' ? 'Q&A (상태)' : b.kind === 'ref' ? '자료 (링크)' : '자유 글';
-      h += '<tr><td>' + esc(b.name) + '</td><td class="muted">' + esc(b.desc) + '</td><td>' + b.posts.length + '</td><td class="muted">' + kindLabel + '</td>' +
+  /* ---------- 화면: RFP / 요구사항 ---------- */
+  function viewRfp() {
+    var r = S.data.rfp, reqs = alive(r.reqs), sel = S.rfpReq;
+    var h = '<div class="card" style="display:flex;align-items:center;gap:14px"><span class="tag" style="background:#000;color:#fff;border-color:#000">PDF</span><div><div style="font-weight:700">' + esc(r.file.name) + '</div><div class="muted">' + esc(r.file.pages) + ' · ' + esc(r.file.date) + '</div></div></div>';
+    h += '<div class="grid2"><div><div class="card"><h3>요구사항 정리' + (canEdit('rfp') ? ' <button class="btn sm" data-req-add="1">＋ 추가</button>' : '') + '</h3><table><tbody>';
+    reqs.forEach(function (q) {
+      h += '<tr class="prow" data-req="' + esc(q.id) + '" style="' + (q.id === sel ? 'background:var(--accent-bg)' : '') + '"><td style="font-weight:700;width:60px">' + esc(q.id) + '</td><td><b>' + esc(q.t) + '</b><div class="muted">' + esc(q.d) + '</div></td>' +
+        (canEdit('rfp') ? '<td><button class="btn ghost sm" data-req-del="' + esc(q.id) + '">삭제</button></td>' : '') + '</tr>';
+    });
+    h += '</tbody></table></div></div><div><div class="card"><h3>유사 사례 추천 <span class="chip">Step 2</span></h3>';
+    var sims = r.similar[sel] || [];
+    h += sims.length ? sims.map(function (x) { return '<div class="act"><div><b>' + esc(x[0]) + '</b><div class="muted">' + esc(x[1]) + ' · ' + esc(x[2]) + '</div></div><span class="d">' + esc(x[3]) + '</span></div>'; }).join('') : '<div class="empty">추천 사례가 없습니다.</div>';
+    return h + '</div></div></div>';
+  }
+  function reqFields() { return [{ k: 'id', label: 'ID (예: R-07)', req: true }, { k: 't', label: '요구사항', req: true }, { k: 'd', label: '설명', type: 'textarea' }]; }
+
+  /* ---------- 화면: 목차 ---------- */
+  function viewToc() {
+    var st = S.data.toc.statusLabel, rows = alive(S.data.toc.rows), can = canEdit('toc');
+    var h = (can ? '<div style="margin-bottom:12px"><button class="btn sm" data-toc-add="1">＋ 목차 추가</button></div>' : '');
+    h += '<div class="card" style="overflow:auto;padding:0"><table><thead><tr><th style="width:40%">목차</th><th>담당</th><th>예상 장수</th><th>상태</th>' + (can ? '<th></th>' : '') + '</tr></thead><tbody>';
+    rows.forEach(function (r) {
+      if (r.lv === 1) h += '<tr><td colspan="' + (can ? 5 : 4) + '" style="font-weight:700;background:#FAFAFA">' + esc(r.title) + (can ? ' <button class="btn ghost sm" data-toc-edit="' + esc(r.id) + '">수정</button> <button class="btn ghost sm" data-toc-del="' + esc(r.id) + '">삭제</button>' : '') + '</td></tr>';
+      else h += '<tr><td style="padding-left:20px">' + esc(r.title) + '</td><td>' + esc(r.owner) + '</td><td>' + esc(r.pages) + '</td><td><span class="chip ' + esc(r.status) + '">' + esc(st[r.status]) + '</span></td>' +
+        (can ? '<td><button class="btn ghost sm" data-toc-edit="' + esc(r.id) + '">수정</button> <button class="btn ghost sm" data-toc-del="' + esc(r.id) + '">삭제</button></td>' : '') + '</tr>';
+    });
+    return h + '</tbody></table></div><p class="muted" style="margin:10px 4px">전체 목차 = 진척 마스터(담당·상태·장수). 여러 장은 (1/2)(2/2)처럼 하위로 나눕니다.</p>';
+  }
+  function tocFields() {
+    return [{ k: 'title', label: '제목', req: true }, { k: 'lv', label: '단계', type: 'select', opts: [{ v: '1', l: '대분류' }, { v: '2', l: '세부' }] },
+      { k: 'owner', label: '담당', type: 'select', opts: alive(S.data.master.members).map(function (x) { return x.name; }) },
+      { k: 'pages', label: '예상 장수' }, { k: 'status', label: '상태', type: 'select', opts: [{ v: 'todo', l: '미착수' }, { v: 'doing', l: '진행중' }, { v: 'fix', l: '보완' }, { v: 'done', l: '완료' }] }];
+  }
+
+  /* ---------- 화면: 제안서 검토 ---------- */
+  function viewReview() {
+    var rv = S.data.review, n = rv.nodes[S.rv] || rv.nodes['2.1'];
+    var h = '<div class="grid2" style="grid-template-columns:300px 1fr"><div class="tree"><div style="padding:8px 10px;font-size:12px;font-weight:700;color:var(--ink2)">목차 (읽기 · 리뷰)</div>';
+    rv.tree.forEach(function (x) {
+      if (x.g) h += '<div class="tnode g"><span class="dot2 ' + x.s + '"></span>' + esc(x.t) + '</div>';
+      else h += '<div class="tnode c' + x.c + (x.node && x.node === S.rv ? ' sel' : '') + '" ' + (x.node ? 'data-node="' + esc(x.node) + '"' : '') + '><span class="dot2 ' + x.s + '"></span>' + esc(x.t) + (x.w ? ' <span class="muted">' + esc(x.w) + '</span>' : '') + '</div>';
+    });
+    h += '</div><div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><div><span class="chip ' + esc(n.s) + '">' + esc(n.c) + '</span> <b style="font-size:17px;margin-left:6px">' + esc(n.t) + '</b></div></div>';
+    h += '<div class="muted" style="margin:8px 0 14px">' + esc(n.m) + '</div>';
+    h += '<div style="font-size:13px;font-weight:700;margin-bottom:6px">' + esc(n.ti) + '</div>';
+    h += '<div class="pipe" style="margin-bottom:14px">' + n.flow.map(function (f, i) { return '<span class="tag">' + esc(f) + '</span>' + (i < n.flow.length - 1 ? '<span class="muted">→</span>' : ''); }).join('') + '</div>';
+    h += '<ul style="padding-left:18px;font-size:14px;line-height:1.9">' + n.b.map(function (b) { return '<li>' + esc(b) + '</li>'; }).join('') + '</ul>';
+    return h + '</div></div>';
+  }
+
+  /* ---------- 화면: 제안서 관리 (버전 이력 · 합본) ---------- */
+  function viewVersions() {
+    var v = S.data.versions, sel = v.commits.filter(function (c) { return c.h === S.commit; })[0] || v.commits[0];
+    var h = '<div style="margin-bottom:12px">' + (canEdit('versions') ? '<button class="btn acc sm" data-merge="1">합본(스냅샷 생성)</button>' : '<button class="btn sm" disabled>합본 — 편집 권한 필요</button>') + '</div>';
+    h += '<div class="grid2" style="grid-template-columns:360px 1fr"><div class="card" style="padding:6px 4px"><div class="tabs" style="margin:8px">' + v.branches.map(function (b, i) { return '<button class="' + (i === 0 ? 'on' : '') + '">⑂ ' + esc(b) + '</button>'; }).join('') + '</div>';
+    v.commits.forEach(function (c) {
+      h += '<div class="commit' + (c.h === sel.h ? ' sel' : '') + '" data-commit="' + esc(c.h) + '"><div class="h">' + esc(c.h) + ' · ' + esc(c.when) + '</div><div style="font-weight:600">' + esc(c.msg) + '</div><div class="muted">' + esc(c.who) + (c.tag ? ' · <span class="tag">' + esc(c.tag) + '</span>' : '') + '</div></div>';
+    });
+    h += '</div><div class="card"><h3>변경 내용 <span class="muted">' + esc(sel.h) + '</span></h3>';
+    sel.diff.forEach(function (d) {
+      h += '<div class="act"><span class="' + (d[0] === 'add' ? 'diff-add' : 'diff-mod') + '" style="font-weight:700;min-width:90px">' + esc(d[1]) + '</span><span>' + esc(d[2]) + '</span></div>';
+    });
+    return h + '</div></div>';
+  }
+
+  /* ---------- 화면: 조견표 ---------- */
+  function viewMatrix() {
+    var m = S.data.matrix, can = canEdit('matrix'), tocs = alive(S.data.toc.rows).filter(function (r) { return r.lv === 2; }).map(function (r) { return r.title; });
+    var h = '<div class="card" style="overflow:auto;padding:0"><table><thead><tr><th>RFP 쪽</th><th>대분류</th><th>중분류</th><th>소분류</th><th>세부사항 1</th><th>수용여부</th><th>해당 목차</th><th>page</th></tr></thead><tbody>';
+    m.rows.forEach(function (r, i) {
+      h += '<tr><td>' + esc(r.rfp) + '</td><td class="muted">' + esc(r.big) + '</td><td class="muted">' + esc(r.mid) + '</td><td class="muted">' + esc(r.small) + '</td><td>' + esc(r.d1) + '</td>' +
+        '<td><select class="cellin" data-mx="' + i + '|ok"' + (can ? '' : ' disabled') + '>' + m.okOptions.map(function (o) { return '<option' + (o === r.ok ? ' selected' : '') + '>' + o + '</option>'; }).join('') + '</select></td>' +
+        '<td><select class="cellin" data-mx="' + i + '|toc"' + (can ? '' : ' disabled') + '>' + tocs.map(function (o) { return '<option' + (o === r.toc ? ' selected' : '') + '>' + esc(o) + '</option>'; }).join('') + '</select></td>' +
+        '<td style="width:80px"><input class="cellin" data-mx="' + i + '|page" value="' + esc(r.page) + '"' + (can ? '' : ' disabled') + '></td></tr>';
+    });
+    return h + '</tbody></table></div><p class="muted" style="margin:10px 4px">최종 취합본(스냅샷) 기준 · RFP 발췌 칸은 읽기 전용, 수용여부·해당 목차·page는 사람이 매핑합니다.</p>';
+  }
+
+  /* ---------- 화면: 워크스페이스 관리 ---------- */
+  function viewWorkspace() {
+    var h = '<div style="margin-bottom:12px"><button class="btn sm" data-ws-add="1">＋ 게시판 추가</button></div><div class="card" style="padding:0"><table><thead><tr><th>게시판</th><th>설명</th><th>글 수</th><th>유형</th><th></th></tr></thead><tbody>';
+    alive(S.data.boards.boards).forEach(function (b) {
+      var kind = b.kind === 'qna' ? 'Q&A (답변 상태)' : b.kind === 'ref' ? '자료 (링크)' : '자유 글';
+      h += '<tr><td>' + esc(b.name) + '</td><td class="muted">' + esc(b.desc) + '</td><td>' + alive(b.posts).length + '</td><td class="muted">' + kind + '</td>' +
         '<td><button class="btn ghost sm" data-ws-edit="' + b.id + '">수정</button> <button class="btn ghost sm" data-ws-del="' + b.id + '">삭제</button></td></tr>';
     });
-    return h + '</tbody></table><p class="muted" style="margin-top:10px">게시판을 추가하면 좌측 메뉴 "제안 워크스페이스"에 바로 나타납니다. 새 게시판은 작성자가 글을 쓸 수 있고 영업대표는 조회만 합니다.</p>';
+    return h + '</tbody></table></div><p class="muted" style="margin-top:10px">게시판을 추가하면 좌측 메뉴 "제안 워크스페이스"에 바로 나타납니다. 새 게시판은 작성자가 글을 쓰고 영업대표는 조회만 합니다.</p>';
+  }
+
+  /* ---------- 화면: 제안 권한관리 ---------- */
+  function viewWsperm() {
+    var m = S.data.master, mem = alive(m.members);
+    var h = '<div style="display:grid;grid-template-columns:340px 1fr;gap:16px"><div class="card"><h3>멤버 <button class="btn sm" data-mem-add="1">＋ 추가</button></h3><table><tbody>';
+    mem.forEach(function (x) {
+      var i = m.members.indexOf(x);
+      h += '<tr><td><b>' + esc(x.name) + '</b><div class="muted">' + esc(x.title) + ' · ' + esc(x.id) + '</div></td><td>' +
+        '<select class="cellin" data-mem-role="' + i + '">' + Object.keys(m.roles).map(function (r) { return '<option value="' + r + '"' + (x.role === r ? ' selected' : '') + '>' + esc(m.roles[r]) + '</option>'; }).join('') + '</select></td>' +
+        '<td>' + (x.id === S.user.id ? '' : '<button class="btn ghost sm" data-mem-del="' + i + '">제외</button>') + '</td></tr>';
+    });
+    h += '</tbody></table></div><div class="card"><h3>화면별 권한 <span class="muted">역할 단위</span></h3><table><thead><tr><th>화면</th>' +
+      Object.keys(m.roles).map(function (r) { return '<th>' + esc(m.roles[r]) + '</th>'; }).join('') + '</tr></thead><tbody>';
+    screens().forEach(function (s) {
+      h += '<tr><td>' + esc(s.label) + '</td>' + Object.keys(m.roles).map(function (r) {
+        var lv = (m.perms[s.k] || {})[r] || 'none';
+        return '<td><select class="cellin" data-perm="' + s.k + '|' + r + '">' + Object.keys(LEVEL_LABEL).map(function (o) { return '<option value="' + o + '"' + (lv === o ? ' selected' : '') + '>' + LEVEL_LABEL[o] + '</option>'; }).join('') + '</select></td>';
+      }).join('') + '</tr>';
+    });
+    return h + '</tbody></table></div></div>';
+  }
+
+  /* ---------- 화면: 제안 경비 / 수행 공수 (편집 그리드) ---------- */
+  function viewExpense() {
+    var e = S.data.expense, can = canEdit('expense'), t = S.expTab, d = e.tabs[t];
+    var h = '<div class="sumrow">' + e.summary.map(function (s, i) { return '<div class="s' + (i === 4 ? ' hl' : '') + '"><div class="l">' + esc(s[0]) + '</div><div class="v">' + esc(s[1]) + ' <span class="muted" style="font-size:11px">원</span></div></div>'; }).join('') + '</div>';
+    h += '<div class="tabs">' + Object.keys(e.tabs).map(function (k) { return '<button class="' + (k === t ? 'on' : '') + '" data-exp-tab="' + k + '">' + esc(e.tabs[k].label) + '</button>'; }).join('') + '</div>';
+    h += '<div class="card" style="overflow:auto;padding:0"><table><thead><tr>' + d.cols.map(function (c) { return '<th>' + esc(c) + '</th>'; }).join('') + '</tr></thead><tbody>';
+    d.rows.forEach(function (r, ri) {
+      h += '<tr>' + r.map(function (c, ci) { return '<td><input class="cellin" data-exp="' + t + '|' + ri + '|' + ci + '" value="' + esc(c) + '"' + (can ? '' : ' disabled') + '></td>'; }).join('') + '</tr>';
+    });
+    return h + '</tbody></table></div><p class="muted" style="margin:10px 4px">' + (can ? '값을 고치면 저장 버튼으로 반영됩니다. 합계는 입력값을 그대로 보여 줍니다(자동 합계는 준비 중).' : '조회 전용 · 편집 권한이 있는 역할만 수정할 수 있습니다.') + '</p>';
+  }
+  function viewEffort() {
+    var e = S.data.effort, can = canEdit('effort');
+    var h = '<div class="card" style="overflow:auto;padding:0"><table><thead><tr>' + e.cols.map(function (c) { return '<th>' + esc(c) + '</th>'; }).join('') + '</tr></thead><tbody>';
+    e.rows.forEach(function (r, ri) {
+      h += '<tr>' + r.map(function (c, ci) { return '<td><input class="cellin" data-eff="' + ri + '|' + ci + '" value="' + esc(c) + '"' + (can ? '' : ' disabled') + '></td>'; }).join('') + '</tr>';
+    });
+    return h + '</tbody></table></div><p class="muted" style="margin:10px 4px">투입 M/M·직급별 입력 그리드입니다. 경비 관리와 별도 화면입니다.</p>';
+  }
+
+  /* ---------- 화면: 자산 라이브러리 ---------- */
+  function viewAssets() {
+    var h = '<div style="display:grid;grid-template-columns:200px 1fr;gap:16px"><div class="card" style="padding:14px"><div style="font-size:12px;font-weight:700;margin-bottom:10px">필터</div>' +
+      '<div style="font-size:12.5px;color:var(--ink2);line-height:2.2">발주처 ▾<br>문서 유형 ▾<br>연도 ▾</div>' +
+      '<div style="margin-top:14px;font-size:12px;color:#B85315;background:var(--accent-bg);padding:8px;border-radius:8px">의미(시맨틱) 검색과 요구사항 기준 페이지 추천은 <b>Step 2</b>입니다.</div></div><div class="cards">';
+    S.data.assets.cards.forEach(function (c) {
+      h += '<div class="acard"><div class="ti">' + esc(c.t) + '</div><div class="m">' + esc(c.m) + ' · ' + esc(c.s) + '</div><div class="p">' + esc(c.p) + '</div></div>';
+    });
+    return h + '</div></div><p class="muted" style="margin:12px 4px">과거 제안서 페이지 단위 적재(Step 1) · 키워드·메타 검색(Step 1) · 시맨틱 추천(Step 2)</p>';
+  }
+
+  /* ---------- 화면: 시스템 접근 권한관리 ---------- */
+  function viewSysperm() {
+    var can = canEdit('sysperm'), u = S.data.master.sysUsers;
+    var h = '<p class="muted" style="margin-bottom:12px">프로젝트 단위(제안 권한관리)가 아닌, <b>시스템 전체</b>에 대한 마스터 권한을 관리합니다.</p><div class="card" style="padding:0"><table><thead><tr><th>사용자</th><th>비고</th><th>전체 프로젝트 접근</th></tr></thead><tbody>';
+    u.forEach(function (x, i) {
+      h += '<tr><td><b>' + esc(x.name) + '</b></td><td class="muted">' + esc(x.note) + '</td><td><span class="sw' + (x.on ? ' on' : '') + '" ' + (can ? 'data-sw="' + i + '" style="cursor:pointer"' : 'style="opacity:.5"') + '></span></td></tr>';
+    });
+    return h + '</tbody></table></div>';
   }
 
   /* ---------- 화면: 사용 가이드 ---------- */
   function viewGuide() {
     var g = S.data.guide, h = '<div style="max-width:760px"><div class="rule">📌 <b>핵심 규칙</b> — ' + esc(g.rule) + '</div>';
-    g.sections.forEach(function (s, i) {
-      h += '<div class="guide-sec"><h4><span class="gnum">' + (i + 1) + '</span>' + esc(s.t) + '</h4><p>' + esc(s.b) + '</p></div>';
-    });
+    g.sections.forEach(function (s, i) { h += '<div class="guide-sec"><h4><span class="gnum">' + (i + 1) + '</span>' + esc(s.t) + '</h4><p>' + esc(s.b) + '</p></div>'; });
+    h += '<div class="guide-sec"><h4>준비 중 (아직 동작하지 않는 기능)</h4><ul style="padding-left:18px;font-size:14px;color:var(--ink2);line-height:1.9">' + g.pending.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul></div>';
     return h + '</div>';
   }
 
-  /* ---------- 화면: 제안 권한관리 (PM 전용) ---------- */
-  function viewWsperm() {
-    var m = S.data.master;
-    var h = '<div style="display:grid;grid-template-columns:320px 1fr;gap:16px">';
-    h += '<div class="card"><h3>멤버 <button class="btn sm" data-mem-add="1">＋ 추가</button></h3>';
-    h += '<table><tbody>';
-    m.members.forEach(function (x, i) {
-      h += '<tr><td><b>' + esc(x.name) + '</b><div class="muted">' + esc(x.title) + '</div></td><td>' +
-        '<select class="perm-sel" data-mem-role="' + i + '">' + ROLES.map(function (r) {
-          return '<option value="' + r.v + '"' + (x.role === r.v ? ' selected' : '') + '>' + r.l + '</option>';
-        }).join('') + '</select></td><td>' +
-        (x.name === S.data.master.me.writer || x.name === S.data.master.me.pm ? '' : '<button class="btn ghost sm" data-mem-del="' + i + '">제외</button>') + '</td></tr>';
+  /* ---------- 화면: 변경 이력 ---------- */
+  function viewHistory() {
+    var list = S.data.history.items;
+    var h = '<div class="card" style="padding:0"><table><thead><tr><th>시각</th><th>사용자</th><th>작업</th><th>대상</th><th>내용 (삭제 사유 포함)</th></tr></thead><tbody>';
+    if (!list.length) h += '<tr><td colspan="5" class="empty">기록이 없습니다.</td></tr>';
+    list.slice(0, 200).forEach(function (x) {
+      h += '<tr><td class="muted">' + esc(x.at) + '</td><td>' + esc(x.who) + '</td><td><span class="tag">' + esc(x.action) + '</span></td><td>' + esc(x.target) + '</td><td>' + esc(x.detail) + '</td></tr>';
     });
-    h += '</tbody></table></div>';
-    var rows = [{ k: 'home', l: '제안서 홈' }, { k: 'comm', l: '커뮤니케이션' }, { k: 'schedule', l: '제안 일정' }];
-    S.data.boards.boards.forEach(function (b) { rows.push({ k: 'board-' + b.id, l: b.name }); });
-    rows.push({ k: 'guide', l: '사용 가이드' });
-    h += '<div class="card"><h3>화면별 접근 권한</h3><p class="muted" style="margin-bottom:10px">PM·사업관리는 모든 화면을 편집합니다. 작성자와 영업대표는 아래에서 정합니다.</p>';
-    h += '<table><thead><tr><th>화면</th><th>PM·사업관리</th><th>작성자</th><th>영업대표</th></tr></thead><tbody>';
-    rows.forEach(function (r) {
-      var p = m.perms[r.k] || {};
-      h += '<tr><td>' + esc(r.l) + '</td><td><span class="dot yes">●</span></td>' +
-        '<td><select class="perm-sel" data-perm="' + r.k + '|writer">' + LEVELS.map(function (o) {
-          return '<option value="' + o.v + '"' + ((p.writer || 'none') === o.v ? ' selected' : '') + '>' + o.l + '</option>';
-        }).join('') + '</select></td>' +
-        '<td><select class="perm-sel" data-perm="' + r.k + '|sales">' + LEVELS.map(function (o) {
-          return '<option value="' + o.v + '"' + ((p.sales || 'none') === o.v ? ' selected' : '') + '>' + o.l + '</option>';
-        }).join('') + '</select></td></tr>';
-    });
-    h += '</tbody></table></div></div>';
-    return h;
-  }
-  function denyView() {
-    return '<div class="deny"><div style="font-size:30px">⛔</div><h3>접근 권한이 없습니다</h3><p>이 화면은 현재 권한(' + esc(ROLE_NAME[S.role]) + ')으로 볼 수 없습니다.<br>상단에서 권한을 바꿔 보세요.</p></div>';
+    return h + '</tbody></table></div><p class="muted" style="margin:10px 4px">이력은 저장 버튼을 누르면 파일에 함께 저장됩니다.</p>';
   }
 
   /* ---------- 렌더 ---------- */
   function renderNav() {
-    var h = '', groups = [{ g: 'ws', t: '제안 워크스페이스' }, { g: 'etc', t: '기타' }, { g: 'adm', t: 'ProWin 관리' }];
+    var h = '', groups = [{ g: 'global', t: '전역' }, { g: 'ws', t: '제안 워크스페이스' }, { g: 'adm', t: 'ProWin 관리' }];
     groups.forEach(function (gr) {
-      var items = screens().filter(function (s) { return s.grp === gr.g && (s.pm ? S.role === 'pm' : canView(s.k)); });
+      var items = screens().filter(function (s) { return s.grp === gr.g && canView(s.k); });
       if (!items.length) return;
       h += '<div class="sec">' + gr.t + '</div>';
-      items.forEach(function (s) {
-        h += '<button class="nav' + (S.route === s.k ? ' on' : '') + '" data-go="' + s.k + '">' + esc(s.label) + '</button>';
-      });
+      items.forEach(function (s) { h += '<button class="nav' + (S.route === s.k ? ' on' : '') + '" data-go="' + s.k + '">' + esc(s.label) + '</button>'; });
     });
     $('side').innerHTML = h;
   }
   function renderHeader() {
     var s = scr(S.route) || scr('home');
     $('projName').textContent = S.data.master.project.name;
-    $('roleTag').textContent = '지금 보는 권한: ' + ROLE_NAME[S.role] + ' (' + me() + ')';
-    ROLES.forEach(function (r) { $('btn' + (r.v === 'writer' ? 'Writer' : r.v === 'pm' ? 'PM' : 'Sales')).classList.toggle('active', S.role === r.v); });
-    $('crumb').innerHTML = '제안 워크스페이스 · <b>' + esc(s.label) + '</b>';
+    $('meTag').textContent = S.user.name + ' · ' + roleName(role());
+    $('crumb').innerHTML = (s.grp === 'global' ? '전역' : s.grp === 'ws' ? '제안 워크스페이스' : 'ProWin 관리') + ' · <b>' + esc(s.label) + '</b>';
     $('title').textContent = s.label;
-    $('desc').textContent = (INFO[s.board ? 'board' : s.k] || {}).req || '';
+    var inf = INFO[s.board ? 'board' : s.k] || {};
+    $('desc').textContent = inf.req || '';
     var ch = changedFiles().length;
-    $('dataState').textContent = (ch ? '저장 전 변경 있음 · ' : '') + (anyDraft() ? '임시저장본 사용 중 (이 브라우저에만 저장됨)' : '원본 데이터 사용 중');
+    $('dataState').textContent = (ch ? '저장 전 변경 ' + ch + '개 파일 · ' : '') + (anyDraft() ? '임시저장본 사용 중' : '원본 데이터 사용 중');
   }
   function renderContent() {
-    var k = S.route, h;
-    if (!scr(k)) k = S.route = 'home';
-    var s = scr(k);
-    if (s.pm && S.role !== 'pm') h = denyView();
-    else if (!canView(k)) h = denyView();
+    var k = S.route;
+    if (!scr(k)) { k = S.route = 'home'; }
+    var s = scr(k), h;
+    if (!canView(k)) h = '<div class="deny"><div style="font-size:30px">⛔</div><h3>접근 권한이 없습니다</h3><p>현재 역할(' + esc(roleName(role())) + ')은 이 화면을 볼 수 없습니다.</p></div>';
+    else if (k === 'proposals') h = viewProposals();
     else if (k === 'home') h = viewHome();
     else if (k === 'comm') h = viewPosts('comm');
     else if (k === 'schedule') h = viewSchedule();
-    else if (k === 'guide') h = viewGuide();
-    else if (k === 'ws') h = viewWs();
+    else if (k === 'rfp') h = viewRfp();
+    else if (k === 'toc') h = viewToc();
+    else if (k === 'review') h = viewReview();
+    else if (k === 'versions') h = viewVersions();
+    else if (k === 'matrix') h = viewMatrix();
+    else if (k === 'workspace') h = viewWorkspace();
     else if (k === 'wsperm') h = viewWsperm();
+    else if (k === 'expense') h = viewExpense();
+    else if (k === 'effort') h = viewEffort();
+    else if (k === 'assets') h = viewAssets();
+    else if (k === 'sysperm') h = viewSysperm();
+    else if (k === 'guide') h = viewGuide();
+    else if (k === 'history') h = viewHistory();
     else if (s.board) h = viewPosts(k);
     $('content').innerHTML = h;
   }
@@ -413,8 +543,7 @@
   function save() {
     var ch = changedFiles();
     if (!ch.length) { toast('변경된 내용이 없습니다'); return; }
-    var ok = confirm('변경 내용을 저장할까요?\n\n대상: ' + ch.map(function (k) { return FILE_LABEL[k]; }).join(', ') +
-      '\n\n이 브라우저에 반영됩니다. 기본 데이터 파일에 반영하려면 내보내기를 이용하세요.');
+    var ok = confirm('변경 내용을 저장할까요?\n\n대상 파일: ' + ch.join(', ') + '\n\n이 브라우저에 반영됩니다. 기본 데이터 파일에 반영하려면 내보내기를 이용하세요.');
     if (!ok) return;
     try {
       ch.forEach(function (k) { localStorage.setItem(KEY + k, JSON.stringify(S.data[k])); S.draft[k] = true; });
@@ -423,49 +552,35 @@
     renderAll();
     toast('저장되었습니다');
   }
-  function fileForRoute() {
-    var k = S.route;
-    if (k === 'home' || k === 'wsperm') return 'master';
-    if (k === 'comm') return 'comm';
-    if (k === 'schedule') return 'schedule';
-    if (k === 'guide') return 'guide';
-    return 'boards';
-  }
-  function exportCurrent() {
-    var k = fileForRoute();
-    var blob = new Blob([JSON.stringify(S.data[k], null, 2)], { type: 'application/json' });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = k + '.json';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
-    toast(k + '.json 내보내기 완료 · data 폴더에 덮어쓰면 기본 데이터가 바뀝니다');
+  function exportAll() {
+    var list = changedFiles().length ? changedFiles() : Object.keys(FILES);
+    list.forEach(function (k, i) {
+      setTimeout(function () {
+        var blob = new Blob([JSON.stringify(S.data[k], null, 2)], { type: 'application/json' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = k + '.json';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+      }, i * 400);
+    });
+    toast(list.length + '개 파일을 내보냅니다 · data 폴더에 덮어쓰면 기본 데이터가 바뀝니다');
   }
   function restoreOriginal() {
     if (!confirm('임시저장본을 모두 버리고 data 폴더의 원본으로 되돌릴까요?')) return;
-    Object.keys(FILES).forEach(function (k) {
-      try { localStorage.removeItem(KEY + k); } catch (e) { /* 무시 */ }
-      S.draft[k] = false;
-    });
-    loadAll(true).then(renderAll);
-    toast('원본으로 복원했습니다');
+    Object.keys(FILES).forEach(function (k) { try { localStorage.removeItem(KEY + k); } catch (e) { /* 무시 */ } S.draft[k] = false; });
+    loadAll(true).then(function () { renderAll(); toast('원본으로 복원했습니다'); });
   }
 
-  /* ---------- 데이터 로드 ---------- */
+  /* ---------- 데이터 로드 / 로그인 ---------- */
   function fetchJSON(path) {
-    return fetch(path, { cache: 'no-store' }).then(function (r) {
-      if (!r.ok) throw new Error(path + ' (' + r.status + ')');
-      return r.json();
-    });
+    return fetch(path, { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error(path + ' (' + r.status + ')'); return r.json(); });
   }
   function loadOne(k, forceOriginal) {
     if (!forceOriginal) {
-      try {
-        var raw = localStorage.getItem(KEY + k);
-        if (raw) { S.draft[k] = true; return Promise.resolve(JSON.parse(raw)); }
-      } catch (e) { /* 임시저장 불가 시 원본 */ }
+      try { var raw = localStorage.getItem(KEY + k); if (raw) { S.draft[k] = true; return Promise.resolve(JSON.parse(raw)); } } catch (e) { /* 원본 사용 */ }
     }
     S.draft[k] = false;
     return fetchJSON(FILES[k]);
@@ -477,34 +592,76 @@
       S.base = snap();
     });
   }
+  function memberById(id) { return S.data.master.members.filter(function (m) { return m.id === id && !m.deleted; })[0]; }
+  function showLogin() {
+    $('login').style.display = 'flex';
+    $('app').style.display = 'none';
+    $('loginProj').textContent = S.data.master.project.name;
+  }
+  function showApp() {
+    $('login').style.display = 'none';
+    $('app').style.display = 'block';
+    route();
+  }
+  function doLogin() {
+    var id = $('loginId').value.trim(), pw = $('loginPw').value;
+    var m = S.data.master.members.filter(function (x) { return x.id === id && x.pw === pw && !x.deleted; })[0];
+    if (!m) { toast('아이디 또는 비밀번호가 맞지 않습니다', true); return; }
+    S.user = m;
+    sessionStorage.setItem(SESSION, m.id);
+    logH('로그인', '로그인', m.name + ' · ' + roleName(m.role));
+    $('loginPw').value = '';
+    showApp();
+  }
+  function logout() {
+    sessionStorage.removeItem(SESSION);
+    S.user = null;
+    showLogin();
+  }
+  var QUICK_ROLE = { writer: 'writer', pm: 'pm', sales: 'sales' };
+  function quickFill(r) {
+    var m = S.data.master.members.filter(function (x) { return x.role === QUICK_ROLE[r] && !x.deleted; })[0];
+    if (!m) return;
+    $('loginId').value = m.id;
+    $('loginPw').value = '';
+    $('loginPw').focus();
+  }
 
   /* ---------- 이벤트 ---------- */
   function route() {
+    if (!S.user) return;
     var h = (location.hash || '').replace('#', '');
     S.route = scr(h) ? h : 'home';
     renderAll();
   }
-  function setRole(r) { S.role = r; renderAll(); }
 
   function bind() {
-    $('side').addEventListener('click', function (e) {
-      var b = e.target.closest('[data-go]');
-      if (b) location.hash = '#' + b.getAttribute('data-go');
+    $('btnLogin').addEventListener('click', doLogin);
+    $('loginPw').addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
+    document.querySelectorAll('[data-quick]').forEach(function (b) {
+      b.addEventListener('click', function () { quickFill(b.getAttribute('data-quick')); });
     });
-    ROLES.forEach(function (r) {
-      var id = 'btn' + (r.v === 'writer' ? 'Writer' : r.v === 'pm' ? 'PM' : 'Sales');
-      $(id).addEventListener('click', function () { setRole(r.v); });
-    });
+    $('btnLogout').addEventListener('click', logout);
     $('btnSave').addEventListener('click', save);
-    $('btnExport').addEventListener('click', exportCurrent);
+    $('btnExport').addEventListener('click', exportAll);
     $('btnRestore').addEventListener('click', restoreOriginal);
     $('btnInfo').addEventListener('click', openInfo);
     window.addEventListener('hashchange', route);
 
+    $('side').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-go]');
+      if (b) location.hash = '#' + b.getAttribute('data-go');
+    });
+
     $('content').addEventListener('click', function (e) {
       var t = e.target, x, id, p;
-      if (t.closest('[data-cal]')) {
-        var cb = t.closest('[data-cal]').getAttribute('data-cal'), c = S.cal;
+      if ((x = t.closest('[data-go-home]')) && !t.closest('button')) { location.hash = '#home'; return; }
+      if ((x = t.closest('[data-req]'))) { S.rfpReq = x.getAttribute('data-req'); renderContent(); return; }
+      if ((x = t.closest('[data-node]'))) { S.rv = x.getAttribute('data-node'); renderContent(); return; }
+      if ((x = t.closest('[data-commit]'))) { S.commit = x.getAttribute('data-commit'); renderContent(); return; }
+      if ((x = t.closest('[data-exp-tab]'))) { S.expTab = x.getAttribute('data-exp-tab'); renderContent(); return; }
+      if ((x = t.closest('[data-cal]'))) {
+        var cb = x.getAttribute('data-cal'), c = S.cal;
         if (cb === 'prev') { c.m--; if (c.m < 0) { c.m = 11; c.y--; } }
         if (cb === 'next') { c.m++; if (c.m > 11) { c.m = 0; c.y++; } }
         if (cb === 'today') { var n = new Date(); c.y = n.getFullYear(); c.m = n.getMonth(); }
@@ -513,125 +670,187 @@
       }
       if ((x = t.closest('[data-ev]'))) { openSched(x.getAttribute('data-ev')); return; }
       if (t.closest('[data-proj-edit]')) {
-        openForm('제안 기본정보 수정', projectFields(), Object.assign({}, S.data.master.project, {
-          pm: S.data.master.project.team.pm, biz: S.data.master.project.team.biz, sales: S.data.master.project.team.sales
-        }), function (v) {
-          var pr = S.data.master.project;
-          pr.name = v.name; pr.client = v.client; pr.summary = v.summary; pr.start = v.start; pr.deadline = v.deadline; pr.presentation = v.presentation;
-          pr.team = { pm: v.pm, biz: v.biz, sales: v.sales };
+        var pr = S.data.master.project;
+        openForm('제안 기본정보 수정', projectFields(), Object.assign({}, pr, { pm: pr.team.pm, biz: pr.team.biz, sales: pr.team.sales }), function (v) {
+          Object.assign(pr, { name: v.name, client: v.client, summary: v.summary, start: v.start, deadline: v.deadline, presentation: v.presentation, team: { pm: v.pm, biz: v.biz, sales: v.sales } });
+          logH('수정', '제안 기본정보', v.name);
         });
+        return;
+      }
+      if (t.closest('[data-prop-add]')) {
+        openForm('새 제안', [{ k: 'name', label: '제안명', req: true }, { k: 'scope', label: '구성' }, { k: 'start', label: '시작일', type: 'date' }, { k: 'end', label: '마감일', type: 'date' }],
+          {}, function (v) {
+            var list = S.data.proposals.items;
+            list.push({ id: nextNum('P', list), status: '준비중', cls: 'prep', name: v.name, scope: v.scope, start: v.start, end: v.end, pm: '', biz: '', sales: '—', pct: 0 });
+            logH('추가', '제안 ' + v.name, '');
+          });
+        return;
+      }
+      if ((x = t.closest('[data-prop-del]'))) {
+        id = x.getAttribute('data-prop-del');
+        var pitem = S.data.proposals.items.filter(function (y) { return y.id === id; })[0];
+        askDelete('제안 ' + pitem.name, '제안 ' + id, function () { markDeleted(pitem, S.lastReason); });
         return;
       }
       if (t.closest('[data-sc-add]')) {
         var today = todayISO();
-        openForm('일정 추가', schedFields(), { start: today, end: today, color: 'c-wr', owner: me(), status: '예정' }, function (v) {
-          S.data.schedule.items.push(Object.assign({ id: nextId('SC', S.data.schedule.items) }, v));
+        openForm('일정 추가', schedFields(), { start: today, end: today, color: 'c-wr', owner: S.user.name, status: '예정' }, function (v) {
+          S.data.schedule.items.push(Object.assign({ id: nextNum('SC', S.data.schedule.items) }, v));
+          logH('추가', '일정', v.title);
         }, null, schedValidate);
         return;
       }
       if ((x = t.closest('[data-sc-edit]'))) { openSched(x.getAttribute('data-sc-edit')); return; }
       if ((x = t.closest('[data-sc-del]'))) {
         id = x.getAttribute('data-sc-del');
-        if (!confirm('이 일정을 삭제할까요?')) return;
-        S.data.schedule.items = S.data.schedule.items.filter(function (y) { return y.id !== id; });
-        renderAll();
-        toast('삭제했습니다. 저장 버튼으로 반영하세요');
+        var sit = S.data.schedule.items.filter(function (y) { return y.id === id; })[0];
+        askDelete('일정 ' + sit.title, '일정 ' + id, function () { markDeleted(sit, S.lastReason); });
         return;
       }
       if ((x = t.closest('[data-post-add]'))) {
         var kk = x.getAttribute('data-post-add');
-        openForm('새 글', postFields(kk), kk === 'qna' || (boardOf(kk) && boardOf(kk).kind === 'qna') ? { status: '답변대기' } : {}, function (v) {
-          var list = postsOf(kk);
-          var pref = kk === 'comm' ? 'CM' : kk === 'board-1' ? 'QA' : 'RF';
-          var np = Object.assign({ id: nextId(pref, list), by: me(), date: todayISO() }, v);
-          list.push(np);
+        openForm('새 글', postFields(kk), boardOf(kk) && boardOf(kk).kind === 'qna' ? { status: '답변대기' } : {}, function (v) {
+          var list = postsOf(kk), pref = kk === 'comm' ? 'CM' : boardOf(kk) && boardOf(kk).kind === 'qna' ? 'QA' : 'RF';
+          list.push(Object.assign({ id: nextNum(pref, list), by: S.user.name, date: todayISO() }, v));
+          logH('추가', kk === 'comm' ? '커뮤니케이션' : boardOf(kk).name, v.title);
         });
         return;
       }
       if ((x = t.closest('[data-post-edit]'))) {
         p = x.getAttribute('data-post-edit').split('|');
-        openPostEdit(p[0], p[1]);
+        var pp = postsOf(p[0]).filter(function (y) { return y.id === p[1]; })[0];
+        if (!pp || !canEditPost(p[0], pp)) { toast('이 글은 수정할 수 없습니다', true); return; }
+        openForm('글 수정', postFields(p[0]), pp, function (v) { Object.assign(pp, v); logH('수정', p[0] === 'comm' ? '커뮤니케이션' : boardOf(p[0]).name, v.title); },
+          function () { askDelete('글 ' + pp.title, p[1], function () { markDeleted(pp, S.lastReason); }); });
         return;
       }
       if ((x = t.closest('[data-post-del]'))) {
         p = x.getAttribute('data-post-del').split('|');
-        var list2 = postsOf(p[0]), target = list2.filter(function (y) { return y.id === p[1]; })[0];
-        if (!target || !canEditPost(p[0], target)) { toast('이 글은 삭제할 수 없습니다', true); return; }
-        if (!confirm('이 글을 삭제할까요?')) return;
-        var remain = list2.filter(function (y) { return y.id !== p[1]; });
-        if (p[0] === 'comm') S.data.comm.posts = remain; else boardOf(p[0]).posts = remain;
-        renderAll();
-        toast('삭제했습니다. 저장 버튼으로 반영하세요');
+        var dp = postsOf(p[0]).filter(function (y) { return y.id === p[1]; })[0];
+        if (!dp || !canEditPost(p[0], dp)) { toast('이 글은 삭제할 수 없습니다', true); return; }
+        askDelete('글 ' + dp.title, p[1], function () { markDeleted(dp, S.lastReason); });
         return;
       }
-      if ((x = t.closest('[data-ws-add]'))) {
-        openForm('게시판 추가', [
-          { k: 'name', label: '게시판명', req: true }, { k: 'desc', label: '설명' },
-          { k: 'kind', label: '유형', type: 'select', opts: [{ v: 'free', l: '자유 글' }, { v: 'qna', l: 'Q&A (답변 상태)' }, { v: 'ref', l: '자료 (링크)' }] }
-        ], { kind: 'free' }, function (v) {
-          var bid = S.data.boards.nextId++;
-          S.data.boards.boards.push({ id: bid, name: v.name, desc: v.desc, kind: v.kind, posts: [] });
-          S.data.master.perms['board-' + bid] = { writer: 'edit', sales: 'view' };
+      if (t.closest('[data-req-add]')) {
+        openForm('요구사항 추가', reqFields(), {}, function (v) { S.data.rfp.reqs.push(v); logH('추가', '요구사항 ' + v.id, v.t); });
+        return;
+      }
+      if ((x = t.closest('[data-req-del]'))) {
+        id = x.getAttribute('data-req-del');
+        var rq = S.data.rfp.reqs.filter(function (y) { return y.id === id; })[0];
+        askDelete('요구사항 ' + rq.t, '요구사항 ' + id, function () { markDeleted(rq, S.lastReason); });
+        return;
+      }
+      if (t.closest('[data-toc-add]')) {
+        openForm('목차 추가', tocFields(), { lv: '2', status: 'todo' }, function (v) {
+          var rows = S.data.toc.rows;
+          rows.push({ id: nextNum('T', rows), lv: parseInt(v.lv, 10), title: v.title, owner: v.owner || '', pages: v.pages || '', status: v.status || 'todo' });
+          logH('추가', '목차', v.title);
         });
+        return;
+      }
+      if ((x = t.closest('[data-toc-edit]'))) {
+        id = x.getAttribute('data-toc-edit');
+        var tr = S.data.toc.rows.filter(function (y) { return y.id === id; })[0];
+        openForm('목차 수정', tocFields(), Object.assign({}, tr, { lv: String(tr.lv) }), function (v) {
+          Object.assign(tr, { title: v.title, lv: parseInt(v.lv, 10), owner: v.owner, pages: v.pages, status: v.status });
+          logH('수정', '목차 ' + id, v.title);
+        });
+        return;
+      }
+      if ((x = t.closest('[data-toc-del]'))) {
+        id = x.getAttribute('data-toc-del');
+        var tr2 = S.data.toc.rows.filter(function (y) { return y.id === id; })[0];
+        askDelete('목차 ' + tr2.title, '목차 ' + id, function () { markDeleted(tr2, S.lastReason); });
+        return;
+      }
+      if (t.closest('[data-merge]')) {
+        var v = S.data.versions, num = v.commits.length + 1;
+        v.commits.unshift({ h: 'm' + String(Date.now()).slice(-5), msg: '합본 v1.' + num + ' · 스냅샷 생성', who: S.user.name, when: '방금', tag: 'v1.' + num, diff: [['add', '+ 스냅샷', '현재 각 노드의 최신본을 묶어 생성']] });
+        logH('추가', '합본', 'v1.' + num);
+        renderAll();
+        toast('합본 스냅샷을 만들었습니다. 저장 버튼으로 확정하세요');
+        return;
+      }
+      if (t.closest('[data-ws-add]')) {
+        openForm('게시판 추가', [{ k: 'name', label: '게시판명', req: true }, { k: 'desc', label: '설명' },
+          { k: 'kind', label: '유형', type: 'select', opts: [{ v: 'free', l: '자유 글' }, { v: 'qna', l: 'Q&A (답변 상태)' }, { v: 'ref', l: '자료 (링크)' }] }],
+          { kind: 'free' }, function (v) {
+            var bid = S.data.boards.nextId++;
+            S.data.boards.boards.push({ id: bid, name: v.name, desc: v.desc, kind: v.kind, posts: [] });
+            S.data.master.perms['board-' + bid] = { writer: 'edit', pm: 'edit', sales: 'view' };
+            logH('추가', '게시판 ' + v.name, '');
+          });
         return;
       }
       if ((x = t.closest('[data-ws-edit]'))) {
         var bid2 = parseInt(x.getAttribute('data-ws-edit'), 10), bd = boardOf('board-' + bid2);
         openForm('게시판 수정', [{ k: 'name', label: '게시판명', req: true }, { k: 'desc', label: '설명' }], bd, function (v) {
-          bd.name = v.name; bd.desc = v.desc;
+          bd.name = v.name; bd.desc = v.desc; logH('수정', '게시판 ' + v.name, '');
         });
         return;
       }
       if ((x = t.closest('[data-ws-del]'))) {
         var did = parseInt(x.getAttribute('data-ws-del'), 10), dbd = boardOf('board-' + did);
-        if (!confirm('"' + dbd.name + '" 게시판과 글 ' + dbd.posts.length + '건을 삭제할까요?')) return;
-        S.data.boards.boards = S.data.boards.boards.filter(function (b) { return b.id !== did; });
-        delete S.data.master.perms['board-' + did];
-        if (S.route === 'board-' + did) location.hash = '#home';
-        renderAll();
-        toast('삭제했습니다. 저장 버튼으로 반영하세요');
+        askDelete('게시판 ' + dbd.name, '게시판 ' + dbd.name, function () { markDeleted(dbd, S.lastReason); });
         return;
       }
       if (t.closest('[data-mem-add]')) {
-        openForm('멤버 추가', [
-          { k: 'name', label: '이름', req: true }, { k: 'title', label: '직함' },
-          { k: 'role', label: '권한', type: 'select', opts: ROLES }
-        ], { role: 'writer' }, function (v) { S.data.master.members.push(v); });
+        openForm('멤버 추가', [{ k: 'name', label: '이름', req: true }, { k: 'id', label: '아이디', req: true }, { k: 'pw', label: '비밀번호', req: true },
+          { k: 'title', label: '직함' }, { k: 'role', label: '역할', type: 'select', opts: Object.keys(S.data.master.roles).map(function (r) { return { v: r, l: S.data.master.roles[r] }; }) }],
+          { role: 'writer' }, function (v) {
+            if (S.data.master.members.some(function (m) { return m.id === v.id; })) { toast('이미 있는 아이디입니다', true); return; }
+            S.data.master.members.push(v); logH('추가', '멤버 ' + v.name, roleName(v.role));
+          });
         return;
       }
       if ((x = t.closest('[data-mem-del]'))) {
-        var di = parseInt(x.getAttribute('data-mem-del'), 10);
-        if (!confirm('이 멤버를 목록에서 제외할까요?')) return;
-        S.data.master.members.splice(di, 1);
-        renderAll();
-        toast('제외했습니다. 저장 버튼으로 반영하세요');
+        var mi = parseInt(x.getAttribute('data-mem-del'), 10), mm = S.data.master.members[mi];
+        askDelete('멤버 ' + mm.name, '멤버 ' + mm.name, function () { markDeleted(mm, S.lastReason); });
         return;
       }
+      if ((x = t.closest('[data-sw]'))) {
+        var si = parseInt(x.getAttribute('data-sw'), 10), su = S.data.master.sysUsers[si];
+        su.on = !su.on; logH('수정', '시스템 권한 ' + su.name, su.on ? '전체 접근 허용' : '전체 접근 해제');
+        renderAll();
+        return;
+      }
+      if ((x = t.closest('[data-del]'))) { return; }
     });
+
     $('content').addEventListener('change', function (e) {
       var t = e.target;
       if (t.hasAttribute('data-mem-role')) {
-        S.data.master.members[parseInt(t.getAttribute('data-mem-role'), 10)].role = t.value;
+        var mem = S.data.master.members[parseInt(t.getAttribute('data-mem-role'), 10)];
+        logH('수정', '멤버 ' + mem.name, '역할: ' + roleName(mem.role) + ' → ' + roleName(t.value));
+        mem.role = t.value;
         renderAll();
       } else if (t.hasAttribute('data-perm')) {
         var pp = t.getAttribute('data-perm').split('|');
         var entry = S.data.master.perms[pp[0]] || (S.data.master.perms[pp[0]] = {});
+        logH('수정', '화면 권한 ' + pp[0], roleName(pp[1]) + ' → ' + LEVEL_LABEL[t.value]);
         entry[pp[1]] = t.value;
         renderAll();
+      } else if (t.hasAttribute('data-mx')) {
+        var mx = t.getAttribute('data-mx').split('|'), row = S.data.matrix.rows[parseInt(mx[0], 10)];
+        row[mx[1]] = t.value;
+        logH('수정', '조견표', (row.mid || '') + ' · ' + mx[1] + ' → ' + t.value);
+      } else if (t.hasAttribute('data-exp')) {
+        var ex = t.getAttribute('data-exp').split('|');
+        S.data.expense.tabs[ex[0]].rows[parseInt(ex[1], 10)][parseInt(ex[2], 10)] = t.value;
+        logH('수정', '경비 ' + S.data.expense.tabs[ex[0]].label, t.value);
+      } else if (t.hasAttribute('data-eff')) {
+        var ef = t.getAttribute('data-eff').split('|');
+        S.data.effort.rows[parseInt(ef[0], 10)][parseInt(ef[1], 10)] = t.value;
+        logH('수정', '수행 공수', t.value);
       }
     });
+
     $('modal').addEventListener('click', function (e) {
       var t = e.target, M = S.modal;
       if (t === this || t.hasAttribute('data-x')) { closeModal(); return; }
       if (!M) return;
-      if (t.hasAttribute('data-del')) {
-        if (!confirm('삭제할까요?')) return;
-        if (M.onDelete) M.onDelete();
-        closeModal();
-        renderAll();
-        toast('삭제했습니다. 저장 버튼으로 반영하세요');
-        return;
-      }
+      if (t.hasAttribute('data-del')) { var dfn = M.onDelete; closeModal(); if (dfn) dfn(); renderAll(); return; }
       if (t.hasAttribute('data-save')) {
         var v = {}, ok = true;
         M.fields.forEach(function (f) {
@@ -640,10 +859,7 @@
           if (f.req && !v[f.k]) ok = false;
         });
         if (!ok) { toast('필수 항목을 입력하세요', true); return; }
-        if (M.validate) {
-          var msg = M.validate(v);
-          if (msg) { toast(msg, true); return; }
-        }
+        if (M.validate) { var msg = M.validate(v); if (msg) { toast(msg, true); return; } }
         M.onSave(v);
         closeModal();
         renderAll();
@@ -651,21 +867,17 @@
       }
     });
   }
-  function openPostEdit(k, pid) {
-    var list = postsOf(k), p = list.filter(function (y) { return y.id === pid; })[0];
-    if (!p) return;
-    if (!canEditPost(k, p)) { toast('이 글은 수정할 수 없습니다', true); return; }
-    openForm('글 수정', postFields(k), p, function (v) { Object.assign(p, v); });
-  }
 
   function boot() {
     loadAll(false).then(function () {
       var n = new Date();
       S.cal = { y: n.getFullYear(), m: n.getMonth() };
       bind();
-      route();
+      var saved = sessionStorage.getItem(SESSION);
+      var m = saved ? memberById(saved) : null;
+      if (m) { S.user = m; showApp(); } else { showLogin(); }
     }).catch(function (err) {
-      $('content').innerHTML = '<div class="empty">데이터를 읽지 못했습니다 (' + esc(err.message) +
+      document.body.innerHTML = '<div class="empty" style="padding:40px">데이터를 읽지 못했습니다 (' + esc(err.message) +
         '). 파일을 직접 열지 말고 로컬 서버로 실행하세요: python3 -m http.server 8000</div>';
     });
   }
