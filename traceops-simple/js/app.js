@@ -33,6 +33,15 @@
   };
   var STATUS_ORDER = { '지연': 0, '진행중': 1, '미착수': 2, '완료': 3 };
   var STATUS_CLS = { '지연': 'late', '진행중': 'doing', '미착수': 'todo', '완료': 'done' };
+  // 단계별 하위 연결 (상위 항목을 가리키는 하위 항목의 필드)
+  var CHAIN = {
+    analysis: { to: 'design', key: 'analysisRef', label: '설계' },
+    design: { to: 'dev', key: 'designRef', label: '개발' },
+    dev: { to: 'unit', key: 'linked', label: '단위테스트' },
+    unit: { to: 'integration', key: 'units', label: '통합테스트' }
+  };
+  // 실적 날짜: 오늘 이후 입력 불가
+  var ACTUAL_KEYS = ['wActStart', 'wActEnd', 'pActStart', 'pActEnd', 'execDate'];
   // 매핑 팝업에서 다른 관리 화면으로 넘어가는 링크 (화면이 만들어지면 master.json 주소만 연결)
   var LINK_TARGETS = {
     reqIds: { key: 'requirementsUrl', label: '요구사항 관리에서 등록 (TODO)' },
@@ -103,6 +112,12 @@
   }
   function getVal(it, f) { return f === 'status' ? statusOf(it) : it[f]; }
 
+  function actualErrors(it, m) {
+    var t = todayISO();
+    if (ACTUAL_KEYS.some(function (k) { return it[k] && it[k] > t; })) m.push('실적 날짜가 오늘 이후');
+    if (it.wActStart && it.wActEnd && it.wActEnd < it.wActStart) m.push('실적 종료일이 시작일보다 빠름');
+    if (it.pActStart && it.pActEnd && it.pActEnd < it.pActStart) m.push('PL 실적 종료일이 시작일보다 빠름');
+  }
   function validate(page, it, all) {
     var m = [];
     if (page.kind === 'stage') {
@@ -111,14 +126,27 @@
       if (page.typesKey === 'design' && !arr(it.analysisRef).length) m.push('분석ID 미연결');
       if (page.typesKey === 'dev' && !arr(it.designRef).length) m.push('설계ID 미연결');
       if (all.filter(function (x) { return x.id === it.id; }).length > 1) m.push('ID 중복');
+      actualErrors(it, m);
     } else {
       if (!arr(it.linked).length) m.push(page.multi ? '연계 개발ID 미지정' : '개발ID 미연결');
       if (page.multi && !arr(it.units).length) m.push('묶인 단위테스트 없음');
       if (!arr(it.reqIds).length) m.push('요구사항 미매핑');
       if (!arr(it.physIds).length) m.push('물리ID 미매핑');
       if (it.result === 'FAIL' && !arr(it.evidence).length) m.push('FAIL 증적 필요');
+      actualErrors(it, m);
     }
     return m;
+  }
+  function chainCount(file, it) {
+    var ch = CHAIN[file];
+    if (!ch) return 0;
+    return S.data[ch.to].items.filter(function (x) { return arr(x[ch.key]).indexOf(it.id) >= 0; }).length;
+  }
+  function chainCell(page, it) {
+    var ch = CHAIN[page.file], n = chainCount(page.file, it);
+    return n
+      ? '<span class="mono">' + ch.label + ' ' + n + '건</span>'
+      : '<span class="chip-missing">⚠ ' + ch.label + ' 없음</span>';
   }
   function needsEvidence(page, it) {
     if (page.kind === 'test') return it.result === 'FAIL' && !arr(it.evidence).length;
@@ -129,6 +157,7 @@
   function columnsOf(page) {
     var c = [], t = page.typesKey;
     c.push({ k: 'v', label: '검증', kind: 'v' });
+    if (CHAIN[page.file]) c.push({ k: 'chain', label: '하위 연결', kind: 'chain' });
     if (page.kind === 'stage') {
       c.push({ k: 'system', label: '시스템', kind: 'sys', edit: 'pl' });
       c.push({ k: 'subsystem', label: '서브시스템', kind: 'sub', edit: 'pl' });
@@ -256,7 +285,8 @@
       case 'sub': return '<select class="txt-input" data-k="subsystem"' + dis + '>' + opts(subsOf(it.system), v) + '</select>';
       case 'typeSel': return '<select class="txt-input" data-k="type"' + dis + '>' + opts(S.master.types[page.typesKey], v) + '</select>';
       case 'text': return '<input class="txt-input" data-k="' + k + '" value="' + esc(v) + '" style="width:' + (c.w || 120) + 'px"' + dis + '>';
-      case 'date': return '<input class="txt-input" type="date" data-k="' + k + '" value="' + esc(v) + '"' + dis + '>';
+      case 'date': return '<input class="txt-input" type="date" data-k="' + k + '" value="' + esc(v) + '"' +
+        (ACTUAL_KEYS.indexOf(k) >= 0 ? ' max="' + todayISO() + '"' : '') + dis + '>';
       case 'select': return '<select class="txt-input" data-k="' + k + '"' + dis + '>' + opts(c.opts, v, c.blank) + '</select>';
       case 'worker':
         if (S.mode === 'pl') {
@@ -265,6 +295,7 @@
         }
         return v ? esc(v) : '<span class="mono">-</span>';
       case 'chips': return chipsHTML(c, it, ed);
+      case 'chain': return chainCell(page, it);
       case 'evidence': return badge(page, it, 'evidence');
       case 'remark': return badge(page, it, 'remarks');
     }
@@ -324,20 +355,30 @@
     $('resultCount').innerHTML = h;
   }
   function renderBanner(page, all) {
-    if (S.mode !== 'pl') { $('banner').innerHTML = ''; return; }
-    var rows = 0, kinds = {};
-    all.forEach(function (it) {
-      var m = validate(page, it, all);
-      if (m.length) {
-        rows++;
-        m.forEach(function (x) { kinds[x] = (kinds[x] || 0) + 1; });
+    var html = '';
+    if (S.mode === 'pl') {
+      var rows = 0, kinds = {};
+      all.forEach(function (it) {
+        var m = validate(page, it, all);
+        if (m.length) {
+          rows++;
+          m.forEach(function (x) { kinds[x] = (kinds[x] || 0) + 1; });
+        }
+      });
+      if (rows) {
+        html += '<div class="validation-banner">⚠ 검증 오류 ' + rows + '행 — ' +
+          Object.keys(kinds).map(function (k) { return k + ' ' + kinds[k] + '건'; }).join(', ') +
+          '. 저장 전 확인이 필요합니다.</div>';
       }
-    });
-    $('banner').innerHTML = rows
-      ? '<div class="validation-banner">⚠ 검증 오류 ' + rows + '행 — ' +
-        Object.keys(kinds).map(function (k) { return k + ' ' + kinds[k] + '건'; }).join(', ') +
-        '. 저장 전 확인이 필요합니다.</div>'
-      : '';
+    }
+    var ch = CHAIN[page.file];
+    if (ch) {
+      var miss = all.filter(function (it) { return chainCount(page.file, it) === 0; }).map(function (it) { return it.id; });
+      if (miss.length) {
+        html += '<div class="paste-hint">🔗 ' + ch.label + ' 연결이 없는 항목 ' + miss.length + '건: ' + esc(miss.join(', ')) + '</div>';
+      }
+    }
+    $('banner').innerHTML = html;
   }
   function renderChrome() {
     var page = pageOf();
@@ -789,6 +830,11 @@
       var tr = el.closest('tr');
       var it = find(pageOf(), tr.getAttribute('data-id'));
       if (!it) return;
+      if (ACTUAL_KEYS.indexOf(k) >= 0 && el.value > todayISO()) {
+        showToast('실적 날짜는 오늘(' + todayISO() + ')까지만 입력할 수 있습니다', true);
+        renderTable();
+        return;
+      }
       if (k === 'system') {
         it.system = el.value;
         it.subsystem = subsOf(el.value)[0] || '';
