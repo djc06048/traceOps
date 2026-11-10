@@ -3,6 +3,22 @@
   "items": [
     {
       "id": "TI-2026-0001",
+      "name": "가입설계 화면 연계",
+      "linked": [
+        "UI_QPM_0001",
+        "UI_QPM_0002",
+        "UI_QPM_0003"
+      ],
+      "reqIds": [],
+      "expected": "",
+      "round": "1차",
+      "worker": "",
+      "result": "미실행",
+      "evidence": [],
+      "remarks": []
+    },
+    {
+      "id": "TI-2026-0002",
       "name": "가입설계 인터페이스 연계",
       "linked": [
         "IF_QPM_0001",
@@ -18,11 +34,28 @@
       "remarks": []
     },
     {
-      "id": "TI-2026-0002",
+      "id": "TI-2026-0003",
       "name": "청약 배치 연계",
       "linked": [
         "BT_QPM_0001",
         "BT_QPM_0002"
+      ],
+      "reqIds": [],
+      "expected": "",
+      "round": "1차",
+      "worker": "",
+      "result": "미실행",
+      "evidence": [],
+      "remarks": []
+    },
+    {
+      "id": "TI-2026-0004",
+      "name": "공통 프로그램 연계",
+      "linked": [
+        "PG_QPM_0001",
+        "PG_QPM_0002",
+        "PG_QPM_0003",
+        "PG_QPM_0004"
       ],
       "reqIds": [],
       "expected": "",

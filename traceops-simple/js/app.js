@@ -32,6 +32,11 @@
   };
   var STATUS_ORDER = { '지연': 0, '진행중': 1, '미착수': 2, '완료': 3 };
   var STATUS_CLS = { '지연': 'late', '진행중': 'doing', '미착수': 'todo', '완료': 'done' };
+  // 매핑 팝업에서 다른 관리 화면으로 넘어가는 링크 (화면이 만들어지면 master.json 주소만 연결)
+  var LINK_TARGETS = {
+    reqIds: { key: 'requirementsUrl', label: '요구사항 관리에서 등록 (TODO)' },
+    physIds: { key: 'physicalIdsUrl', label: '물리ID 관리에서 등록 (TODO)' }
+  };
 
   var S = {
     master: null, data: {}, draft: {},
@@ -448,8 +453,9 @@
       '<div class="modal-search"><input class="f-input" id="pickQ" placeholder="검색" style="width:100%"></div>' +
       '<div class="modal-list" id="pickList"></div>' +
       '<div class="modal-input"><div class="row">' +
-      (c.src === 'reqIds'
-        ? '<a class="btn ghost sm" href="' + esc(S.master.requirementsUrl || '#') + '" target="_blank" rel="noopener">요구사항 관리에서 등록 ↗</a>'
+      (LINK_TARGETS[c.src]
+        ? '<a class="btn ghost sm" href="' + esc(S.master[LINK_TARGETS[c.src].key] || '#') + '" target="_blank" rel="noopener">' +
+          esc(LINK_TARGETS[c.src].label) + ' ↗</a>'
         : '<span></span>') +
       '<span class="pick-btns"><button class="btn ghost sm" id="pickClear">선택 해제</button>' +
       '<button class="btn sm" id="pickApply">적용</button></span></div></div>';

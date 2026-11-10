@@ -7,7 +7,9 @@
       "linked": [
         "UI_QPM_0001"
       ],
-      "reqIds": [],
+      "reqIds": [
+        "RF_LTR_001"
+      ],
       "expected": "",
       "round": "1차",
       "worker": "정현규",
@@ -21,7 +23,9 @@
       "linked": [
         "UI_QPM_0002"
       ],
-      "reqIds": [],
+      "reqIds": [
+        "RF_LTR_001"
+      ],
       "expected": "",
       "round": "1차",
       "worker": "장윤나",
@@ -35,7 +39,9 @@
       "linked": [
         "UI_QPM_0003"
       ],
-      "reqIds": [],
+      "reqIds": [
+        "RF_LTR_004"
+      ],
       "expected": "",
       "round": "1차",
       "worker": "이외화",
@@ -49,7 +55,9 @@
       "linked": [
         "IF_QPM_0001"
       ],
-      "reqIds": [],
+      "reqIds": [
+        "RF_LTR_002"
+      ],
       "expected": "",
       "round": "1차",
       "worker": "이외화",
@@ -63,7 +71,9 @@
       "linked": [
         "IF_QPM_0002"
       ],
-      "reqIds": [],
+      "reqIds": [
+        "RF_LTR_002"
+      ],
       "expected": "",
       "round": "1차",
       "worker": "이외화",
@@ -77,7 +87,9 @@
       "linked": [
         "IF_QPM_0003"
       ],
-      "reqIds": [],
+      "reqIds": [
+        "RF_LTR_002"
+      ],
       "expected": "",
       "round": "1차",
       "worker": "최재호",
@@ -91,7 +103,9 @@
       "linked": [
         "BT_QPM_0001"
       ],
-      "reqIds": [],
+      "reqIds": [
+        "RF_LTR_003"
+      ],
       "expected": "",
       "round": "1차",
       "worker": "이학수",
@@ -105,10 +119,76 @@
       "linked": [
         "BT_QPM_0002"
       ],
-      "reqIds": [],
+      "reqIds": [
+        "RF_LTR_003"
+      ],
       "expected": "",
       "round": "1차",
       "worker": "이학수",
+      "result": "미실행",
+      "evidence": [],
+      "remarks": []
+    },
+    {
+      "id": "TU-2026-0009",
+      "name": "단위테스트 · 장기공통",
+      "linked": [
+        "PG_QPM_0001"
+      ],
+      "reqIds": [
+        "RF_LTR_005"
+      ],
+      "expected": "",
+      "round": "1차",
+      "worker": "최재호",
+      "result": "미실행",
+      "evidence": [],
+      "remarks": []
+    },
+    {
+      "id": "TU-2026-0010",
+      "name": "단위테스트 · 공통현완",
+      "linked": [
+        "PG_QPM_0002"
+      ],
+      "reqIds": [
+        "RF_LTR_005"
+      ],
+      "expected": "",
+      "round": "1차",
+      "worker": "김영수",
+      "result": "미실행",
+      "evidence": [],
+      "remarks": []
+    },
+    {
+      "id": "TU-2026-0011",
+      "name": "단위테스트 · 장기공통코드정보",
+      "linked": [
+        "PG_QPM_0003"
+      ],
+      "reqIds": [
+        "RF_LTR_005"
+      ],
+      "expected": "",
+      "round": "1차",
+      "worker": "김종학",
+      "result": "미실행",
+      "evidence": [],
+      "remarks": []
+    },
+    {
+      "id": "TU-2026-0012",
+      "name": "단위테스트 · 공통신용정보관리",
+      "linked": [
+        "PG_QPM_0004"
+      ],
+      "reqIds": [
+        "RF_LTR_005"
+      ],
+      "expected": "",
+      "round": "1차",
+      "worker": "김종학",
       "result": "미실행",
       "evidence": [],
       "remarks": []

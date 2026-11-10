@@ -13,11 +13,24 @@
       "wPlanEnd": "2026-04-15",
       "wActStart": "2026-04-06",
       "wActEnd": "2026-04-22",
-      "devType": "변경",
-      "devRound": "",
-      "reqIds": [],
-      "physIds": [],
-      "evidence": [],
+      "pPlanStart": "2026-04-18",
+      "pPlanEnd": "2026-04-20",
+      "devType": "신규",
+      "devRound": "1차",
+      "reqIds": [
+        "RF_LTR_001"
+      ],
+      "physIds": [
+        "LTRA010.html"
+      ],
+      "evidence": [
+        {
+          "date": "2026-04-22",
+          "author": "정민규",
+          "text": "산출물 제출",
+          "file": "UI_QPM_0001_설계서.docx"
+        }
+      ],
       "remarks": []
     },
     {
@@ -32,11 +45,24 @@
       "wPlanEnd": "2026-04-10",
       "wActStart": "2026-04-13",
       "wActEnd": "2026-04-17",
+      "pPlanStart": "2026-04-13",
+      "pPlanEnd": "2026-04-15",
       "devType": "변경",
-      "devRound": "",
-      "reqIds": [],
-      "physIds": [],
-      "evidence": [],
+      "devRound": "1차",
+      "reqIds": [
+        "RF_LTR_001"
+      ],
+      "physIds": [
+        "LTRA020.html"
+      ],
+      "evidence": [
+        {
+          "date": "2026-04-17",
+          "author": "장윤나",
+          "text": "산출물 제출",
+          "file": "UI_QPM_0002_설계서.docx"
+        }
+      ],
       "remarks": []
     },
     {
@@ -51,11 +77,24 @@
       "wPlanEnd": "2026-03-18",
       "wActStart": "2026-03-23",
       "wActEnd": "2026-03-25",
-      "devType": "변경",
-      "devRound": "",
-      "reqIds": [],
-      "physIds": [],
-      "evidence": [],
+      "pPlanStart": "2026-03-21",
+      "pPlanEnd": "2026-03-23",
+      "devType": "신규",
+      "devRound": "1차",
+      "reqIds": [
+        "RF_LTR_004"
+      ],
+      "physIds": [
+        "LTRA030.html"
+      ],
+      "evidence": [
+        {
+          "date": "2026-03-25",
+          "author": "이외화",
+          "text": "산출물 제출",
+          "file": "UI_QPM_0003_설계서.docx"
+        }
+      ],
       "remarks": []
     },
     {
@@ -70,11 +109,24 @@
       "wPlanEnd": "2026-04-15",
       "wActStart": "2026-04-13",
       "wActEnd": "2026-04-22",
+      "pPlanStart": "2026-04-18",
+      "pPlanEnd": "2026-04-20",
       "devType": "변경",
-      "devRound": "",
-      "reqIds": [],
-      "physIds": [],
-      "evidence": [],
+      "devRound": "1차",
+      "reqIds": [
+        "RF_LTR_002"
+      ],
+      "physIds": [
+        "InfLtrA010.java"
+      ],
+      "evidence": [
+        {
+          "date": "2026-04-22",
+          "author": "이외화",
+          "text": "산출물 제출",
+          "file": "IF_QPM_0001_설계서.docx"
+        }
+      ],
       "remarks": []
     },
     {
@@ -89,11 +141,24 @@
       "wPlanEnd": "2026-04-15",
       "wActStart": "2026-04-13",
       "wActEnd": "2026-04-22",
-      "devType": "변경",
-      "devRound": "",
-      "reqIds": [],
-      "physIds": [],
-      "evidence": [],
+      "pPlanStart": "2026-04-18",
+      "pPlanEnd": "2026-04-20",
+      "devType": "신규",
+      "devRound": "1차",
+      "reqIds": [
+        "RF_LTR_002"
+      ],
+      "physIds": [
+        "InfLtrA020.java"
+      ],
+      "evidence": [
+        {
+          "date": "2026-04-22",
+          "author": "이외화",
+          "text": "산출물 제출",
+          "file": "IF_QPM_0002_설계서.docx"
+        }
+      ],
       "remarks": []
     },
     {
@@ -108,11 +173,24 @@
       "wPlanEnd": "2026-04-15",
       "wActStart": "2026-04-13",
       "wActEnd": "2026-04-22",
+      "pPlanStart": "2026-04-18",
+      "pPlanEnd": "2026-04-20",
       "devType": "변경",
-      "devRound": "",
-      "reqIds": [],
-      "physIds": [],
-      "evidence": [],
+      "devRound": "1차",
+      "reqIds": [
+        "RF_LTR_002"
+      ],
+      "physIds": [
+        "InfLtrA030.java"
+      ],
+      "evidence": [
+        {
+          "date": "2026-04-22",
+          "author": "정민규",
+          "text": "산출물 제출",
+          "file": "IF_QPM_0003_설계서.docx"
+        }
+      ],
       "remarks": []
     },
     {
@@ -125,10 +203,16 @@
       "worker": "이학수",
       "wPlanStart": "2026-10-06",
       "wPlanEnd": "2026-11-20",
-      "devType": "변경",
-      "devRound": "",
-      "reqIds": [],
-      "physIds": [],
+      "pPlanStart": "2026-11-23",
+      "pPlanEnd": "2026-11-25",
+      "devType": "신규",
+      "devRound": "1차",
+      "reqIds": [
+        "RF_LTR_003"
+      ],
+      "physIds": [
+        "BtLtrA010.java"
+      ],
       "evidence": [],
       "remarks": []
     },
@@ -142,11 +226,177 @@
       "worker": "이학수",
       "wPlanStart": "2026-10-06",
       "wPlanEnd": "2026-11-20",
+      "pPlanStart": "2026-11-23",
+      "pPlanEnd": "2026-11-25",
       "devType": "변경",
-      "devRound": "",
-      "reqIds": [],
-      "physIds": [],
+      "devRound": "1차",
+      "reqIds": [
+        "RF_LTR_003"
+      ],
+      "physIds": [
+        "BtLtrA020.java"
+      ],
       "evidence": [],
+      "remarks": []
+    },
+    {
+      "id": "PG_QPM_0001",
+      "srcId": "PG_QPM_0001",
+      "system": "가입설계/청약",
+      "subsystem": "가입설계/청약",
+      "type": "프로그램설계(온라인)",
+      "name": "장기공통",
+      "worker": "한형민",
+      "wPlanStart": "2026-03-06",
+      "wPlanEnd": "2026-03-11",
+      "wActStart": "2026-03-06",
+      "wActEnd": "2026-03-11",
+      "pPlanStart": "2026-03-14",
+      "pPlanEnd": "2026-03-16",
+      "devType": "신규",
+      "devRound": "1차",
+      "reqIds": [
+        "RF_LTR_005"
+      ],
+      "physIds": [
+        "SvLtrA010.java"
+      ],
+      "evidence": [
+        {
+          "date": "2026-03-11",
+          "author": "한형민",
+          "text": "산출물 제출",
+          "file": "PG_QPM_0001_설계서.docx"
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "PG_QPM_0002",
+      "srcId": "PG_QPM_0015",
+      "system": "가입설계/청약",
+      "subsystem": "가입설계/청약",
+      "type": "프로그램설계(온라인)",
+      "name": "공통현완",
+      "worker": "한형민",
+      "wPlanStart": "2026-03-06",
+      "wPlanEnd": "2026-03-11",
+      "wActStart": "2026-03-13",
+      "wActEnd": "2026-03-18",
+      "pPlanStart": "2026-03-14",
+      "pPlanEnd": "2026-03-16",
+      "devType": "변경",
+      "devRound": "1차",
+      "reqIds": [
+        "RF_LTR_005"
+      ],
+      "physIds": [
+        "SvLtrA020.java"
+      ],
+      "evidence": [
+        {
+          "date": "2026-03-18",
+          "author": "한형민",
+          "text": "산출물 제출",
+          "file": "PG_QPM_0002_설계서.docx"
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "PG_QPM_0003",
+      "srcId": "PG_QPM_0016",
+      "system": "가입설계/청약",
+      "subsystem": "가입설계/청약",
+      "type": "프로그램설계(온라인)",
+      "name": "장기공통코드정보",
+      "worker": "한형민",
+      "wPlanStart": "2026-03-06",
+      "wPlanEnd": "2026-03-11",
+      "wActStart": "2026-03-13",
+      "wActEnd": "2026-03-18",
+      "pPlanStart": "2026-03-14",
+      "pPlanEnd": "2026-03-16",
+      "devType": "신규",
+      "devRound": "1차",
+      "reqIds": [
+        "RF_LTR_005"
+      ],
+      "physIds": [
+        "SvLtrA030.java"
+      ],
+      "evidence": [
+        {
+          "date": "2026-03-18",
+          "author": "한형민",
+          "text": "산출물 제출",
+          "file": "PG_QPM_0003_설계서.docx"
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "PG_QPM_0004",
+      "srcId": "PG_QPM_0017",
+      "system": "가입설계/청약",
+      "subsystem": "가입설계/청약",
+      "type": "프로그램설계(온라인)",
+      "name": "공통신용정보관리",
+      "worker": "황태택",
+      "wPlanStart": "2026-03-12",
+      "wPlanEnd": "2026-03-18",
+      "wActStart": "2026-03-19",
+      "wActEnd": "2026-03-25",
+      "pPlanStart": "2026-03-21",
+      "pPlanEnd": "2026-03-23",
+      "devType": "변경",
+      "devRound": "1차",
+      "reqIds": [
+        "RF_LTR_005"
+      ],
+      "physIds": [
+        "SvLtrA040.java"
+      ],
+      "evidence": [
+        {
+          "date": "2026-03-25",
+          "author": "황태택",
+          "text": "산출물 제출",
+          "file": "PG_QPM_0004_설계서.docx"
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "PG_QPM_0005",
+      "srcId": "PG_QPM_0018",
+      "system": "가입설계/청약",
+      "subsystem": "가입설계/청약",
+      "type": "프로그램설계(온라인)",
+      "name": "공통신용정보조회동의",
+      "worker": "황태택",
+      "wPlanStart": "2026-03-12",
+      "wPlanEnd": "2026-03-18",
+      "wActStart": "2026-03-19",
+      "wActEnd": "2026-03-25",
+      "pPlanStart": "2026-03-21",
+      "pPlanEnd": "2026-03-23",
+      "devType": "신규",
+      "devRound": "1차",
+      "reqIds": [
+        "RF_LTR_005"
+      ],
+      "physIds": [
+        "SvLtrA050.java"
+      ],
+      "evidence": [
+        {
+          "date": "2026-03-25",
+          "author": "황태택",
+          "text": "산출물 제출",
+          "file": "PG_QPM_0005_설계서.docx"
+        }
+      ],
       "remarks": []
     }
   ]

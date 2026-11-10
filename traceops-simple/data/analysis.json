@@ -1,4 +1,325 @@
 {
   "stage": "analysis",
-  "items": []
+  "items": [
+    {
+      "id": "UI_QPM_0001",
+      "system": "가입설계/청약",
+      "subsystem": "가입설계/청약",
+      "type": "현황업무분석",
+      "name": "계약사항 입력",
+      "worker": "정민규",
+      "wPlanStart": "2026-04-02",
+      "wPlanEnd": "2026-04-08",
+      "wActStart": "2026-03-30",
+      "wActEnd": "2026-04-05",
+      "evidence": [
+        {
+          "date": "2026-04-05",
+          "author": "정민규",
+          "text": "분석서 제출",
+          "file": "UI_QPM_0001_분석서.docx"
+        }
+      ],
+      "pPlanStart": "2026-04-11",
+      "pPlanEnd": "2026-04-13",
+      "reqIds": [
+        "RF_LTR_001"
+      ],
+      "remarks": []
+    },
+    {
+      "id": "UI_QPM_0002",
+      "system": "가입설계/청약",
+      "subsystem": "가입설계/청약",
+      "type": "현황업무분석",
+      "name": "인수심사요청및결과",
+      "worker": "장윤나",
+      "wPlanStart": "2026-03-30",
+      "wPlanEnd": "2026-04-05",
+      "wActStart": "2026-04-06",
+      "wActEnd": "2026-04-12",
+      "evidence": [
+        {
+          "date": "2026-04-12",
+          "author": "장윤나",
+          "text": "분석서 제출",
+          "file": "UI_QPM_0002_분석서.docx"
+        }
+      ],
+      "pPlanStart": "2026-04-08",
+      "pPlanEnd": "2026-04-10",
+      "reqIds": [
+        "RF_LTR_001"
+      ],
+      "remarks": []
+    },
+    {
+      "id": "UI_QPM_0003",
+      "system": "가입설계/청약",
+      "subsystem": "가입설계/청약",
+      "type": "현황업무분석",
+      "name": "장기보험-가입설계요청",
+      "worker": "이외화",
+      "wPlanStart": "2026-03-09",
+      "wPlanEnd": "2026-03-15",
+      "wActStart": "2026-03-16",
+      "wActEnd": "2026-03-22",
+      "evidence": [
+        {
+          "date": "2026-03-22",
+          "author": "이외화",
+          "text": "분석서 제출",
+          "file": "UI_QPM_0003_분석서.docx"
+        }
+      ],
+      "pPlanStart": "2026-03-18",
+      "pPlanEnd": "2026-03-20",
+      "reqIds": [
+        "RF_LTR_004"
+      ],
+      "remarks": []
+    },
+    {
+      "id": "IF_QPM_0001",
+      "system": "가입설계/청약",
+      "subsystem": "가입설계/청약",
+      "type": "현황업무분석",
+      "name": "가입설계 삭제",
+      "worker": "이외화",
+      "wPlanStart": "2026-03-30",
+      "wPlanEnd": "2026-04-05",
+      "wActStart": "2026-04-06",
+      "wActEnd": "2026-04-12",
+      "evidence": [
+        {
+          "date": "2026-04-12",
+          "author": "이외화",
+          "text": "분석서 제출",
+          "file": "IF_QPM_0001_분석서.docx"
+        }
+      ],
+      "pPlanStart": "2026-04-08",
+      "pPlanEnd": "2026-04-10",
+      "reqIds": [
+        "RF_LTR_002"
+      ],
+      "remarks": []
+    },
+    {
+      "id": "IF_QPM_0002",
+      "system": "가입설계/청약",
+      "subsystem": "가입설계/청약",
+      "type": "현황업무분석",
+      "name": "가입설계검색 조회",
+      "worker": "이외화",
+      "wPlanStart": "2026-03-30",
+      "wPlanEnd": "2026-04-05",
+      "wActStart": "2026-04-06",
+      "wActEnd": "2026-04-12",
+      "evidence": [
+        {
+          "date": "2026-04-12",
+          "author": "이외화",
+          "text": "분석서 제출",
+          "file": "IF_QPM_0002_분석서.docx"
+        }
+      ],
+      "pPlanStart": "2026-04-08",
+      "pPlanEnd": "2026-04-10",
+      "reqIds": [
+        "RF_LTR_002"
+      ],
+      "remarks": []
+    },
+    {
+      "id": "IF_QPM_0003",
+      "system": "가입설계/청약",
+      "subsystem": "가입설계/청약",
+      "type": "현황업무분석",
+      "name": "보증군별 보험종목 목록 조회(LTRA020 화면용)",
+      "worker": "정민규",
+      "wPlanStart": "2026-03-30",
+      "wPlanEnd": "2026-04-05",
+      "wActStart": "2026-04-06",
+      "wActEnd": "2026-04-12",
+      "evidence": [
+        {
+          "date": "2026-04-12",
+          "author": "정민규",
+          "text": "분석서 제출",
+          "file": "IF_QPM_0003_분석서.docx"
+        }
+      ],
+      "pPlanStart": "2026-04-08",
+      "pPlanEnd": "2026-04-10",
+      "reqIds": [
+        "RF_LTR_002"
+      ],
+      "remarks": []
+    },
+    {
+      "id": "BT_QPM_0001",
+      "system": "가입설계/청약",
+      "subsystem": "가입설계/청약",
+      "type": "현황업무분석",
+      "name": "청약오라자로 전송",
+      "worker": "이학수",
+      "wPlanStart": "2026-09-29",
+      "wPlanEnd": "2026-10-05",
+      "evidence": [],
+      "pPlanStart": "2026-10-08",
+      "pPlanEnd": "2026-10-10",
+      "reqIds": [
+        "RF_LTR_003"
+      ],
+      "remarks": []
+    },
+    {
+      "id": "BT_QPM_0002",
+      "system": "가입설계/청약",
+      "subsystem": "가입설계/청약",
+      "type": "현황업무분석",
+      "name": "cm파일건간 이메일전송",
+      "worker": "이학수",
+      "wPlanStart": "2026-09-29",
+      "wPlanEnd": "2026-10-05",
+      "evidence": [],
+      "pPlanStart": "2026-10-08",
+      "pPlanEnd": "2026-10-10",
+      "reqIds": [
+        "RF_LTR_003"
+      ],
+      "remarks": []
+    },
+    {
+      "id": "PG_QPM_0001",
+      "system": "가입설계/청약",
+      "subsystem": "가입설계/청약",
+      "type": "현황업무분석",
+      "name": "장기공통",
+      "worker": "한형민",
+      "wPlanStart": "2026-02-27",
+      "wPlanEnd": "2026-03-05",
+      "wActStart": "2026-02-27",
+      "wActEnd": "2026-03-05",
+      "evidence": [
+        {
+          "date": "2026-03-05",
+          "author": "한형민",
+          "text": "분석서 제출",
+          "file": "PG_QPM_0001_분석서.docx"
+        }
+      ],
+      "pPlanStart": "2026-03-08",
+      "pPlanEnd": "2026-03-10",
+      "reqIds": [
+        "RF_LTR_005"
+      ],
+      "remarks": []
+    },
+    {
+      "id": "PG_QPM_0002",
+      "system": "가입설계/청약",
+      "subsystem": "가입설계/청약",
+      "type": "현황업무분석",
+      "name": "공통현완",
+      "worker": "한형민",
+      "wPlanStart": "2026-02-27",
+      "wPlanEnd": "2026-03-05",
+      "wActStart": "2026-03-06",
+      "wActEnd": "2026-03-12",
+      "evidence": [
+        {
+          "date": "2026-03-12",
+          "author": "한형민",
+          "text": "분석서 제출",
+          "file": "PG_QPM_0002_분석서.docx"
+        }
+      ],
+      "pPlanStart": "2026-03-08",
+      "pPlanEnd": "2026-03-10",
+      "reqIds": [
+        "RF_LTR_005"
+      ],
+      "remarks": []
+    },
+    {
+      "id": "PG_QPM_0003",
+      "system": "가입설계/청약",
+      "subsystem": "가입설계/청약",
+      "type": "현황업무분석",
+      "name": "장기공통코드정보",
+      "worker": "한형민",
+      "wPlanStart": "2026-02-27",
+      "wPlanEnd": "2026-03-05",
+      "wActStart": "2026-03-06",
+      "wActEnd": "2026-03-12",
+      "evidence": [
+        {
+          "date": "2026-03-12",
+          "author": "한형민",
+          "text": "분석서 제출",
+          "file": "PG_QPM_0003_분석서.docx"
+        }
+      ],
+      "pPlanStart": "2026-03-08",
+      "pPlanEnd": "2026-03-10",
+      "reqIds": [
+        "RF_LTR_005"
+      ],
+      "remarks": []
+    },
+    {
+      "id": "PG_QPM_0004",
+      "system": "가입설계/청약",
+      "subsystem": "가입설계/청약",
+      "type": "현황업무분석",
+      "name": "공통신용정보관리",
+      "worker": "황태택",
+      "wPlanStart": "2026-03-05",
+      "wPlanEnd": "2026-03-11",
+      "wActStart": "2026-03-12",
+      "wActEnd": "2026-03-18",
+      "evidence": [
+        {
+          "date": "2026-03-18",
+          "author": "황태택",
+          "text": "분석서 제출",
+          "file": "PG_QPM_0004_분석서.docx"
+        }
+      ],
+      "pPlanStart": "2026-03-14",
+      "pPlanEnd": "2026-03-16",
+      "reqIds": [
+        "RF_LTR_005"
+      ],
+      "remarks": []
+    },
+    {
+      "id": "PG_QPM_0005",
+      "system": "가입설계/청약",
+      "subsystem": "가입설계/청약",
+      "type": "현황업무분석",
+      "name": "공통신용정보조회동의",
+      "worker": "황태택",
+      "wPlanStart": "2026-03-05",
+      "wPlanEnd": "2026-03-11",
+      "wActStart": "2026-03-12",
+      "wActEnd": "2026-03-18",
+      "evidence": [
+        {
+          "date": "2026-03-18",
+          "author": "황태택",
+          "text": "분석서 제출",
+          "file": "PG_QPM_0005_분석서.docx"
+        }
+      ],
+      "pPlanStart": "2026-03-14",
+      "pPlanEnd": "2026-03-16",
+      "reqIds": [
+        "RF_LTR_005"
+      ],
+      "remarks": []
+    }
+  ]
 }

@@ -9,7 +9,11 @@
     "정현규",
     "이외화",
     "최재호",
-    "이학수"
+    "이학수",
+    "한형민",
+    "황태택",
+    "김종학",
+    "김영수"
   ],
   "systems": [
     {
@@ -19,8 +23,28 @@
       ]
     }
   ],
-  "reqIds": [],
-  "physIds": [],
+  "reqIds": [
+    "RF_LTR_001",
+    "RF_LTR_002",
+    "RF_LTR_003",
+    "RF_LTR_004",
+    "RF_LTR_005"
+  ],
+  "physIds": [
+    "LTRA010.html",
+    "LTRA020.html",
+    "LTRA030.html",
+    "InfLtrA010.java",
+    "InfLtrA020.java",
+    "InfLtrA030.java",
+    "BtLtrA010.java",
+    "BtLtrA020.java",
+    "SvLtrA010.java",
+    "SvLtrA020.java",
+    "SvLtrA030.java",
+    "SvLtrA040.java",
+    "SvLtrA050.java"
+  ],
   "types": {
     "analysis": [
       "현황업무분석"
@@ -40,5 +64,6 @@
       "프로그램개발",
       "데이터전환개발"
     ]
-  }
+  },
+  "physicalIdsUrl": "physical-ids.html"
 }
