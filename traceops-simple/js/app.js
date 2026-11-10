@@ -156,6 +156,10 @@
     if (ch && chainCount(page.file, it) === 0) {
       info.push({ t: (st ? '하위 ' : '') + ch.label + ' 미등록', h: ch.label + ' 항목을 추가하고 이 항목과 연결하세요.', g: ch.to });
     }
+    var pst = parentStopped(page.file, it);
+    if (pst) {
+      info.push({ t: '상위 사용중지', h: '연결된 ' + pst + ' 항목이 사용중지 상태입니다. 이 항목도 사용중지할지 확인하세요.', f: null });
+    }
     if (it.recheck) {
       info.push({ t: '재검증 필요', h: '상위의 요구사항·물리ID·설계 연결이 바뀌었습니다. 결과와 실적을 확인한 뒤 "재검증 완료"를 누르세요.', f: null, rc: true });
     }
@@ -252,14 +256,22 @@
       if (it) it.recheck = true;
     });
   }
-  function withImpact(title, mutate, source) {
+  function withImpact(title, mutate, source, alt) {
     var before = snapData();
     mutate();
     syncDown();
     var diff = diffData(before);
     restoreData(before);
     if (!diff.length) { mutate(); syncDown(); renderTable(); return; }
-    S.impact = { title: title, diff: diff, mutate: mutate, flags: recheckFlags(diff, source) };
+    var altInfo = null;
+    if (alt) {
+      var b2 = snapData();
+      alt.mutate(); syncDown();
+      var d2 = diffData(b2);
+      restoreData(b2);
+      altInfo = { label: alt.label, diff: d2, mutate: alt.mutate, flags: recheckFlags(d2, source) };
+    }
+    S.impact = { title: title, diff: diff, mutate: mutate, flags: recheckFlags(diff, source), alt: altInfo };
     renderImpact();
     $('impactModal').classList.add('open');
   }
@@ -283,11 +295,13 @@
       '<p>' + (I.block ? '실적·증적이 있는 항목이 포함되어 있어 삭제를 진행할 수 없습니다' : '연관 항목 ' + I.diff.length + '건이 함께 바뀝니다' + (del ? ' (삭제 ' + del + '건)' : '')) + '</p></div>' +
       '<button class="modal-close" data-imp-cancel="1">✕</button></div>' +
       '<div class="modal-list">' + rows + '</div>' +
+      (I.alt && !I.isAlt ? '' : '') +
       (I.block
         ? '<div class="modal-input"><div class="row"><span class="imp-note">기록(실적·증적)은 감사 대상이므로 삭제하지 않습니다.</span>' +
           '<span class="pick-btns"><button class="btn sm" data-imp-cancel="1">닫기</button></span></div></div>'
         : '<div class="modal-input"><div class="row"><span class="imp-note">진행하면 저장 전까지 임시 반영됩니다. 저장 버튼으로 확정하세요.</span>' +
           '<span class="pick-btns"><button class="btn ghost sm" data-imp-cancel="1">취소</button>' +
+          (I.alt && !I.isAlt ? '<button class="btn ghost sm" data-imp-alt="1">' + esc(I.alt.label) + '</button>' : '') +
           '<button class="btn sm" data-imp-ok="1">진행</button></span></div></div>');
   }
   function closeImpact() { S.impact = null; $('impactModal').classList.remove('open'); }
@@ -322,6 +336,54 @@
       return (it.result && it.result !== '미실행') || !!it.execDate || arr(it.evidence).length > 0;
     }
     return !!(it.wActStart || it.wActEnd || it.pActStart || it.pActEnd || arr(it.evidence).length);
+  }
+  // 사용중지 / 재개. 사용중지 시 활성 하위가 있으면 '하위 포함' 선택지 제공(기본은 하위 유지). 재개 시 재검증 표시.
+  function toggleStop(page, id) {
+    var it = find(page, id);
+    if (!it) return;
+    var stopping = !it.stopped, alt = null;
+    if (stopping) {
+      var t = {};
+      collectCascade(page.file, id, t);
+      var active = 0;
+      Object.keys(t).forEach(function (f) {
+        t[f].forEach(function (x) {
+          if (f === page.file && x === id) return;
+          var k = S.data[f].items.filter(function (y) { return y.id === x; })[0];
+          if (k && !k.stopped) active++;
+        });
+      });
+      if (active) {
+        alt = {
+          label: '하위 ' + active + '건 포함 사용중지',
+          mutate: function () {
+            var t2 = {};
+            collectCascade(page.file, id, t2);
+            Object.keys(t2).forEach(function (f) {
+              t2[f].forEach(function (x) {
+                var k = S.data[f].items.filter(function (y) { return y.id === x; })[0];
+                if (k) k.stopped = true;
+              });
+            });
+          }
+        };
+      }
+    }
+    withImpact((stopping ? '사용중지' : '재개') + ': ' + id, function () {
+      var x = find(page, id);
+      if (!x) return;
+      if (stopping) { x.stopped = true; }
+      else { x.stopped = false; x.recheck = true; }
+    }, { f: page.file, id: id }, alt);
+  }
+  // 상위가 사용중지 상태인지 (하위 유지 시 특이사항 표시용)
+  function parentStopped(file, it) {
+    var map = { design: ['analysis', 'analysisRef'], dev: ['design', 'designRef'], unit: ['dev', 'linked'] };
+    var m = map[file];
+    if (!m) return null;
+    var pid = arr(it[m[1]])[0];
+    var pr = pid && S.data[m[0]].items.filter(function (x) { return x.id === pid; })[0];
+    return pr && pr.stopped ? PAGE_NAME[m[0]] : null;
   }
   function deleteRow(page, id) {
     if (!find(page, id)) return;
@@ -1175,12 +1237,7 @@
         else openChips(page, id, ck);
         return;
       }
-      if ((x = t.closest('[data-stoptoggle]'))) {
-        withImpact((find(page, id).stopped ? '재개' : '사용중지') + ': ' + id, function () {
-          var si = find(page, id); if (si) si.stopped = !si.stopped;
-        }, { f: page.file, id: id });
-        return;
-      }
+      if ((x = t.closest('[data-stoptoggle]'))) { toggleStop(page, id); return; }
       if ((x = t.closest('[data-rowdel]'))) { deleteRow(page, id); return; }
       if ((x = t.closest('[data-vcheck]'))) { openVCheck(page, id); return; }
       if ((x = t.closest('[data-worker]'))) { openWorkerPick(page, id); return; }
@@ -1240,6 +1297,14 @@
     $('impactModal').addEventListener('click', function (e) {
       var t = e.target;
       if (t === this || t.hasAttribute('data-imp-cancel')) { closeImpact(); return; }
+      if (t.hasAttribute('data-imp-alt')) {
+        var A0 = S.impact;
+        if (A0 && A0.alt) {
+          S.impact = { title: A0.title, diff: A0.alt.diff, mutate: A0.alt.mutate, flags: A0.alt.flags, alt: null, isAlt: true };
+          renderImpact();
+        }
+        return;
+      }
       if (t.hasAttribute('data-imp-ok')) {
         var I = S.impact;
         closeImpact();
