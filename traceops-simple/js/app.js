@@ -40,6 +40,9 @@
     dev: { to: 'unit', key: 'linked', label: '단위테스트' },
     unit: { to: 'integration', key: 'units', label: '통합테스트' }
   };
+  var TRI = '<svg class=\"tri\" width=\"14\" height=\"13\" viewBox=\"0 0 14 13\" aria-label=\"오류\"><path d=\"M7 .8 L13.4 12.2 H.6 Z\" fill=\"#D64545\"/><rect x=\"6.15\" y=\"4.3\" width=\"1.7\" height=\"4.3\" rx=\".8\" fill=\"#fff\"/><rect x=\"6.15\" y=\"9.5\" width=\"1.7\" height=\"1.7\" rx=\".85\" fill=\"#fff\"/></svg>';
+  // 값 셀 클릭 시 이동: 대상 화면과 조회 조건 키
+  var NAV = { designRef: ['design', 'id'], analysisRef: ['analysis', 'id'], reqIds: ['analysis', 'reqId'], physIds: ['design', 'physId'], linked: ['dev', 'id'], units: ['unit', 'id'] };
   var PAGE_NAME = { analysis: '분석', design: '설계', dev: '개발', unit: '단위테스트', integration: '통합테스트' };
   // 실적 날짜: 오늘 이후 입력 불가
   var ACTUAL_KEYS = ['wActStart', 'wActEnd', 'pActStart', 'pActEnd', 'execDate'];
@@ -177,11 +180,11 @@
       return '<div class="vi ' + cls + '"><div class="vi-top"><span class="vi-ic">' + ic + '</span><span class="vi-t">' + esc(x.t) + '</span></div>' +
         '<div class="vi-hint">' + esc(x.h) + '</div><div class="vi-act">' + act + '</div></div>';
     };
-    var body = r.err.map(function (x) { return card(x, '⚠', 'is-err'); })
+    var body = r.err.map(function (x) { return card(x, TRI, 'is-err'); })
       .concat(r.info.map(function (x) { return card(x, '🔗', 'is-info'); })).join('');
     $('vBox').innerHTML =
       '<div class="modal-hd"><div><h3>검증 상세</h3><p>' + esc(v.id) + ' · ' + esc(it.name || '') + '</p>' +
-      '<p class="vi-legend">⚠ 입력·매핑 필요 ' + r.err.length + '건 · 🔗 하위 연결 ' + r.info.length + '건</p></div>' +
+      '<p class="vi-legend">' + TRI + ' 입력·매핑 필요 ' + r.err.length + '건 · 🔗 하위 연결 ' + r.info.length + '건</p></div>' +
       '<button class="modal-close" data-close="1">✕</button></div>' +
       '<div class="modal-list">' + (body || '<div class="empty">정합성 문제가 없습니다.</div>') + '</div>';
   }
@@ -313,22 +316,45 @@
   }
   function chipsHTML(c, it, ed) {
     var vals = arr(it[c.k]);
-    var h = vals.map(function (v) {
-      return '<span class="chip">' + esc(v) +
-        (ed ? ' <span class="x" data-chipx="' + c.k + '" data-val="' + esc(v) + '">✕</span>' : '') + '</span>';
-    }).join('');
-    if (ed && !(c.max === 1 && vals.length)) {
-      h += ' <button class="search-btn" data-pick="' + c.k + '">🔍 검색</button>';
-    }
-    return h || (ed ? '' : '<span class="mono">-</span>');
+    if (!vals.length) return ed ? '<button class="search-btn" data-pick="' + c.k + '">🔍 검색</button>' : '<span class="mono">-</span>';
+    var more = vals.length > 1 ? ' 외 ' + (vals.length - 1) + '건' : '';
+    return '<button class="chip-sum" data-chips="' + c.k + '" title="전체 보기">' + esc(vals[0]) + more + '</button>';
   }
+  // 값 클릭: 1건이고 수정 불가면 바로 해당 화면 조회, 그 외에는 전체 목록 모달
+  function goFilter(page, key, val) {
+    var target = '#' + page + '?' + key + '=' + encodeURIComponent(val);
+    if (location.hash === target) route(); else location.hash = target;
+  }
+  function openChips(page, id, k) {
+    var it = find(page, id), c = columnsOf(page).filter(function (x) { return x.k === k; })[0];
+    if (!it || !c) return;
+    var ed = canEdit(c), vals = arr(it[k]), nav = NAV[k];
+    var label = {};
+    srcOptions(c.src).forEach(function (o) { label[o.id] = o.label; });
+    S.chips = { page: page, id: id, k: k };
+    var list = vals.map(function (v) {
+      return '<div class="ci">' +
+        (nav ? '<button class="ci-go" data-nav-page="' + nav[0] + '" data-nav-key="' + nav[1] + '" data-nav-val="' + esc(v) + '">' +
+          esc(label[v] || v) + ' <span class="ci-arrow">→ 조회</span></button>' : '<span>' + esc(label[v] || v) + '</span>') +
+        (ed ? '<button class="x-btn" data-chip-rm="' + esc(v) + '">✕ 제외</button>' : '') + '</div>';
+    }).join('');
+    $('chipBox').innerHTML =
+      '<div class="modal-hd"><div><h3>' + esc(c.label) + ' (' + vals.length + '건)</h3><p>' + esc(id) + ' · 항목을 누르면 해당 화면에서 조회합니다</p></div>' +
+      '<button class="modal-close" data-close="1">✕</button></div>' +
+      '<div class="modal-list">' + (list || '<div class="empty">연결된 항목이 없습니다.</div>') + '</div>' +
+      '<div class="modal-input"><div class="row"><span></span><span class="pick-btns">' +
+      (ed ? '<button class="btn ghost sm" data-chip-add="1">🔍 추가·변경</button>' : '') +
+      '<button class="btn sm" data-close="1">닫기</button></span></div></div>';
+    $('chipModal').classList.add('open');
+  }
+  function closeChips() { S.chips = null; $('chipModal').classList.remove('open'); }
   function cell(c, it, page, msgs) {
     var ed = canEdit(c), dis = ed ? '' : ' disabled', k = c.k, v = it[k];
     switch (c.kind) {
       case 'v':
         if (!msgs.err.length && !msgs.info.length) return '<span class="check-ok">✓</span>';
         return '<button class="v-btn" data-vcheck="1" title="검증 상세 보기">' +
-          (msgs.err.length ? '<span class="check-err">⚠ ' + msgs.err.length + '</span>' : '') +
+          (msgs.err.length ? TRI + '<span class="check-err">' + msgs.err.length + '</span>' : '') +
           (msgs.info.length ? '<span class="chain-mark">🔗</span>' : '') + '</button>';
       case 'id': return '<span class="disabled-field">' + esc(it.id) + '</span>';
       case 'status': var s = statusOf(it); return '<span class="st ' + STATUS_CLS[s] + '">' + s + '</span>';
@@ -417,7 +443,7 @@
       });
     });
     $('banner').innerHTML = rows
-      ? '<div class="validation-banner">⚠ 정합성 확인 필요 ' + rows + '행 — ' +
+      ? '<div class="validation-banner">' + TRI + ' 정합성 확인 필요 ' + rows + '행 — ' +
         Object.keys(kinds).map(function (k) { return k + ' ' + kinds[k] + '건'; }).join(', ') +
         ' <span class="banner-ids">(예: ' + esc(ids.slice(0, 5).join(', ')) + (ids.length > 5 ? ' 외' : '') + ')</span></div>'
       : '';
@@ -468,6 +494,7 @@
       adv.push({ k: 'planTo', label: '계획기간(종료)', t: 'to', f: 'wPlanEnd' });
     } else {
       base = [
+        { k: 'id', label: 'ID', t: 'txt', f: 'id', ph: 'TU- / TI-' },
         { k: 'name', label: '테스트명', t: 'txt', f: 'name', ph: '검색' },
         { k: 'linked', label: '연결 개발ID', t: 'txt', f: 'linked', ph: 'DEV' },
         { k: 'result', label: '결과', t: 'sel', f: 'result', src: ['미실행', 'PASS', 'FAIL'] },
@@ -780,10 +807,24 @@
 
   /* ---------- 라우팅 / 모드 ---------- */
   function route() {
-    var h = (location.hash || '').replace('#', '');
-    S.route = PAGES[h] ? h : 'analysis';
+    closeChips();
+    if (S.vpop) closeVCheck();
+    var parts = (location.hash || '').replace('#', '').split('?');
+    S.route = PAGES[parts[0]] ? parts[0] : 'analysis';
     buildFilters(pageOf());
     $('filtersAdv').classList.remove('open');
+    if (parts[1]) {
+      parts[1].split('&').forEach(function (kv) {
+        var i = kv.indexOf('=');
+        if (i < 0) return;
+        var key = decodeURIComponent(kv.slice(0, i)), val = decodeURIComponent(kv.slice(i + 1));
+        var el = document.querySelector('#filterCard [data-fk="' + key + '"]');
+        if (!el) return;
+        el.value = val;
+        if (el.closest('#filtersAdv')) $('filtersAdv').classList.add('open');
+      });
+      S.applied = readFilters();
+    }
     if (S.mode === 'worker') { setWorkerFilter(S.account); S.applied = readFilters(); }
     renderChrome();
     renderTable();
@@ -895,6 +936,13 @@
         renderTable();
         return;
       }
+      if ((x = t.closest('[data-chips]'))) {
+        var ck = x.getAttribute('data-chips'), cit = find(page, id), cc = columnsOf(page).filter(function (q) { return q.k === ck; })[0];
+        var cv = arr(cit && cit[ck]);
+        if (cv.length === 1 && NAV[ck]) goFilter(NAV[ck][0], NAV[ck][1], cv[0]);
+        else openChips(page, id, ck);
+        return;
+      }
       if ((x = t.closest('[data-vcheck]'))) { openVCheck(page, id); return; }
       if ((x = t.closest('[data-worker]'))) { openWorkerPick(page, id); return; }
       if ((x = t.closest('[data-pick]'))) { openPicker(page, id, x.getAttribute('data-pick')); return; }
@@ -938,6 +986,28 @@
           renderPop();
           renderTable();
         }
+      }
+    });
+    // 값 모달 (여러 값 셀)
+    $('chipModal').addEventListener('click', function (e) {
+      var t = e.target, x;
+      if (t === this || t.hasAttribute('data-close')) { closeChips(); return; }
+      if ((x = t.closest('[data-nav-page]'))) {
+        closeChips();
+        goFilter(x.getAttribute('data-nav-page'), x.getAttribute('data-nav-key'), x.getAttribute('data-nav-val'));
+        return;
+      }
+      if ((x = t.closest('[data-chip-rm]'))) {
+        var c = S.chips; if (!c) return;
+        var it = find(c.page, c.id);
+        it[c.k] = arr(it[c.k]).filter(function (v) { return v !== x.getAttribute('data-chip-rm'); });
+        openChips(c.page, c.id, c.k);
+        renderTable();
+        return;
+      }
+      if (t.hasAttribute('data-chip-add') || t.closest('[data-chip-add]')) {
+        var cs = S.chips; closeChips();
+        if (cs) openPicker(cs.page, cs.id, cs.k);
       }
     });
     // 검증 상세 팝업
