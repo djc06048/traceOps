@@ -13,67 +13,60 @@
     "deadline": "2026-11-27",
     "presentation": "2026-11-28",
     "team": {
-      "pm": "황피엠",
-      "biz": "박민수",
-      "sales": "조은지"
+      "pm": "PM",
+      "biz": "사업관리",
+      "sales": "영업대표"
     }
   },
   "members": [
     {
       "id": "201803176",
       "pw": "0000",
-      "name": "관리자",
-      "title": "시스템 관리",
+      "name": "황금빛",
+      "title": "시스템관리자",
       "role": "admin"
     },
     {
       "id": "202600001",
       "pw": "1111",
-      "name": "황금빛",
-      "title": "제안 PL(기술)",
+      "name": "제안멤버1",
+      "title": "제안 작성",
       "role": "writer"
     },
     {
       "id": "202600002",
       "pw": "2222",
-      "name": "황피엠",
-      "title": "PM",
-      "role": "pm"
+      "name": "제안멤버2",
+      "title": "제안 작성",
+      "role": "writer"
     },
     {
       "id": "202600003",
       "pw": "3333",
-      "name": "박민수",
-      "title": "사업관리",
-      "role": "pm"
+      "name": "제안멤버3",
+      "title": "제안 작성",
+      "role": "writer"
     },
     {
       "id": "202600004",
       "pw": "4444",
-      "name": "조은지",
-      "title": "영업대표",
-      "role": "sales"
+      "name": "PM",
+      "title": "PM",
+      "role": "pm"
     },
     {
       "id": "202600005",
       "pw": "5555",
-      "name": "홍길동",
-      "title": "작성자(사업개요)",
-      "role": "writer"
+      "name": "사업관리",
+      "title": "사업관리",
+      "role": "pm"
     },
     {
       "id": "202600006",
       "pw": "6666",
-      "name": "김철수",
-      "title": "작성자(기술)",
-      "role": "writer"
-    },
-    {
-      "id": "202600007",
-      "pw": "7777",
-      "name": "김영희",
-      "title": "작성자(관리)",
-      "role": "writer"
+      "name": "영업대표",
+      "title": "영업대표",
+      "role": "sales"
     }
   ],
   "perms": {
@@ -194,23 +187,18 @@
   },
   "sysUsers": [
     {
-      "name": "관리자",
-      "note": "시스템 전체 관리",
+      "name": "황금빛",
+      "note": "시스템 전체 관리 (관리자)",
       "on": true
     },
     {
-      "name": "황피엠",
+      "name": "PM",
       "note": "전체 프로젝트 열람 (팀장 겸직)",
-      "on": true
-    },
-    {
-      "name": "박민수",
-      "note": "전체 프로젝트 열람",
       "on": false
     },
     {
-      "name": "황금빛",
-      "note": "소속 제안만 접근",
+      "name": "사업관리",
+      "note": "전체 프로젝트 열람",
       "on": false
     }
   ]
