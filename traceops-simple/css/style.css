@@ -125,6 +125,16 @@ select.txt-input:disabled{padding-right:2px}
 .file-attach{display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--line2);border-radius:var(--r-sm);padding:7px 12px;font-size:12.5px;color:var(--ink3);background:#fff;cursor:pointer}
 .file-attach input{display:none}
 .file-name{font-size:12px;color:var(--ink2)}
+.pick-btns{display:flex;gap:8px;margin-left:auto}
+.wk-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}
+.wk-actions{margin-left:auto;display:flex;gap:6px}
+
+/* 입력 필요 음영 / 작업자 셀 */
+table td.need{background:#FFF0E3 !important}
+table td.need .txt-input{border-color:var(--accent)}
+.worker-btn{border:1px dashed var(--line2);border-radius:var(--r-pill);padding:5px 12px;font-size:13px;background:#fff;color:var(--ink)}
+.worker-btn:hover{border-color:var(--accent);color:var(--accent)}
+.worker-btn.empty{color:var(--accent);border-color:var(--accent)}
 
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(10px);background:#000;color:#fff;padding:11px 20px;border-radius:var(--r-pill);font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100;max-width:90vw}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}

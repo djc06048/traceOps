@@ -126,8 +126,9 @@
       c.push({ k: 'name', label: page.nameLabel, kind: 'text', edit: 'pl', w: 140 });
       if (t === 'dev') c.push({ k: 'desc', label: '설명', kind: 'text', edit: 'pl', w: 160 });
       c.push({ k: 'status', label: '진행상태', kind: 'status' });
-      c.push({ k: 'wPlanStart', label: '작업자 계획기간', sub: '시작일', kind: 'date', edit: 'pl', g: 'workerPlan' });
-      c.push({ k: 'wPlanEnd', label: '작업자 계획기간', sub: '종료일', kind: 'date', edit: 'pl', g: 'workerPlan' });
+      c.push({ k: 'worker', label: '작업자', kind: 'worker', edit: 'pl' });
+      c.push({ k: 'wPlanStart', label: '작업자 계획기간', sub: '시작일', kind: 'date', edit: 'none', g: 'workerPlan' });
+      c.push({ k: 'wPlanEnd', label: '작업자 계획기간', sub: '종료일', kind: 'date', edit: 'none', g: 'workerPlan' });
       c.push({ k: 'wActStart', label: '작업자 실적기간', sub: '시작일', kind: 'date', edit: 'worker', g: 'workerActual' });
       c.push({ k: 'wActEnd', label: '작업자 실적기간', sub: '종료일', kind: 'date', edit: 'worker', g: 'workerActual' });
       c.push({ k: 'evidence', label: '증적', kind: 'evidence' });
@@ -143,7 +144,6 @@
         c.push({ k: 'difficulty', label: '난이도', kind: 'select', opts: ['상', '중', '하'], blank: true, edit: 'pl' });
         c.push({ k: 'priority', label: '우선순위', kind: 'select', opts: ['P1', 'P2', 'P3'], blank: true, edit: 'pl' });
       }
-      c.push({ k: 'worker', label: '작업자', kind: 'worker', edit: 'pl' });
       if (t === 'dev') c.push({ k: 'designRef', label: '설계ID', kind: 'chips', src: 'designIds', max: 1, edit: 'pl', g: 'mapping' });
       c.push({ k: 'reqIds', label: '요구사항ID', kind: 'chips', src: 'reqIds', edit: 'pl', g: 'mapping' });
       if (t === 'design') c.push({ k: 'physIds', label: '물리ID', kind: 'chips', src: 'physIds', edit: 'pl', g: 'mapping' });
@@ -182,6 +182,13 @@
     if (c.edit === 'pl') return S.mode === 'pl';
     if (c.edit === 'worker') return S.mode === 'worker';
     return false;
+  }
+  // 편집 가능하지만 아직 입력되지 않은 칸은 음영으로 표시
+  function needClass(c, it) {
+    if (!canEdit(c)) return '';
+    var v = it[c.k];
+    var empty = c.kind === 'chips' ? !arr(v).length : !v;
+    return empty ? ' need' : '';
   }
 
   /* ---------- 셀 렌더링 ---------- */
@@ -235,7 +242,12 @@
       case 'text': return '<input class="txt-input" data-k="' + k + '" value="' + esc(v) + '" style="width:' + (c.w || 120) + 'px"' + dis + '>';
       case 'date': return '<input class="txt-input" type="date" data-k="' + k + '" value="' + esc(v) + '"' + dis + '>';
       case 'select': return '<select class="txt-input" data-k="' + k + '"' + dis + '>' + opts(c.opts, v, c.blank) + '</select>';
-      case 'worker': return '<select class="txt-input" data-k="worker"' + dis + '>' + opts(S.master.workers, v, true) + '</select>';
+      case 'worker':
+        if (S.mode === 'pl') {
+          return '<button class="worker-btn' + (v ? '' : ' empty') + '" data-worker="1">' +
+            (v ? esc(v) : '+ 작업자 선택') + '</button>';
+        }
+        return v ? esc(v) : '<span class="mono">-</span>';
       case 'chips': return chipsHTML(c, it, ed);
       case 'evidence': return badge(page, it, 'evidence');
       case 'remark': return badge(page, it, 'remarks');
@@ -275,7 +287,7 @@
       ? list.map(function (it) {
           var msgs = validate(page, it, all);
           return '<tr data-id="' + esc(it.id) + '">' + cols.map(function (c) {
-            return '<td' + (c.kind === 'date' ? ' class="mono"' : '') + '>' + cell(c, it, page, msgs) + '</td>';
+            return '<td class="' + (c.kind === 'date' ? 'mono' : '') + needClass(c, it) + '">' + cell(c, it, page, msgs) + '</td>';
           }).join('') + '</tr>';
         }).join('')
       : '<tr><td colspan="' + cols.length + '" class="empty">조건에 맞는 항목이 없습니다.</td></tr>';
@@ -343,7 +355,7 @@
         { k: 'name', label: page.nameLabel, t: 'txt', f: 'name', ph: '검색' },
         { k: 'type', label: '처리유형', t: 'sel', f: 'type', src: S.master.types[t] },
         { k: 'status', label: '진행상태', t: 'sel', f: 'status', src: ['지연', '진행중', '미착수', '완료'] },
-        { k: 'worker', label: '작업자', t: 'txt', f: 'worker', ph: '이름 입력' }
+        { k: 'worker', label: '작업자', t: 'sel', f: 'worker', src: S.master.workers }
       ];
       adv = [];
       if (t !== 'analysis') {
@@ -360,7 +372,7 @@
         { k: 'name', label: '테스트명', t: 'txt', f: 'name', ph: '검색' },
         { k: 'linked', label: '연결 개발ID', t: 'txt', f: 'linked', ph: 'DEV' },
         { k: 'result', label: '결과', t: 'sel', f: 'result', src: ['미실행', 'PASS', 'FAIL'] },
-        { k: 'worker', label: '담당자', t: 'txt', f: 'worker', ph: '이름 입력' }
+        { k: 'worker', label: '담당자', t: 'sel', f: 'worker', src: S.master.workers }
       ];
       adv = [
         { k: 'round', label: '테스트 차수', t: 'sel', f: 'round', src: ['1차', '2차'] },
@@ -435,8 +447,12 @@
       '<button class="modal-close" data-close>✕</button></div>' +
       '<div class="modal-search"><input class="f-input" id="pickQ" placeholder="검색" style="width:100%"></div>' +
       '<div class="modal-list" id="pickList"></div>' +
-      '<div class="modal-input"><div class="row"><button class="btn ghost sm" id="pickClear">선택 해제</button>' +
-      '<button class="btn sm" id="pickApply">적용</button></div></div>';
+      '<div class="modal-input"><div class="row">' +
+      (c.src === 'reqIds'
+        ? '<a class="btn ghost sm" href="' + esc(S.master.requirementsUrl || '#') + '" target="_blank" rel="noopener">요구사항 관리에서 등록 ↗</a>'
+        : '<span></span>') +
+      '<span class="pick-btns"><button class="btn ghost sm" id="pickClear">선택 해제</button>' +
+      '<button class="btn sm" id="pickApply">적용</button></span></div></div>';
     renderPickList('');
     $('pickModal').classList.add('open');
     $('pickQ').focus();
@@ -494,6 +510,99 @@
     showToast(p.key === 'evidence' ? '실적 증적이 등록되었습니다' : '비고가 등록되었습니다');
   }
   function closePop() { S.pop = null; $('popModal').classList.remove('open'); }
+
+  /* ---------- 작업자 선택 팝업 (PL 전용: 선택/등록/수정/삭제) ---------- */
+  var ITEM_FILES = ['analysis', 'design', 'dev', 'unit', 'integration'];
+  function persistFiles(names) {
+    var ok = true;
+    names.forEach(function (n) {
+      try {
+        localStorage.setItem(DRAFT_KEY + n, JSON.stringify(n === 'master' ? S.master : S.data[n]));
+        S.draft[n] = true;
+      } catch (e) { ok = false; }
+    });
+    if (!ok) showToast('브라우저 저장소에 저장하지 못했습니다. 내보내기를 이용하세요.', true);
+  }
+  function buildAccountSelect() {
+    $('workerAccount').innerHTML = S.master.workers.map(function (w) {
+      return '<option value="' + esc(w) + '"' + (w === S.account ? ' selected' : '') + '>' + esc(w) + '</option>';
+    }).join('');
+  }
+  function workerCount(name) {
+    var n = 0;
+    ITEM_FILES.forEach(function (f) {
+      S.data[f].items.forEach(function (it) { if (it.worker === name) n++; });
+    });
+    return n;
+  }
+  function renameWorker(i, name) {
+    var old = S.master.workers[i], changed = [];
+    S.master.workers[i] = name;
+    ITEM_FILES.forEach(function (f) {
+      var hit = false;
+      S.data[f].items.forEach(function (it) { if (it.worker === old) { it.worker = name; hit = true; } });
+      if (hit) changed.push(f);
+    });
+    if (S.account === old) S.account = name;
+    return changed.concat(['master']);
+  }
+  function deleteWorker(i) {
+    var name = S.master.workers[i], changed = [];
+    S.master.workers.splice(i, 1);
+    ITEM_FILES.forEach(function (f) {
+      var hit = false;
+      S.data[f].items.forEach(function (it) { if (it.worker === name) { it.worker = ''; hit = true; } });
+      if (hit) changed.push(f);
+    });
+    if (S.account === name) S.account = S.master.workers[0] || '';
+    return changed.concat(['master']);
+  }
+  function validNewName(n) {
+    if (!n) { showToast('이름을 입력하세요', true); return false; }
+    if (S.master.workers.indexOf(n) >= 0) { showToast('이미 등록된 작업자입니다', true); return false; }
+    return true;
+  }
+  function openWorkerPick(page, id) {
+    S.wk = { page: page, id: id, editing: null };
+    renderWorkerPick();
+    $('workerModal').classList.add('open');
+  }
+  function closeWorkerPick() { S.wk = null; $('workerModal').classList.remove('open'); }
+  function renderWorkerPick() {
+    var w = S.wk, it = find(w.page, w.id), cur = it.worker || '';
+    var rows = S.master.workers.map(function (name, i) {
+      var editing = w.editing === i;
+      var nameHTML = editing
+        ? '<input class="f-input" id="wkEditInput" value="' + esc(name) + '" style="min-width:140px">'
+        : '<span>' + esc(name) + '</span>' + (name === cur ? ' <span class="st doing">현재 담당</span>' : '');
+      var actions = editing
+        ? '<button class="btn sm" data-wk-save="' + i + '">저장</button> <button class="btn ghost sm" data-wk-cancel="1">취소</button>'
+        : '<button class="btn sm" data-wk-select="' + i + '">선택</button> ' +
+          '<button class="btn ghost sm" data-wk-edit="' + i + '">수정</button> ' +
+          '<button class="btn ghost sm" data-wk-del="' + i + '">삭제</button>';
+      return '<div class="wk-row">' + nameHTML + '<div class="wk-actions">' + actions + '</div></div>';
+    }).join('') || '<div class="empty">등록된 작업자가 없습니다.</div>';
+    $('workerBox').innerHTML =
+      '<div class="modal-hd"><div><h3>작업자 선택</h3><p>' + esc(w.id) + ' · 선택한 작업자에게 이 업무가 할당됩니다</p></div>' +
+      '<button class="modal-close" data-close>✕</button></div>' +
+      '<div class="modal-list">' + rows + '</div>' +
+      '<div class="modal-input"><div class="who">작업자 등록 (PL 권한)</div>' +
+      '<div class="row"><input class="f-input" id="wkNew" placeholder="이름 입력" style="flex:1">' +
+      '<button class="btn sm" id="wkAdd">등록</button></div>' +
+      '<div class="row"><span class="pick-btns"><button class="btn ghost sm" id="wkClear">담당 해제</button>' +
+      '<button class="btn ghost sm" id="wkExport">작업자 목록 내보내기</button></span></div></div>';
+  }
+  function exportNamed(name, data) {
+    var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    showToast(name + '.json 내보내기 완료');
+  }
 
   /* ---------- 행 추가 / 저장 / 내보내기 / 원본복원 ---------- */
   function addRow() {
@@ -681,6 +790,7 @@
         renderTable();
         return;
       }
+      if ((x = t.closest('[data-worker]'))) { openWorkerPick(page, id); return; }
       if ((x = t.closest('[data-pick]'))) { openPicker(page, id, x.getAttribute('data-pick')); return; }
       if ((x = t.closest('[data-pop]'))) { openPop(page, id, x.getAttribute('data-pop')); }
     });
@@ -724,6 +834,67 @@
         }
       }
     });
+    // 작업자 팝업 (PL 전용)
+    $('workerModal').addEventListener('click', function (e) {
+      var t = e.target, w = S.wk, attr;
+      if (t === this) { closeWorkerPick(); return; }
+      if (!w) return;
+      if (t.hasAttribute('data-close')) { closeWorkerPick(); return; }
+      if (t.id === 'wkClear') {
+        find(w.page, w.id).worker = '';
+        closeWorkerPick();
+        renderTable();
+        showToast('담당 작업자를 해제했습니다. 저장 버튼으로 반영하세요');
+        return;
+      }
+      if (t.id === 'wkAdd') {
+        var n = $('wkNew').value.trim();
+        if (!validNewName(n)) return;
+        S.master.workers.push(n);
+        persistFiles(['master']);
+        buildAccountSelect();
+        renderWorkerPick();
+        showToast('작업자가 등록되었습니다');
+        return;
+      }
+      if (t.id === 'wkExport') { exportNamed('master', S.master); return; }
+      if ((attr = t.getAttribute('data-wk-select')) !== null) {
+        var picked = S.master.workers[+attr];
+        find(w.page, w.id).worker = picked;
+        closeWorkerPick();
+        renderTable();
+        showToast(picked + ' 님에게 업무가 할당되었습니다. 저장 버튼으로 반영하세요');
+        return;
+      }
+      if ((attr = t.getAttribute('data-wk-edit')) !== null) { w.editing = +attr; renderWorkerPick(); return; }
+      if (t.hasAttribute('data-wk-cancel')) { w.editing = null; renderWorkerPick(); return; }
+      if ((attr = t.getAttribute('data-wk-save')) !== null) {
+        var idx = +attr, nn = $('wkEditInput').value.trim();
+        if (!nn) { showToast('이름을 입력하세요', true); return; }
+        if (nn !== S.master.workers[idx] && S.master.workers.indexOf(nn) >= 0) {
+          showToast('이미 등록된 작업자입니다', true);
+          return;
+        }
+        persistFiles(renameWorker(idx, nn));
+        w.editing = null;
+        buildAccountSelect();
+        renderWorkerPick();
+        renderTable();
+        showToast('작업자 이름을 수정했습니다');
+        return;
+      }
+      if ((attr = t.getAttribute('data-wk-del')) !== null) {
+        var di = +attr, dn = S.master.workers[di], cnt = workerCount(dn);
+        if (!confirm('"' + dn + '" 작업자를 삭제할까요?' + (cnt ? '\n담당 중인 업무 ' + cnt + '건은 작업자가 비워집니다.' : ''))) return;
+        persistFiles(deleteWorker(di));
+        w.editing = null;
+        buildAccountSelect();
+        renderWorkerPick();
+        renderTable();
+        showToast('작업자를 삭제했습니다');
+      }
+    });
+
     $('popBox').addEventListener('change', function (e) {
       if (e.target.id === 'popFile') {
         var f = e.target.files[0];
@@ -735,10 +906,12 @@
   /* ---------- 시작 ---------- */
   async function boot() {
     try {
-      S.master = await fetchJSON(FILES.master);
-      var names = ['analysis', 'design', 'dev', 'unit', 'integration'];
+      var names = ['master', 'analysis', 'design', 'dev', 'unit', 'integration'];
       var res = await Promise.all(names.map(loadFile));
-      names.forEach(function (n, i) { S.data[n] = res[i].data; S.draft[n] = res[i].draft; });
+      names.forEach(function (n, i) {
+        if (n === 'master') S.master = res[i].data; else S.data[n] = res[i].data;
+        S.draft[n] = res[i].draft;
+      });
     } catch (e) {
       $('thead').innerHTML = '';
       $('tbody').innerHTML = '<tr><td class="empty">데이터 파일을 읽지 못했습니다 (' + esc(e.message) +
@@ -746,9 +919,7 @@
       return;
     }
     S.account = S.master.workers[0];
-    $('workerAccount').innerHTML = S.master.workers.map(function (w) {
-      return '<option value="' + esc(w) + '"' + (w === S.account ? ' selected' : '') + '>' + esc(w) + '</option>';
-    }).join('');
+    buildAccountSelect();
     bind();
     route();
   }

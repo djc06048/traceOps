@@ -1,5 +1,6 @@
 {
   "pl": { "name": "황금빛" },
+  "requirementsUrl": "requirements.html",
   "workers": ["김도영", "이수민", "박준혁"],
   "systems": [
     { "name": "자동차보상", "subs": ["손해조사", "보험금지급"] },
