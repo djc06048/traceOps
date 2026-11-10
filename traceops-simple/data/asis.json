@@ -1,0 +1,122 @@
+{
+  "kind": "asis",
+  "items": [
+    {
+      "id": "LTRA010.html",
+      "type": "화면",
+      "name": "계약사항 입력",
+      "group": "가입설계/청약",
+      "relatedScreen": "",
+      "status": "사용확정",
+      "remark": ""
+    },
+    {
+      "id": "LTRA020.html",
+      "type": "화면",
+      "name": "인수심사요청및결과",
+      "group": "가입설계/청약",
+      "relatedScreen": "",
+      "status": "사용확정",
+      "remark": ""
+    },
+    {
+      "id": "LTRA030.html",
+      "type": "화면",
+      "name": "장기보험-가입설계요청",
+      "group": "가입설계/청약",
+      "relatedScreen": "",
+      "status": "사용확정",
+      "remark": ""
+    },
+    {
+      "id": "InfLtrA010.java",
+      "type": "인터페이스",
+      "name": "가입설계 삭제",
+      "group": "가입설계/청약",
+      "relatedScreen": "-",
+      "status": "사용확정",
+      "remark": ""
+    },
+    {
+      "id": "InfLtrA020.java",
+      "type": "인터페이스",
+      "name": "가입설계검색 조회",
+      "group": "가입설계/청약",
+      "relatedScreen": "-",
+      "status": "사용확정",
+      "remark": ""
+    },
+    {
+      "id": "InfLtrA030.java",
+      "type": "인터페이스",
+      "name": "보증군별 보험종목 목록 조회(LTRA020 화면용)",
+      "group": "가입설계/청약",
+      "relatedScreen": "-",
+      "status": "사용확정",
+      "remark": ""
+    },
+    {
+      "id": "BtLtrA010.java",
+      "type": "배치",
+      "name": "청약완료 전송",
+      "group": "가입설계/청약",
+      "relatedScreen": "-",
+      "status": "사용확정",
+      "remark": ""
+    },
+    {
+      "id": "BtLtrA020.java",
+      "type": "배치",
+      "name": "cm파일건간 이메일전송",
+      "group": "가입설계/청약",
+      "relatedScreen": "-",
+      "status": "사용확정",
+      "remark": ""
+    },
+    {
+      "id": "SvLtrA010.java",
+      "type": "프로그램",
+      "name": "장기공통",
+      "group": "가입설계/청약",
+      "relatedScreen": "-",
+      "status": "사용확정",
+      "remark": ""
+    },
+    {
+      "id": "SvLtrA020.java",
+      "type": "프로그램",
+      "name": "공통현완",
+      "group": "가입설계/청약",
+      "relatedScreen": "-",
+      "status": "사용확정",
+      "remark": ""
+    },
+    {
+      "id": "SvLtrA030.java",
+      "type": "프로그램",
+      "name": "장기공통코드정보",
+      "group": "가입설계/청약",
+      "relatedScreen": "-",
+      "status": "사용확정",
+      "remark": ""
+    },
+    {
+      "id": "SvLtrA040.java",
+      "type": "프로그램",
+      "name": "공통신용정보관리",
+      "group": "가입설계/청약",
+      "relatedScreen": "-",
+      "status": "사용확정",
+      "remark": ""
+    },
+    {
+      "id": "SvLtrA050.java",
+      "type": "프로그램",
+      "name": "공통신용정보조회동의",
+      "group": "가입설계/청약",
+      "relatedScreen": "-",
+      "status": "사용확정",
+      "remark": ""
+    }
+  ]
+}

@@ -30,21 +30,6 @@
     "RF_LTR_004",
     "RF_LTR_005"
   ],
-  "physIds": [
-    "LTRA010.html",
-    "LTRA020.html",
-    "LTRA030.html",
-    "InfLtrA010.java",
-    "InfLtrA020.java",
-    "InfLtrA030.java",
-    "BtLtrA010.java",
-    "BtLtrA020.java",
-    "SvLtrA010.java",
-    "SvLtrA020.java",
-    "SvLtrA030.java",
-    "SvLtrA040.java",
-    "SvLtrA050.java"
-  ],
   "types": {
     "analysis": [
       "현황업무분석"
@@ -65,5 +50,5 @@
       "데이터전환개발"
     ]
   },
-  "physicalIdsUrl": "physical-ids.html"
+  "physicalIdsUrl": "asis.html"
 }

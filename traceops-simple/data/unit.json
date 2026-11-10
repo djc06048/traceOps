@@ -16,7 +16,16 @@
       "execDate": "2026-10-02",
       "result": "PASS",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-10-02",
+          "author": "정현규",
+          "text": "회귀 테스트 대상으로 등록"
+        }
+      ],
+      "physIds": [
+        "LTRA010.html"
+      ]
     },
     {
       "id": "TU-2026-0002",
@@ -33,7 +42,16 @@
       "execDate": "2026-10-02",
       "result": "PASS",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-10-02",
+          "author": "정현규",
+          "text": "회귀 테스트 대상으로 등록"
+        }
+      ],
+      "physIds": [
+        "LTRA010.html"
+      ]
     },
     {
       "id": "TU-2026-0003",
@@ -50,7 +68,16 @@
       "execDate": "2026-10-02",
       "result": "PASS",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-10-02",
+          "author": "정현규",
+          "text": "회귀 테스트 대상으로 등록"
+        }
+      ],
+      "physIds": [
+        "LTRA010.html"
+      ]
     },
     {
       "id": "TU-2026-0004",
@@ -67,7 +94,16 @@
       "execDate": "2026-10-02",
       "result": "PASS",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-10-02",
+          "author": "정현규",
+          "text": "회귀 테스트 대상으로 등록"
+        }
+      ],
+      "physIds": [
+        "LTRA010.html"
+      ]
     },
     {
       "id": "TU-2026-0005",
@@ -84,7 +120,16 @@
       "execDate": "2026-08-26",
       "result": "PASS",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-08-26",
+          "author": "장윤나",
+          "text": "회귀 테스트 대상으로 등록"
+        }
+      ],
+      "physIds": [
+        "LTRA020.html"
+      ]
     },
     {
       "id": "TU-2026-0006",
@@ -101,7 +146,16 @@
       "execDate": "2026-08-26",
       "result": "PASS",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-08-26",
+          "author": "장윤나",
+          "text": "회귀 테스트 대상으로 등록"
+        }
+      ],
+      "physIds": [
+        "LTRA020.html"
+      ]
     },
     {
       "id": "TU-2026-0007",
@@ -118,7 +172,16 @@
       "execDate": "2026-08-26",
       "result": "PASS",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-08-26",
+          "author": "장윤나",
+          "text": "회귀 테스트 대상으로 등록"
+        }
+      ],
+      "physIds": [
+        "LTRA020.html"
+      ]
     },
     {
       "id": "TU-2026-0008",
@@ -135,7 +198,16 @@
       "execDate": "2026-08-26",
       "result": "PASS",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-08-26",
+          "author": "장윤나",
+          "text": "회귀 테스트 대상으로 등록"
+        }
+      ],
+      "physIds": [
+        "LTRA020.html"
+      ]
     },
     {
       "id": "TU-2026-0009",
@@ -152,7 +224,16 @@
       "execDate": "2026-07-22",
       "result": "PASS",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-07-22",
+          "author": "이외화",
+          "text": "회귀 테스트 대상으로 등록"
+        }
+      ],
+      "physIds": [
+        "LTRA030.html"
+      ]
     },
     {
       "id": "TU-2026-0010",
@@ -169,7 +250,16 @@
       "execDate": "2026-07-22",
       "result": "PASS",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-07-22",
+          "author": "이외화",
+          "text": "회귀 테스트 대상으로 등록"
+        }
+      ],
+      "physIds": [
+        "LTRA030.html"
+      ]
     },
     {
       "id": "TU-2026-0011",
@@ -186,7 +276,16 @@
       "execDate": "2026-07-22",
       "result": "PASS",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-07-22",
+          "author": "이외화",
+          "text": "회귀 테스트 대상으로 등록"
+        }
+      ],
+      "physIds": [
+        "LTRA030.html"
+      ]
     },
     {
       "id": "TU-2026-0012",
@@ -203,7 +302,16 @@
       "execDate": "2026-07-22",
       "result": "PASS",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-07-22",
+          "author": "이외화",
+          "text": "회귀 테스트 대상으로 등록"
+        }
+      ],
+      "physIds": [
+        "LTRA030.html"
+      ]
     },
     {
       "id": "TU-2026-0013",
@@ -220,7 +328,16 @@
       "execDate": "2026-06-02",
       "result": "PASS",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-06-02",
+          "author": "이외화",
+          "text": "회귀 테스트 대상으로 등록"
+        }
+      ],
+      "physIds": [
+        "InfLtrA010.java"
+      ]
     },
     {
       "id": "TU-2026-0014",
@@ -237,7 +354,16 @@
       "execDate": "2026-06-02",
       "result": "PASS",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-06-02",
+          "author": "이외화",
+          "text": "회귀 테스트 대상으로 등록"
+        }
+      ],
+      "physIds": [
+        "InfLtrA020.java"
+      ]
     },
     {
       "id": "TU-2026-0015",
@@ -254,7 +380,16 @@
       "execDate": "2026-06-12",
       "result": "PASS",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-06-12",
+          "author": "최재호",
+          "text": "회귀 테스트 대상으로 등록"
+        }
+      ],
+      "physIds": [
+        "InfLtrA030.java"
+      ]
     },
     {
       "id": "TU-2026-0016",
@@ -271,7 +406,16 @@
       "execDate": "",
       "result": "미실행",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-11-10",
+          "author": "이학수",
+          "text": "데이터 준비 후 수행 예정"
+        }
+      ],
+      "physIds": [
+        "BtLtrA010.java"
+      ]
     },
     {
       "id": "TU-2026-0017",
@@ -288,7 +432,16 @@
       "execDate": "",
       "result": "미실행",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-11-10",
+          "author": "이학수",
+          "text": "데이터 준비 후 수행 예정"
+        }
+      ],
+      "physIds": [
+        "BtLtrA020.java"
+      ]
     },
     {
       "id": "TU-2026-0018",
@@ -305,7 +458,16 @@
       "execDate": "2026-07-15",
       "result": "PASS",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-07-15",
+          "author": "최재호",
+          "text": "회귀 테스트 대상으로 등록"
+        }
+      ],
+      "physIds": [
+        "SvLtrA010.java"
+      ]
     },
     {
       "id": "TU-2026-0019",
@@ -322,7 +484,16 @@
       "execDate": "2026-04-21",
       "result": "PASS",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-04-21",
+          "author": "김영수",
+          "text": "회귀 테스트 대상으로 등록"
+        }
+      ],
+      "physIds": [
+        "SvLtrA020.java"
+      ]
     },
     {
       "id": "TU-2026-0020",
@@ -339,7 +510,16 @@
       "execDate": "2026-05-06",
       "result": "PASS",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-05-06",
+          "author": "김종학",
+          "text": "회귀 테스트 대상으로 등록"
+        }
+      ],
+      "physIds": [
+        "SvLtrA030.java"
+      ]
     },
     {
       "id": "TU-2026-0021",
@@ -356,7 +536,16 @@
       "execDate": "2026-09-21",
       "result": "PASS",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-09-21",
+          "author": "김종학",
+          "text": "회귀 테스트 대상으로 등록"
+        }
+      ],
+      "physIds": [
+        "SvLtrA040.java"
+      ]
     }
   ]
 }

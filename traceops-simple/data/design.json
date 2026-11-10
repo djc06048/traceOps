@@ -226,7 +226,13 @@
         "BtLtrA010.java"
       ],
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-10-08",
+          "author": "황금빛",
+          "text": "분석 완료 후 착수 예정 (배치 윈도우 확정 대기)"
+        }
+      ]
     },
     {
       "id": "BT_QPM_0002",
@@ -249,7 +255,13 @@
         "BtLtrA020.java"
       ],
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-10-08",
+          "author": "황금빛",
+          "text": "분석 완료 후 착수 예정 (재발송 기준 확정 대기)"
+        }
+      ]
     },
     {
       "id": "PG_QPM_0001",

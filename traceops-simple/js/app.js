@@ -7,6 +7,7 @@
 
   var FILES = {
     master: 'data/master.json',
+    asis: 'data/asis.json',
     analysis: 'data/analysis.json',
     design: 'data/design.json',
     dev: 'data/dev.json',
@@ -35,7 +36,7 @@
   // 매핑 팝업에서 다른 관리 화면으로 넘어가는 링크 (화면이 만들어지면 master.json 주소만 연결)
   var LINK_TARGETS = {
     reqIds: { key: 'requirementsUrl', label: '요구사항 관리에서 등록 (TODO)' },
-    physIds: { key: 'physicalIdsUrl', label: '물리ID 관리에서 등록 (TODO)' }
+    physIds: { key: 'physicalIdsUrl', label: 'AS-IS 목록에서 물리ID 관리' }
   };
 
   var S = {
@@ -105,13 +106,14 @@
   function validate(page, it, all) {
     var m = [];
     if (page.kind === 'stage') {
-      if (page.typesKey === 'design' && !arr(it.physIds).length) m.push('물리ID 미매핑');
+      if (!arr(it.physIds).length) m.push('물리ID 미매핑');
       if (page.typesKey === 'dev' && !arr(it.designRef).length) m.push('설계ID 미연결');
       if (all.filter(function (x) { return x.id === it.id; }).length > 1) m.push('ID 중복');
     } else {
       if (!arr(it.linked).length) m.push(page.multi ? '연계 개발ID 미지정' : '개발ID 미연결');
       if (it.result === 'FAIL' && !arr(it.evidence).length) m.push('FAIL 증적 필요');
       if (page.multi && !arr(it.units).length) m.push('묶인 단위테스트 없음');
+      if (!arr(it.physIds).length) m.push('물리ID 미매핑');
     }
     return m;
   }
@@ -150,9 +152,9 @@
         c.push({ k: 'difficulty', label: '난이도', kind: 'select', opts: ['상', '중', '하'], blank: true, edit: 'pl' });
         c.push({ k: 'priority', label: '우선순위', kind: 'select', opts: ['P1', 'P2', 'P3'], blank: true, edit: 'pl' });
       }
-      if (t === 'dev') c.push({ k: 'designRef', label: '설계ID', kind: 'chips', src: 'designIds', max: 1, edit: 'pl', g: 'mapping' });
+      if (t === 'dev') c.push({ k: 'designRef', label: '설계ID', kind: 'chips', src: 'designIds', max: 0, edit: 'pl', g: 'mapping' });
       c.push({ k: 'reqIds', label: '요구사항ID', kind: 'chips', src: 'reqIds', edit: 'pl', g: 'mapping' });
-      if (t === 'design') c.push({ k: 'physIds', label: '물리ID', kind: 'chips', src: 'physIds', edit: 'pl', g: 'mapping' });
+      c.push({ k: 'physIds', label: '물리ID', kind: 'chips', src: 'physIds', edit: 'pl', g: 'mapping' });
       c.push({ k: 'remark', label: '비고', kind: 'remark' });
     } else {
       c.push({ k: 'id', label: 'ID', kind: 'id' });
@@ -160,6 +162,7 @@
       c.push({ k: 'linked', label: '연결 개발ID', kind: 'chips', src: 'devIds', max: page.multi ? 0 : 1, edit: 'pl', g: 'mapping' });
       if (page.multi) c.push({ k: 'units', label: '묶인 단위테스트', kind: 'chips', src: 'unitIds', edit: 'pl', g: 'mapping' });
       c.push({ k: 'reqIds', label: '요구사항ID', kind: 'chips', src: 'reqIds', edit: 'pl', g: 'mapping' });
+      c.push({ k: 'physIds', label: '물리ID', kind: 'chips', src: 'physIds', edit: 'pl', g: 'mapping' });
       c.push({ k: 'expected', label: '기대결과', kind: 'text', edit: 'pl', w: 200 });
       c.push({ k: 'round', label: '테스트 차수', kind: 'select', opts: ['1차', '2차'], edit: 'pl' });
       c.push({ k: 'worker', label: '담당자', kind: 'worker', edit: 'pl' });
@@ -209,8 +212,8 @@
   }
   function srcOptions(src) {
     if (src === 'reqIds') return S.master.reqIds.map(function (v) { return { id: v, label: v }; });
-    if (src === 'physIds') return S.master.physIds.map(function (v) { return { id: v, label: v }; });
     if (src === 'designIds') return S.data.design.items.map(function (x) { return { id: x.id, label: x.id + ' · ' + x.name }; });
+    if (src === 'physIds') return S.data.asis.items.map(function (x) { return { id: x.id, label: x.id + ' · ' + x.name }; });
     if (src === 'unitIds') return S.data.unit.items.map(function (x) { return { id: x.id, label: x.id + ' · ' + x.name }; });
     if (src === 'devIds') return S.data.dev.items.map(function (x) { return { id: x.id, label: x.id + ' · ' + x.name }; });
     return [];
@@ -371,7 +374,7 @@
         adv.push({ k: 'devRound', label: '개발차수', t: 'sel', f: 'devRound', src: ['1차', '2차'] });
       }
       adv.push({ k: 'reqId', label: '요구사항ID', t: 'txt', f: 'reqIds', ph: 'RF_CCM' });
-      if (t === 'design') adv.push({ k: 'physId', label: '물리ID', t: 'txt', f: 'physIds', ph: 'CCM' });
+      adv.push({ k: 'physId', label: '물리ID', t: 'txt', f: 'physIds', ph: 'LTRA' });
       if (t === 'dev') adv.push({ k: 'designRef', label: '설계ID', t: 'txt', f: 'designRef', ph: 'SCR' });
       adv.push({ k: 'planFrom', label: '계획기간(시작)', t: 'from', f: 'wPlanStart' });
       adv.push({ k: 'planTo', label: '계획기간(종료)', t: 'to', f: 'wPlanEnd' });
@@ -915,7 +918,7 @@
   /* ---------- 시작 ---------- */
   async function boot() {
     try {
-      var names = ['master', 'analysis', 'design', 'dev', 'unit', 'integration'];
+      var names = ['master', 'asis', 'analysis', 'design', 'dev', 'unit', 'integration'];
       var res = await Promise.all(names.map(loadFile));
       names.forEach(function (n, i) {
         if (n === 'master') S.master = res[i].data; else S.data[n] = res[i].data;

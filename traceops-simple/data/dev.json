@@ -44,7 +44,10 @@
         }
       ],
       "pActStart": "2026-06-15",
-      "pActEnd": "2026-06-17"
+      "pActEnd": "2026-06-17",
+      "physIds": [
+        "LTRA010.html"
+      ]
     },
     {
       "id": "UI_QPM_0002",
@@ -88,7 +91,10 @@
         }
       ],
       "pActStart": "2026-08-29",
-      "pActEnd": "2026-08-31"
+      "pActEnd": "2026-08-31",
+      "physIds": [
+        "LTRA020.html"
+      ]
     },
     {
       "id": "UI_QPM_0003",
@@ -126,7 +132,10 @@
       ],
       "remarks": [],
       "pActStart": "2026-07-25",
-      "pActEnd": "2026-07-27"
+      "pActEnd": "2026-07-27",
+      "physIds": [
+        "LTRA030.html"
+      ]
     },
     {
       "id": "IF_QPM_0001",
@@ -164,7 +173,10 @@
       ],
       "remarks": [],
       "pActStart": "2026-06-05",
-      "pActEnd": "2026-06-07"
+      "pActEnd": "2026-06-07",
+      "physIds": [
+        "InfLtrA010.java"
+      ]
     },
     {
       "id": "IF_QPM_0002",
@@ -208,7 +220,10 @@
         }
       ],
       "pActStart": "2026-06-05",
-      "pActEnd": "2026-06-07"
+      "pActEnd": "2026-06-07",
+      "physIds": [
+        "InfLtrA020.java"
+      ]
     },
     {
       "id": "IF_QPM_0003",
@@ -253,7 +268,10 @@
         }
       ],
       "pActStart": "2026-06-15",
-      "pActEnd": "2026-06-17"
+      "pActEnd": "2026-06-17",
+      "physIds": [
+        "InfLtrA030.java"
+      ]
     },
     {
       "id": "BT_QPM_0001",
@@ -282,10 +300,13 @@
       "evidence": [],
       "remarks": [
         {
-          "date": "2026-11-03",
-          "author": "황금빛",
-          "text": "11월 배치 윈도우 확정 후 일정 재확인"
+          "date": "2026-10-08",
+          "author": "이학수",
+          "text": "분석 완료 후 착수 예정 (배치 윈도우 확정 대기)"
         }
+      ],
+      "physIds": [
+        "BtLtrA010.java"
       ]
     },
     {
@@ -313,7 +334,16 @@
       "desc": "cm 마케팅 발송 누락건 재발송 배치",
       "linkBasis": "ID 일치",
       "evidence": [],
-      "remarks": []
+      "remarks": [
+        {
+          "date": "2026-10-08",
+          "author": "이학수",
+          "text": "분석 완료 후 착수 예정 (재발송 기준 확정 대기)"
+        }
+      ],
+      "physIds": [
+        "BtLtrA020.java"
+      ]
     },
     {
       "id": "PG_QPM_0001",
@@ -352,7 +382,10 @@
       ],
       "remarks": [],
       "pActStart": "2026-07-18",
-      "pActEnd": "2026-07-20"
+      "pActEnd": "2026-07-20",
+      "physIds": [
+        "SvLtrA010.java"
+      ]
     },
     {
       "id": "PG_QPM_0002",
@@ -397,7 +430,10 @@
         }
       ],
       "pActStart": "2026-05-03",
-      "pActEnd": "2026-05-05"
+      "pActEnd": "2026-05-05",
+      "physIds": [
+        "SvLtrA020.java"
+      ]
     },
     {
       "id": "PG_QPM_0003",
@@ -436,7 +472,10 @@
       ],
       "remarks": [],
       "pActStart": "2026-05-09",
-      "pActEnd": "2026-05-11"
+      "pActEnd": "2026-05-11",
+      "physIds": [
+        "SvLtrA030.java"
+      ]
     },
     {
       "id": "PG_QPM_0004",
@@ -481,7 +520,10 @@
         }
       ],
       "pActStart": "2026-09-26",
-      "pActEnd": "2026-09-28"
+      "pActEnd": "2026-09-28",
+      "physIds": [
+        "SvLtrA040.java"
+      ]
     }
   ]
 }
