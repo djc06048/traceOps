@@ -618,7 +618,7 @@
     S.user = null;
     showLogin();
   }
-  var QUICK_ROLE = { writer: 'writer', pm: 'pm', sales: 'sales' };
+  var QUICK_ROLE = { writer: 'writer', pm: 'pm', sales: 'sales', admin: 'admin' };
   function quickFill(r) {
     var m = S.data.master.members.filter(function (x) { return x.role === QUICK_ROLE[r] && !x.deleted; })[0];
     if (!m) return;
