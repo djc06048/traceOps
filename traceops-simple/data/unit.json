@@ -2,35 +2,116 @@
   "kind": "unit",
   "items": [
     {
-      "id": "TU-2026-0001", "name": "사고조사 입력 필수값 검증", "linked": ["DEV-2026-0001"], "reqIds": ["RF_CCM_080"],
-      "expected": "필수값 누락 시 오류 메시지 표시", "round": "1차", "worker": "김도영",
-      "execDate": "2026-11-07", "result": "PASS",
-      "evidence": [{ "date": "2026-11-07", "author": "김도영", "text": "단위테스트 결과 캡처", "file": "ut_0001.png" }],
-      "remarks": []
-    },
-    {
-      "id": "TU-2026-0002", "name": "사고조사 입력 예외흐름", "linked": ["DEV-2026-0001"], "reqIds": ["RF_CCM_080"],
-      "expected": "예외 발생 시 입력값 유지", "round": "1차", "worker": "김도영",
-      "execDate": "2026-11-08", "result": "FAIL",
+      "id": "TU-2026-0001",
+      "name": "단위테스트 · 계약사항 입력",
+      "linked": [
+        "UI_QPM_0001"
+      ],
+      "reqIds": [],
+      "expected": "",
+      "round": "1차",
+      "worker": "정현규",
+      "result": "미실행",
       "evidence": [],
-      "remarks": [{ "date": "2026-11-08", "author": "김도영", "text": "저장 실패 시 입력값이 초기화됨" }]
-    },
-    {
-      "id": "TU-2026-0003", "name": "과실도표 관리 조회", "linked": ["DEV-2026-0002"], "reqIds": ["RF_CCM_084"],
-      "expected": "조회 결과가 기준일 기준으로 표시", "round": "1차", "worker": "이수민",
-      "result": "미실행", "evidence": [], "remarks": []
-    },
-    {
-      "id": "TU-2026-0004", "name": "사고조사 목록 페이징", "linked": ["DEV-2026-0003"], "reqIds": ["RF_CCM_081"],
-      "expected": "페이지당 20건 표시", "round": "1차", "worker": "이수민",
-      "execDate": "2026-11-04", "result": "PASS",
-      "evidence": [{ "date": "2026-11-04", "author": "이수민", "text": "페이징 결과 캡처", "file": "ut_0004.png" }],
       "remarks": []
     },
     {
-      "id": "TU-2026-0005", "name": "목록 정렬 확인", "linked": [], "reqIds": [],
-      "expected": "정렬 기준 변경 시 순서 반영", "round": "1차", "worker": "",
-      "result": "미실행", "evidence": [], "remarks": []
+      "id": "TU-2026-0002",
+      "name": "단위테스트 · 인수심사요청및결과",
+      "linked": [
+        "UI_QPM_0002"
+      ],
+      "reqIds": [],
+      "expected": "",
+      "round": "1차",
+      "worker": "장윤나",
+      "result": "미실행",
+      "evidence": [],
+      "remarks": []
+    },
+    {
+      "id": "TU-2026-0003",
+      "name": "단위테스트 · 장기보험-가입설계요청",
+      "linked": [
+        "UI_QPM_0003"
+      ],
+      "reqIds": [],
+      "expected": "",
+      "round": "1차",
+      "worker": "이외화",
+      "result": "미실행",
+      "evidence": [],
+      "remarks": []
+    },
+    {
+      "id": "TU-2026-0004",
+      "name": "단위테스트 · 가입설계 삭제",
+      "linked": [
+        "IF_QPM_0001"
+      ],
+      "reqIds": [],
+      "expected": "",
+      "round": "1차",
+      "worker": "이외화",
+      "result": "미실행",
+      "evidence": [],
+      "remarks": []
+    },
+    {
+      "id": "TU-2026-0005",
+      "name": "단위테스트 · 가입설계검색 조회",
+      "linked": [
+        "IF_QPM_0002"
+      ],
+      "reqIds": [],
+      "expected": "",
+      "round": "1차",
+      "worker": "이외화",
+      "result": "미실행",
+      "evidence": [],
+      "remarks": []
+    },
+    {
+      "id": "TU-2026-0006",
+      "name": "단위테스트 · 보증군별 보험종목 목록 조회(LTRA020 화면용)",
+      "linked": [
+        "IF_QPM_0003"
+      ],
+      "reqIds": [],
+      "expected": "",
+      "round": "1차",
+      "worker": "최재호",
+      "result": "미실행",
+      "evidence": [],
+      "remarks": []
+    },
+    {
+      "id": "TU-2026-0007",
+      "name": "단위테스트 · 청약오라자로 전송",
+      "linked": [
+        "BT_QPM_0001"
+      ],
+      "reqIds": [],
+      "expected": "",
+      "round": "1차",
+      "worker": "이학수",
+      "result": "미실행",
+      "evidence": [],
+      "remarks": []
+    },
+    {
+      "id": "TU-2026-0008",
+      "name": "단위테스트 · cm파일건간 이메일전송",
+      "linked": [
+        "BT_QPM_0002"
+      ],
+      "reqIds": [],
+      "expected": "",
+      "round": "1차",
+      "worker": "이학수",
+      "result": "미실행",
+      "evidence": [],
+      "remarks": []
     }
   ]
 }

@@ -19,17 +19,8 @@
       ]
     }
   ],
-  "reqIds": [
-    "RF_CCM_080",
-    "RF_CCM_081",
-    "RF_CCM_083",
-    "RF_CCM_084"
-  ],
-  "physIds": [
-    "CCMZ101",
-    "CCMB010",
-    "CCMZ102"
-  ],
+  "reqIds": [],
+  "physIds": [],
   "types": {
     "analysis": [
       "현황업무분석"
