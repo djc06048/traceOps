@@ -623,8 +623,8 @@
     var m = S.data.master.members.filter(function (x) { return x.role === QUICK_ROLE[r] && !x.deleted; })[0];
     if (!m) return;
     $('loginId').value = m.id;
-    $('loginPw').value = '';
-    $('loginPw').focus();
+    $('loginPw').value = m.pw;
+    $('btnLogin').focus();
   }
 
   /* ---------- 이벤트 ---------- */
