@@ -40,6 +40,7 @@
     dev: { to: 'unit', key: 'linked', label: '단위테스트' },
     unit: { to: 'integration', key: 'units', label: '통합테스트' }
   };
+  var PAGE_NAME = { analysis: '분석', design: '설계', dev: '개발', unit: '단위테스트', integration: '통합테스트' };
   // 실적 날짜: 오늘 이후 입력 불가
   var ACTUAL_KEYS = ['wActStart', 'wActEnd', 'pActStart', 'pActEnd', 'execDate'];
   // 매핑 팝업에서 다른 관리 화면으로 넘어가는 링크 (화면이 만들어지면 master.json 주소만 연결)
@@ -112,40 +113,44 @@
   }
   function getVal(it, f) { return f === 'status' ? statusOf(it) : it[f]; }
 
-  function actualErrors(it, m) {
+  function actualErrors(it, err) {
     var t = todayISO();
-    if (ACTUAL_KEYS.some(function (k) { return it[k] && it[k] > t; })) m.push('실적 날짜가 오늘 이후');
-    if (it.wActStart && it.wActEnd && it.wActEnd < it.wActStart) m.push('실적 종료일이 시작일보다 빠름');
-    if (it.pActStart && it.pActEnd && it.pActEnd < it.pActStart) m.push('PL 실적 종료일이 시작일보다 빠름');
+    var fut = ACTUAL_KEYS.filter(function (k) { return it[k] && it[k] > t; });
+    if (fut.length) err.push({ t: '실적 날짜가 오늘 이후', h: '실적 날짜는 오늘(' + t + ')까지만 입력할 수 있습니다. 날짜를 수정하세요.', f: fut[0] });
+    if (it.wActStart && it.wActEnd && it.wActEnd < it.wActStart) err.push({ t: '실적 종료일이 시작일보다 빠름', h: '작업자 실적 종료일을 시작일 이후로 수정하세요.', f: 'wActEnd' });
+    if (it.pActStart && it.pActEnd && it.pActEnd < it.pActStart) err.push({ t: 'PL 실적 종료일이 시작일보다 빠름', h: 'PL 실적 종료일을 시작일 이후로 수정하세요.', f: 'pActEnd' });
   }
-  // 반환: { err: 오류(입력/매핑 필요), info: 특이사항(하위 연결 누락) } — 메시지는 '무엇이 없고 → 무엇을 하라'
+  // 반환: { err: 입력·매핑 필요 항목, info: 하위 연결 특이사항 } — 각 항목은 {t: 문제, h: 해결 방법, f: 수정할 칸, g: 이동할 화면}
   function checkItem(page, it, all) {
-    var err = [], info = [];
-    if (page.kind === 'stage') {
-      if (!it.name) err.push('명 미입력 → 명칭을 입력하세요');
-      if (!it.worker) err.push('작업자 미지정 → 작업자를 선택하세요');
-      if (!it.wPlanStart || !it.wPlanEnd) err.push('작업자 계획기간 미등록 → 계획 시작·종료일을 입력하세요');
-      if (!arr(it.reqIds).length) err.push('요구사항 미등록 → 분석 단계에서 요구사항ID를 매핑하세요');
-      if (page.typesKey !== 'analysis' && !arr(it.physIds).length) err.push('물리ID 미등록 → 물리ID를 선택하세요 (AS-IS 목록에 먼저 등록)');
-      if (page.typesKey === 'design' && !arr(it.analysisRef).length) err.push('분석ID 미연결 → 분석 항목을 선택하세요');
-      if (page.typesKey === 'dev' && !arr(it.designRef).length) err.push('설계ID 미연결 → 설계 항목을 선택하세요');
-      if (all.filter(function (x) { return x.id === it.id; }).length > 1) err.push('ID 중복 → 다른 ID로 변경하세요');
+    var err = [], info = [], st = page.kind === 'stage', ty = page.typesKey;
+    if (st) {
+      if (!it.name) err.push({ t: '명 미입력', h: '명칭을 입력하세요.', f: 'name' });
+      if (!it.worker) err.push({ t: '작업자 미지정', h: '작업자를 선택하세요. 선택하면 그 업무가 해당 작업자에게 할당됩니다.', f: 'worker' });
+      if (!it.wPlanStart || !it.wPlanEnd) err.push({ t: '작업자 계획기간 미등록', h: '계획 시작·종료일이 없습니다. 작업자 계획기간은 PL도 수정할 수 없으므로 데이터 파일에서 입력해야 합니다.', f: null });
+      if (!arr(it.reqIds).length) err.push(ty === 'analysis'
+        ? { t: '요구사항 미등록', h: '요구사항ID를 선택하세요. 요구사항은 분석 단계에서 정하고 아래 단계가 물려받습니다.', f: 'reqIds' }
+        : { t: '요구사항 미등록', h: '분석 항목에 요구사항이 없습니다. 분석 항목의 요구사항을 먼저 지정하세요.', f: null });
+      if (ty !== 'analysis' && !arr(it.physIds).length) err.push({ t: '물리ID 미등록', h: '물리ID를 선택하세요. 목록에 없으면 AS-IS 목록에서 먼저 등록하세요.', f: 'physIds' });
+      if (ty === 'design' && !arr(it.analysisRef).length) err.push({ t: '분석ID 미연결', h: '이 설계가 근거하는 분석 항목을 선택하세요.', f: 'analysisRef' });
+      if (ty === 'dev' && !arr(it.designRef).length) err.push({ t: '설계ID 미연결', h: '이 개발이 구현하는 설계 항목을 선택하세요.', f: 'designRef' });
+      if (all.filter(function (x) { return x.id === it.id; }).length > 1) err.push({ t: 'ID 중복', h: '같은 ID가 여러 번 등록되어 있습니다. 데이터를 확인하세요.', f: null });
       actualErrors(it, err);
     } else {
-      if (!it.name) err.push('테스트명 미입력 → 테스트명을 입력하세요');
-      if (!arr(it.linked).length) err.push(page.multi ? '연계 개발ID 미지정 → 개발 항목을 선택하세요' : '개발ID 미연결 → 개발 항목을 선택하세요');
-      if (page.multi && !arr(it.units).length) err.push('묶인 단위테스트 없음 → 단위테스트를 선택하세요');
-      if (!arr(it.reqIds).length) err.push('요구사항 미등록 → 개발 항목의 요구사항을 확인하세요');
-      if (!arr(it.physIds).length) err.push('물리ID 미등록 → 개발 항목의 물리ID를 확인하세요');
-      if (!it.worker) err.push('담당자 미지정 → 담당자를 선택하세요');
-      if (!it.expected) err.push('기대결과 미입력 → 기대결과를 작성하세요');
-      if (it.result === 'FAIL' && !arr(it.evidence).length) err.push('FAIL 증적 미첨부 → 증적을 등록해야 저장됩니다');
+      if (!it.name) err.push({ t: '테스트명 미입력', h: '테스트명을 입력하세요.', f: 'name' });
+      if (!arr(it.linked).length) err.push(page.multi
+        ? { t: '연계 개발ID 미지정', h: '이 통합테스트가 묶는 개발 항목을 선택하세요.', f: 'linked' }
+        : { t: '개발ID 미연결', h: '이 단위테스트가 검증하는 개발 항목을 선택하세요.', f: 'linked' });
+      if (page.multi && !arr(it.units).length) err.push({ t: '묶인 단위테스트 없음', h: '통합테스트에 포함할 단위테스트를 선택하세요.', f: 'units' });
+      if (!arr(it.reqIds).length) err.push({ t: '요구사항 미등록', h: '개발 항목의 요구사항에서 상속됩니다. 개발 항목을 확인하세요.', f: null });
+      if (!arr(it.physIds).length) err.push({ t: '물리ID 미등록', h: '설계 항목의 물리ID에서 상속됩니다. 설계 항목을 확인하세요.', f: null });
+      if (!it.worker) err.push({ t: '담당자 미지정', h: '담당자를 선택하세요.', f: 'worker' });
+      if (!it.expected) err.push({ t: '기대결과 미입력', h: '검증할 기대 동작을 작성하세요.', f: 'expected' });
+      if (it.result === 'FAIL' && !arr(it.evidence).length) err.push({ t: 'FAIL 증적 미첨부', h: '실패 결과는 증적을 등록해야 저장됩니다. 증적 칸에서 등록하세요.', f: 'evidence' });
       actualErrors(it, err);
     }
-    // 하위 연결 특이사항
     var ch = CHAIN[page.file];
     if (ch && chainCount(page.file, it) === 0) {
-      info.push((page.kind === 'stage' ? '하위 ' : '') + ch.label + ' 미등록 → ' + ch.label + ' 항목을 추가하고 연결하세요');
+      info.push({ t: (st ? '하위 ' : '') + ch.label + ' 미등록', h: ch.label + ' 항목을 추가하고 이 항목과 연결하세요.', g: ch.to });
     }
     return { err: err, info: info };
   }
@@ -153,6 +158,46 @@
     var ch = CHAIN[file];
     if (!ch) return 0;
     return S.data[ch.to].items.filter(function (x) { return arr(x[ch.key]).indexOf(it.id) >= 0; }).length;
+  }
+  /* ---------- 검증 상세 팝업 ---------- */
+  function openVCheck(page, id) {
+    S.vpop = { page: page, id: id };
+    renderVCheck();
+    $('vModal').classList.add('open');
+  }
+  function renderVCheck() {
+    var v = S.vpop, it = find(v.page, v.id);
+    if (!it) return;
+    var r = checkItem(v.page, it, items(v.page));
+    var card = function (x, ic, cls) {
+      var act = x.g
+        ? '<button class="btn sm" data-goto="' + x.g + '">' + PAGE_NAME[x.g] + ' 화면에서 등록 →</button>'
+        : (x.f ? '<button class="btn sm" data-focus="' + x.f + '">해당 칸으로 이동</button>'
+               : '<span class="vi-note">이 항목은 화면에서 직접 수정할 수 없습니다</span>');
+      return '<div class="vi ' + cls + '"><div class="vi-top"><span class="vi-ic">' + ic + '</span><span class="vi-t">' + esc(x.t) + '</span></div>' +
+        '<div class="vi-hint">' + esc(x.h) + '</div><div class="vi-act">' + act + '</div></div>';
+    };
+    var body = r.err.map(function (x) { return card(x, '⚠', 'is-err'); })
+      .concat(r.info.map(function (x) { return card(x, '🔗', 'is-info'); })).join('');
+    $('vBox').innerHTML =
+      '<div class="modal-hd"><div><h3>검증 상세</h3><p>' + esc(v.id) + ' · ' + esc(it.name || '') + '</p>' +
+      '<p class="vi-legend">⚠ 입력·매핑 필요 ' + r.err.length + '건 · 🔗 하위 연결 ' + r.info.length + '건</p></div>' +
+      '<button class="modal-close" data-close="1">✕</button></div>' +
+      '<div class="modal-list">' + (body || '<div class="empty">정합성 문제가 없습니다.</div>') + '</div>';
+  }
+  function closeVCheck() { S.vpop = null; $('vModal').classList.remove('open'); }
+  function focusCell(id, f) {
+    var tr = $('tbody').querySelector('tr[data-id="' + id + '"]');
+    if (!tr) { showToast('현재 검색 조건에서 숨겨져 있습니다. 초기화 후 다시 시도하세요', true); return; }
+    var sel = f === 'worker' ? '[data-worker], [data-k="worker"]'
+      : '[data-k="' + f + '"], [data-pick="' + f + '"], [data-pop="' + f + '"]';
+    var el = tr.querySelector(sel);
+    tr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    tr.classList.add('flash');
+    setTimeout(function () { tr.classList.remove('flash'); }, 1800);
+    if (!el) { showToast('이 칸이 표시 컬럼에서 꺼져 있습니다. 표시 컬럼에서 켜 주세요', true); return; }
+    if (el.tagName === 'BUTTON') el.click();
+    else el.focus();
   }
   function needsEvidence(page, it) {
     if (page.kind === 'test') return it.result === 'FAIL' && !arr(it.evidence).length;
@@ -189,8 +234,8 @@
         c.push({ k: 'difficulty', label: '난이도', kind: 'select', opts: ['상', '중', '하'], blank: true, edit: 'pl' });
         c.push({ k: 'priority', label: '우선순위', kind: 'select', opts: ['P1', 'P2', 'P3'], blank: true, edit: 'pl' });
       }
-      if (t === 'design') c.push({ k: 'analysisRef', label: '분석ID', kind: 'chips', src: 'analysisIds', max: 1, edit: 'none', g: 'mapping' });
-      if (t === 'dev') c.push({ k: 'designRef', label: '설계ID', kind: 'chips', src: 'designIds', max: 1, edit: 'none', g: 'mapping' });
+      if (t === 'design') c.push({ k: 'analysisRef', label: '분석ID', kind: 'chips', src: 'analysisIds', max: 1, edit: 'pl', g: 'mapping' });
+      if (t === 'dev') c.push({ k: 'designRef', label: '설계ID', kind: 'chips', src: 'designIds', max: 1, edit: 'pl', g: 'mapping' });
       c.push({ k: 'reqIds', label: '요구사항ID', kind: 'chips', src: 'reqIds', edit: t === 'analysis' ? 'pl' : 'none', g: 'mapping' });
       if (t !== 'analysis') c.push({ k: 'physIds', label: '물리ID', kind: 'chips', src: 'physIds', edit: 'pl', g: 'mapping' });
       c.push({ k: 'remark', label: '비고', kind: 'remark' });
@@ -281,11 +326,10 @@
     var ed = canEdit(c), dis = ed ? '' : ' disabled', k = c.k, v = it[k];
     switch (c.kind) {
       case 'v':
-        var tip = msgs.err.map(function (x) { return '⚠ ' + x; }).concat(msgs.info.map(function (x) { return '🔗 ' + x; })).join('\n');
         if (!msgs.err.length && !msgs.info.length) return '<span class="check-ok">✓</span>';
-        return '<span class="v-wrap" title="' + esc(tip) + '">' +
-          (msgs.err.length ? '<span class="check-err">⚠</span>' : '') +
-          (msgs.info.length ? '<span class="chain-mark">🔗</span>' : '') + '</span>';
+        return '<button class="v-btn" data-vcheck="1" title="검증 상세 보기">' +
+          (msgs.err.length ? '<span class="check-err">⚠ ' + msgs.err.length + '</span>' : '') +
+          (msgs.info.length ? '<span class="chain-mark">🔗</span>' : '') + '</button>';
       case 'id': return '<span class="disabled-field">' + esc(it.id) + '</span>';
       case 'status': var s = statusOf(it); return '<span class="st ' + STATUS_CLS[s] + '">' + s + '</span>';
       case 'sys': return '<select class="txt-input" data-k="system"' + dis + '>' + opts(sysNames(), v) + '</select>';
@@ -368,7 +412,7 @@
       rows++;
       ids.push(it.id);
       list.forEach(function (m) {
-        var k = m.split(' → ')[0];
+        var k = m.t;
         kinds[k] = (kinds[k] || 0) + 1;
       });
     });
@@ -851,6 +895,7 @@
         renderTable();
         return;
       }
+      if ((x = t.closest('[data-vcheck]'))) { openVCheck(page, id); return; }
       if ((x = t.closest('[data-worker]'))) { openWorkerPick(page, id); return; }
       if ((x = t.closest('[data-pick]'))) { openPicker(page, id, x.getAttribute('data-pick')); return; }
       if ((x = t.closest('[data-pop]'))) { openPop(page, id, x.getAttribute('data-pop')); }
@@ -893,6 +938,21 @@
           renderPop();
           renderTable();
         }
+      }
+    });
+    // 검증 상세 팝업
+    $('vModal').addEventListener('click', function (e) {
+      var t = e.target, x;
+      if (t === this) { closeVCheck(); return; }
+      if (t.hasAttribute('data-close')) { closeVCheck(); return; }
+      if ((x = t.closest('[data-focus]'))) {
+        var v = S.vpop; closeVCheck();
+        if (v) focusCell(v.id, x.getAttribute('data-focus'));
+        return;
+      }
+      if ((x = t.closest('[data-goto]'))) {
+        closeVCheck();
+        location.hash = '#' + x.getAttribute('data-goto');
       }
     });
     // 작업자 팝업 (PL 전용)
