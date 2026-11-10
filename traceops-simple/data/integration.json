@@ -1,0 +1,15 @@
+{
+  "kind": "integration",
+  "items": [
+    {
+      "id": "TI-2026-0001", "name": "사고접수 → 목록조회 연계", "linked": ["DEV-2026-0001", "DEV-2026-0003"], "reqIds": ["RF_CCM_080", "RF_CCM_081"],
+      "expected": "접수 건이 목록에 즉시 반영", "round": "1차", "worker": "이수민",
+      "result": "미실행", "evidence": [], "remarks": []
+    },
+    {
+      "id": "TI-2026-0002", "name": "과실도표 연계 흐름", "linked": [], "reqIds": ["RF_CCM_084"],
+      "expected": "배치 결과가 조회 화면에 반영", "round": "1차", "worker": "",
+      "result": "미실행", "evidence": [], "remarks": []
+    }
+  ]
+}

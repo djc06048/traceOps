@@ -1,0 +1,54 @@
+{
+  "stage": "design",
+  "items": [
+    {
+      "id": "SCR-2026-0142", "system": "자동차보상", "subsystem": "손해조사", "type": "화면설계", "name": "사고조사 입력",
+      "worker": "김도영",
+      "wPlanStart": "2026-11-03", "wPlanEnd": "2026-11-05", "wActStart": "2026-11-03",
+      "pPlanStart": "2026-11-06", "pPlanEnd": "2026-11-07",
+      "devType": "신규", "devRound": "1차",
+      "reqIds": ["RF_CCM_080"], "physIds": [],
+      "evidence": [
+        { "date": "2026-11-06", "author": "김도영", "text": "화면 캡처 첨부합니다. 확인 부탁드려요.", "file": "screenshot_0142.png" },
+        { "date": "2026-11-04", "author": "김도영", "text": "1차 실적 등록. 별도 첨부 없음." }
+      ],
+      "remarks": [
+        { "date": "2026-11-07", "author": "이수민", "text": "화면설계ID 중복 확인 요청드립니다. PL 확인 부탁드려요." },
+        { "date": "2026-11-06", "author": "황금빛", "text": "고객사 요청으로 PIN 입력 화면 문구 변경 예정. 다음 차수 반영." },
+        { "date": "2026-11-05", "author": "김도영", "text": "최초 등록. 요구사항 RF_CCM_080 기준으로 설계 진행." }
+      ]
+    },
+    {
+      "id": "SCR-2026-0145", "system": "자동차보상", "subsystem": "손해조사", "type": "프로그램설계(배치)", "name": "과실_도표_관리",
+      "worker": "이수민",
+      "wPlanStart": "2026-11-09", "wPlanEnd": "2026-11-13", "wActStart": "2026-11-10",
+      "pPlanStart": "2026-11-11", "pPlanEnd": "2026-11-11",
+      "devType": "신규", "devRound": "1차",
+      "reqIds": ["RF_CCM_084"], "physIds": ["CCMZ101"],
+      "evidence": [],
+      "remarks": [
+        { "date": "2026-11-09", "author": "황금빛", "text": "배치 주기는 야간 1회로 가정하고 설계 진행" },
+        { "date": "2026-11-08", "author": "이수민", "text": "CCMZ101 매핑 확인 완료" }
+      ]
+    },
+    {
+      "id": "SCR-2026-0144", "system": "자동차보상", "subsystem": "손해조사", "type": "인터페이스설계", "name": "과실도표 선택",
+      "worker": "박준혁",
+      "wPlanStart": "2026-11-12", "wPlanEnd": "2026-11-14",
+      "devType": "신규", "devRound": "1차",
+      "reqIds": ["RF_CCM_083"], "physIds": [],
+      "evidence": [],
+      "remarks": [{ "date": "2026-11-08", "author": "박준혁", "text": "외부 기관 연계 방식 협의 필요" }]
+    },
+    {
+      "id": "SCR-2026-0143", "system": "자동차보상", "subsystem": "손해조사", "type": "화면설계", "name": "사고조사 목록조회",
+      "worker": "이수민",
+      "wPlanStart": "2026-11-01", "wPlanEnd": "2026-11-02", "wActStart": "2026-11-01", "wActEnd": "2026-11-04",
+      "pPlanStart": "2026-11-03", "pPlanEnd": "2026-11-03", "pActStart": "2026-11-03", "pActEnd": "2026-11-03",
+      "devType": "신규", "devRound": "1차",
+      "reqIds": ["RF_CCM_081"], "physIds": ["CCMB010"],
+      "evidence": [{ "date": "2026-11-04", "author": "이수민", "text": "목록 화면 설계서 제출", "file": "scr_0143.pdf" }],
+      "remarks": []
+    }
+  ]
+}

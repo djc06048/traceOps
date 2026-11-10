@@ -1,0 +1,29 @@
+{
+  "stage": "analysis",
+  "items": [
+    {
+      "id": "ANL-2026-0001", "system": "자동차보상", "subsystem": "손해조사", "type": "현황업무분석", "name": "사고조사 요구 분석",
+      "worker": "김도영",
+      "wPlanStart": "2026-11-02", "wPlanEnd": "2026-11-06", "wActStart": "2026-11-02", "wActEnd": "2026-11-06",
+      "reqIds": ["RF_CCM_080"],
+      "evidence": [{ "date": "2026-11-06", "author": "김도영", "text": "분석서 제출", "file": "analysis_0001.docx" }],
+      "remarks": []
+    },
+    {
+      "id": "ANL-2026-0002", "system": "자동차보상", "subsystem": "손해조사", "type": "현황업무분석", "name": "과실도표 현황 분석",
+      "worker": "이수민",
+      "wPlanStart": "2026-11-05", "wPlanEnd": "2026-11-12", "wActStart": "2026-11-06",
+      "reqIds": ["RF_CCM_084"],
+      "evidence": [],
+      "remarks": [{ "date": "2026-11-06", "author": "이수민", "text": "과실도표 화면 사용 현황 인터뷰 예정" }]
+    },
+    {
+      "id": "ANL-2026-0003", "system": "자동차보상", "subsystem": "손해조사", "type": "현황업무분석", "name": "과실도표 선택 분석",
+      "worker": "박준혁",
+      "wPlanStart": "2026-11-11", "wPlanEnd": "2026-11-14",
+      "reqIds": ["RF_CCM_083"],
+      "evidence": [],
+      "remarks": []
+    }
+  ]
+}
