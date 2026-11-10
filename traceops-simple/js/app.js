@@ -241,10 +241,12 @@
   function renderImpact() {
     var I = S.impact, del = I.diff.filter(function (d) { return d.removed; }).length;
     var rows = I.diff.map(function (d) {
-      var tagc = d.removed ? 'del' : 'chg';
-      var head = '<div class="im-h"><span class="im-tag ' + tagc + '">' + (d.removed ? '삭제' : '변경') + '</span> ' +
+      var tagc = d.note ? 'block' : (d.removed ? 'del' : 'chg');
+      var head = '<div class="im-h"><span class="im-tag ' + tagc + '">' + (d.note || (d.removed ? '삭제' : '변경')) + '</span> ' +
         FILE_LABEL[d.f] + ' · <b>' + esc(d.id) + '</b> ' + esc(d.name || '') + '</div>';
-      var body = d.removed
+      var body = d.note
+        ? '<div class="im-b">기록 보존을 위해 이 항목은 삭제할 수 없습니다</div>'
+        : d.removed
         ? '<div class="im-b">연결 기준에 따라 함께 삭제됩니다</div>'
         : d.changes.map(function (c) {
             return '<div class="im-b">' + IMPACT_LABEL[c.k] + ': ' + esc(c.from) + ' → <b>' + esc(c.to) + '</b></div>';
@@ -253,12 +255,15 @@
     }).join('');
     $('impactBox').innerHTML =
       '<div class="modal-hd"><div><h3>' + esc(I.title) + '</h3>' +
-      '<p>연관 항목 ' + I.diff.length + '건이 함께 바뀝니다' + (del ? ' (삭제 ' + del + '건)' : '') + '</p></div>' +
+      '<p>' + (I.block ? '실적·증적이 있는 항목이 포함되어 있어 삭제를 진행할 수 없습니다' : '연관 항목 ' + I.diff.length + '건이 함께 바뀝니다' + (del ? ' (삭제 ' + del + '건)' : '')) + '</p></div>' +
       '<button class="modal-close" data-imp-cancel="1">✕</button></div>' +
       '<div class="modal-list">' + rows + '</div>' +
-      '<div class="modal-input"><div class="row"><span class="imp-note">진행하면 저장 전까지 임시 반영됩니다. 저장 버튼으로 확정하세요.</span>' +
-      '<span class="pick-btns"><button class="btn ghost sm" data-imp-cancel="1">취소</button>' +
-      '<button class="btn sm" data-imp-ok="1">진행</button></span></div></div>';
+      (I.block
+        ? '<div class="modal-input"><div class="row"><span class="imp-note">기록(실적·증적)은 감사 대상이므로 삭제하지 않습니다.</span>' +
+          '<span class="pick-btns"><button class="btn sm" data-imp-cancel="1">닫기</button></span></div></div>'
+        : '<div class="modal-input"><div class="row"><span class="imp-note">진행하면 저장 전까지 임시 반영됩니다. 저장 버튼으로 확정하세요.</span>' +
+          '<span class="pick-btns"><button class="btn ghost sm" data-imp-cancel="1">취소</button>' +
+          '<button class="btn sm" data-imp-ok="1">진행</button></span></div></div>');
   }
   function closeImpact() { S.impact = null; $('impactModal').classList.remove('open'); }
   // 연결이 바뀐 단위테스트는 수행 결과가 무효이므로 초기화
@@ -286,8 +291,29 @@
     });
   }
 
+  // 실적·증적 기록이 있는 항목: 기록 보존을 위해 삭제 차단
+  function hasRecord(file, it) {
+    if (file === 'unit' || file === 'integration') {
+      return (it.result && it.result !== '미실행') || !!it.execDate || arr(it.evidence).length > 0;
+    }
+    return !!(it.wActStart || it.wActEnd || it.pActStart || it.pActEnd || arr(it.evidence).length);
+  }
   function deleteRow(page, id) {
     if (!find(page, id)) return;
+    var t = {}, blockers = [];
+    collectCascade(page.file, id, t);
+    Object.keys(t).forEach(function (f) {
+      t[f].forEach(function (x) {
+        var it = S.data[f].items.filter(function (y) { return y.id === x; })[0];
+        if (it && hasRecord(f, it)) blockers.push({ f: f, id: x, name: it.name, removed: true, changes: [], note: '실적·증적 있음' });
+      });
+    });
+    if (blockers.length) {
+      S.impact = { title: '"' + id + '" 삭제 불가', diff: blockers, mutate: null, block: true };
+      renderImpact();
+      $('impactModal').classList.add('open');
+      return;
+    }
     withImpact('"' + id + '" 삭제', function () { cascadeDelete(page.file, id); });
   }
   function chainCount(file, it) {
