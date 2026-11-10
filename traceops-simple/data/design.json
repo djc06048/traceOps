@@ -2,7 +2,7 @@
   "stage": "design",
   "items": [
     {
-      "id": "UI_QPM_0001",
+      "id": "DS-UI_QPM_0001",
       "srcId": "UI_QPM_0002",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -33,10 +33,13 @@
       ],
       "remarks": [],
       "pActStart": "2026-04-18",
-      "pActEnd": "2026-04-20"
+      "pActEnd": "2026-04-20",
+      "analysisRef": [
+        "AN-UI_QPM_0001"
+      ]
     },
     {
-      "id": "UI_QPM_0002",
+      "id": "DS-UI_QPM_0002",
       "srcId": "UI_QPM_0005",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -67,10 +70,13 @@
       ],
       "remarks": [],
       "pActStart": "2026-04-13",
-      "pActEnd": "2026-04-15"
+      "pActEnd": "2026-04-15",
+      "analysisRef": [
+        "AN-UI_QPM_0002"
+      ]
     },
     {
-      "id": "UI_QPM_0003",
+      "id": "DS-UI_QPM_0003",
       "srcId": "UI_QPM_0012",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -101,10 +107,13 @@
       ],
       "remarks": [],
       "pActStart": "2026-03-21",
-      "pActEnd": "2026-03-23"
+      "pActEnd": "2026-03-23",
+      "analysisRef": [
+        "AN-UI_QPM_0003"
+      ]
     },
     {
-      "id": "IF_QPM_0001",
+      "id": "DS-IF_QPM_0001",
       "srcId": "IF_QPM_0001",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -135,10 +144,13 @@
       ],
       "remarks": [],
       "pActStart": "2026-04-18",
-      "pActEnd": "2026-04-20"
+      "pActEnd": "2026-04-20",
+      "analysisRef": [
+        "AN-IF_QPM_0001"
+      ]
     },
     {
-      "id": "IF_QPM_0002",
+      "id": "DS-IF_QPM_0002",
       "srcId": "IF_QPM_0002",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -169,10 +181,13 @@
       ],
       "remarks": [],
       "pActStart": "2026-04-18",
-      "pActEnd": "2026-04-20"
+      "pActEnd": "2026-04-20",
+      "analysisRef": [
+        "AN-IF_QPM_0002"
+      ]
     },
     {
-      "id": "IF_QPM_0003",
+      "id": "DS-IF_QPM_0003",
       "srcId": "IF_QPM_0004",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -203,10 +218,13 @@
       ],
       "remarks": [],
       "pActStart": "2026-04-18",
-      "pActEnd": "2026-04-20"
+      "pActEnd": "2026-04-20",
+      "analysisRef": [
+        "AN-IF_QPM_0003"
+      ]
     },
     {
-      "id": "BT_QPM_0001",
+      "id": "DS-BT_QPM_0001",
       "srcId": "BT_H031",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -225,17 +243,31 @@
       "physIds": [
         "BtLtrA010.java"
       ],
-      "evidence": [],
+      "evidence": [
+        {
+          "date": "2026-11-09",
+          "author": "이학수",
+          "text": "산출물 제출",
+          "file": "BT_QPM_0001_design.pdf"
+        }
+      ],
       "remarks": [
         {
-          "date": "2026-10-08",
-          "author": "황금빛",
-          "text": "분석 완료 후 착수 예정 (배치 윈도우 확정 대기)"
+          "date": "2026-11-09",
+          "author": "이학수",
+          "text": "완료 처리, 운영 반영 확인 완료"
         }
+      ],
+      "wActStart": "2026-10-06",
+      "wActEnd": "2026-11-09",
+      "pActStart": "2026-11-23",
+      "pActEnd": "2026-11-25",
+      "analysisRef": [
+        "AN-BT_QPM_0001"
       ]
     },
     {
-      "id": "BT_QPM_0002",
+      "id": "DS-BT_QPM_0002",
       "srcId": "BT_LH062",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -254,17 +286,31 @@
       "physIds": [
         "BtLtrA020.java"
       ],
-      "evidence": [],
+      "evidence": [
+        {
+          "date": "2026-11-09",
+          "author": "이학수",
+          "text": "산출물 제출",
+          "file": "BT_QPM_0002_design.pdf"
+        }
+      ],
       "remarks": [
         {
-          "date": "2026-10-08",
-          "author": "황금빛",
-          "text": "분석 완료 후 착수 예정 (재발송 기준 확정 대기)"
+          "date": "2026-11-09",
+          "author": "이학수",
+          "text": "완료 처리, 운영 반영 확인 완료"
         }
+      ],
+      "wActStart": "2026-10-06",
+      "wActEnd": "2026-11-09",
+      "pActStart": "2026-11-23",
+      "pActEnd": "2026-11-25",
+      "analysisRef": [
+        "AN-BT_QPM_0002"
       ]
     },
     {
-      "id": "PG_QPM_0001",
+      "id": "DS-PG_QPM_0001",
       "srcId": "PG_QPM_0001",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -295,10 +341,13 @@
       ],
       "remarks": [],
       "pActStart": "2026-03-14",
-      "pActEnd": "2026-03-16"
+      "pActEnd": "2026-03-16",
+      "analysisRef": [
+        "AN-PG_QPM_0001"
+      ]
     },
     {
-      "id": "PG_QPM_0002",
+      "id": "DS-PG_QPM_0002",
       "srcId": "PG_QPM_0015",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -329,10 +378,13 @@
       ],
       "remarks": [],
       "pActStart": "2026-03-14",
-      "pActEnd": "2026-03-16"
+      "pActEnd": "2026-03-16",
+      "analysisRef": [
+        "AN-PG_QPM_0002"
+      ]
     },
     {
-      "id": "PG_QPM_0003",
+      "id": "DS-PG_QPM_0003",
       "srcId": "PG_QPM_0016",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -363,10 +415,13 @@
       ],
       "remarks": [],
       "pActStart": "2026-03-14",
-      "pActEnd": "2026-03-16"
+      "pActEnd": "2026-03-16",
+      "analysisRef": [
+        "AN-PG_QPM_0003"
+      ]
     },
     {
-      "id": "PG_QPM_0004",
+      "id": "DS-PG_QPM_0004",
       "srcId": "PG_QPM_0017",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -397,10 +452,13 @@
       ],
       "remarks": [],
       "pActStart": "2026-03-21",
-      "pActEnd": "2026-03-23"
+      "pActEnd": "2026-03-23",
+      "analysisRef": [
+        "AN-PG_QPM_0004"
+      ]
     },
     {
-      "id": "PG_QPM_0005",
+      "id": "DS-PG_QPM_0005",
       "srcId": "PG_QPM_0018",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -431,7 +489,10 @@
       ],
       "remarks": [],
       "pActStart": "2026-03-21",
-      "pActEnd": "2026-03-23"
+      "pActEnd": "2026-03-23",
+      "analysisRef": [
+        "AN-PG_QPM_0005"
+      ]
     }
   ]
 }

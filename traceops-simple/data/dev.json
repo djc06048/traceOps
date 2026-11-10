@@ -2,7 +2,7 @@
   "stage": "dev",
   "items": [
     {
-      "id": "UI_QPM_0001",
+      "id": "DV-UI_QPM_0001-01",
       "srcId": "LTPA350_01",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -21,7 +21,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "UI_QPM_0001"
+        "DS-UI_QPM_0001"
       ],
       "reqIds": [
         "RF_LTR_001"
@@ -50,7 +50,7 @@
       ]
     },
     {
-      "id": "UI_QPM_0002",
+      "id": "DV-UI_QPM_0002-01",
       "srcId": "LTPA350_04",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -68,7 +68,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "UI_QPM_0002"
+        "DS-UI_QPM_0002"
       ],
       "reqIds": [
         "RF_LTR_001"
@@ -97,7 +97,7 @@
       ]
     },
     {
-      "id": "UI_QPM_0003",
+      "id": "DV-UI_QPM_0003-01",
       "srcId": "LTPA400",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -115,7 +115,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "UI_QPM_0003"
+        "DS-UI_QPM_0003"
       ],
       "reqIds": [
         "RF_LTR_004"
@@ -138,7 +138,7 @@
       ]
     },
     {
-      "id": "IF_QPM_0001",
+      "id": "DV-IF_QPM_0001-01",
       "srcId": "IF_QPM_0001",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -156,7 +156,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "IF_QPM_0001"
+        "DS-IF_QPM_0001"
       ],
       "reqIds": [
         "RF_LTR_002"
@@ -179,7 +179,7 @@
       ]
     },
     {
-      "id": "IF_QPM_0002",
+      "id": "DV-IF_QPM_0002-01",
       "srcId": "IF_QPM_0002",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -197,7 +197,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "IF_QPM_0002"
+        "DS-IF_QPM_0002"
       ],
       "reqIds": [
         "RF_LTR_002"
@@ -226,7 +226,7 @@
       ]
     },
     {
-      "id": "IF_QPM_0003",
+      "id": "DV-IF_QPM_0003-01",
       "srcId": "IF_QPM_0004",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -245,7 +245,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "IF_QPM_0003"
+        "DS-IF_QPM_0003"
       ],
       "reqIds": [
         "RF_LTR_002"
@@ -274,7 +274,7 @@
       ]
     },
     {
-      "id": "BT_QPM_0001",
+      "id": "DV-BT_QPM_0001-01",
       "srcId": "BT_H031",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -290,27 +290,38 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "BT_QPM_0001"
+        "DS-BT_QPM_0001"
       ],
       "reqIds": [
         "RF_LTR_003"
       ],
       "desc": "청약 완료 건 전송 배치 (고령자용 확인서 PDF 및 우편안내장)",
       "linkBasis": "ID 일치",
-      "evidence": [],
+      "evidence": [
+        {
+          "date": "2026-11-09",
+          "author": "이학수",
+          "text": "산출물 제출",
+          "file": "BT_QPM_0001_dev.pdf"
+        }
+      ],
       "remarks": [
         {
-          "date": "2026-10-08",
+          "date": "2026-11-09",
           "author": "이학수",
-          "text": "분석 완료 후 착수 예정 (배치 윈도우 확정 대기)"
+          "text": "완료 처리, 운영 반영 확인 완료"
         }
       ],
       "physIds": [
         "BtLtrA010.java"
-      ]
+      ],
+      "wActStart": "2026-10-06",
+      "wActEnd": "2026-11-09",
+      "pActStart": "2026-11-23",
+      "pActEnd": "2026-11-25"
     },
     {
-      "id": "BT_QPM_0002",
+      "id": "DV-BT_QPM_0002-01",
       "srcId": "BT_LH062",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -326,27 +337,38 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "BT_QPM_0002"
+        "DS-BT_QPM_0002"
       ],
       "reqIds": [
         "RF_LTR_003"
       ],
       "desc": "cm 마케팅 발송 누락건 재발송 배치",
       "linkBasis": "ID 일치",
-      "evidence": [],
+      "evidence": [
+        {
+          "date": "2026-11-09",
+          "author": "이학수",
+          "text": "산출물 제출",
+          "file": "BT_QPM_0002_dev.pdf"
+        }
+      ],
       "remarks": [
         {
-          "date": "2026-10-08",
+          "date": "2026-11-09",
           "author": "이학수",
-          "text": "분석 완료 후 착수 예정 (재발송 기준 확정 대기)"
+          "text": "완료 처리, 운영 반영 확인 완료"
         }
       ],
       "physIds": [
         "BtLtrA020.java"
-      ]
+      ],
+      "wActStart": "2026-10-06",
+      "wActEnd": "2026-11-09",
+      "pActStart": "2026-11-23",
+      "pActEnd": "2026-11-25"
     },
     {
-      "id": "PG_QPM_0001",
+      "id": "DV-PG_QPM_0001-01",
       "srcId": "PG_QPM_0001",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -365,7 +387,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "PG_QPM_0001"
+        "DS-PG_QPM_0001"
       ],
       "reqIds": [
         "RF_LTR_005"
@@ -388,7 +410,7 @@
       ]
     },
     {
-      "id": "PG_QPM_0002",
+      "id": "DV-PG_QPM_0002-01",
       "srcId": "PG_QPM_0002",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -407,7 +429,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "PG_QPM_0002"
+        "DS-PG_QPM_0002"
       ],
       "reqIds": [
         "RF_LTR_005"
@@ -436,7 +458,7 @@
       ]
     },
     {
-      "id": "PG_QPM_0003",
+      "id": "DV-PG_QPM_0003-01",
       "srcId": "PG_QPM_0003",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -455,7 +477,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "PG_QPM_0003"
+        "DS-PG_QPM_0003"
       ],
       "reqIds": [
         "RF_LTR_005"
@@ -478,7 +500,7 @@
       ]
     },
     {
-      "id": "PG_QPM_0004",
+      "id": "DV-PG_QPM_0004-01",
       "srcId": "PG_QPM_0004",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -497,7 +519,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "PG_QPM_0004"
+        "DS-PG_QPM_0004"
       ],
       "reqIds": [
         "RF_LTR_005"
