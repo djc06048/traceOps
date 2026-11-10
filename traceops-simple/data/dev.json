@@ -2,7 +2,7 @@
   "stage": "dev",
   "items": [
     {
-      "id": "DV-UI_QPM_0001-01",
+      "id": "DV-0001",
       "srcId": "LTPA350_01",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -21,7 +21,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "DS-UI_QPM_0001"
+        "DS-0001"
       ],
       "reqIds": [
         "RF_LTR_001"
@@ -50,7 +50,7 @@
       ]
     },
     {
-      "id": "DV-UI_QPM_0002-01",
+      "id": "DV-0002",
       "srcId": "LTPA350_04",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -68,7 +68,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "DS-UI_QPM_0002"
+        "DS-0002"
       ],
       "reqIds": [
         "RF_LTR_001"
@@ -97,7 +97,7 @@
       ]
     },
     {
-      "id": "DV-UI_QPM_0003-01",
+      "id": "DV-0003",
       "srcId": "LTPA400",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -115,7 +115,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "DS-UI_QPM_0003"
+        "DS-0003"
       ],
       "reqIds": [
         "RF_LTR_004"
@@ -138,7 +138,7 @@
       ]
     },
     {
-      "id": "DV-IF_QPM_0001-01",
+      "id": "DV-0004",
       "srcId": "IF_QPM_0001",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -156,7 +156,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "DS-IF_QPM_0001"
+        "DS-0004"
       ],
       "reqIds": [
         "RF_LTR_002"
@@ -179,7 +179,7 @@
       ]
     },
     {
-      "id": "DV-IF_QPM_0002-01",
+      "id": "DV-0005",
       "srcId": "IF_QPM_0002",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -197,7 +197,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "DS-IF_QPM_0002"
+        "DS-0005"
       ],
       "reqIds": [
         "RF_LTR_002"
@@ -226,7 +226,7 @@
       ]
     },
     {
-      "id": "DV-IF_QPM_0003-01",
+      "id": "DV-0006",
       "srcId": "IF_QPM_0004",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -245,7 +245,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "DS-IF_QPM_0003"
+        "DS-0006"
       ],
       "reqIds": [
         "RF_LTR_002"
@@ -274,7 +274,7 @@
       ]
     },
     {
-      "id": "DV-BT_QPM_0001-01",
+      "id": "DV-0007",
       "srcId": "BT_H031",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -290,7 +290,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "DS-BT_QPM_0001"
+        "DS-0007"
       ],
       "reqIds": [
         "RF_LTR_003"
@@ -321,7 +321,7 @@
       "pActEnd": "2026-11-10"
     },
     {
-      "id": "DV-BT_QPM_0002-01",
+      "id": "DV-0008",
       "srcId": "BT_LH062",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -337,7 +337,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "DS-BT_QPM_0002"
+        "DS-0008"
       ],
       "reqIds": [
         "RF_LTR_003"
@@ -368,7 +368,7 @@
       "pActEnd": "2026-11-10"
     },
     {
-      "id": "DV-PG_QPM_0001-01",
+      "id": "DV-0009",
       "srcId": "PG_QPM_0001",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -387,7 +387,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "DS-PG_QPM_0001"
+        "DS-0009"
       ],
       "reqIds": [
         "RF_LTR_005"
@@ -410,7 +410,7 @@
       ]
     },
     {
-      "id": "DV-PG_QPM_0002-01",
+      "id": "DV-0010",
       "srcId": "PG_QPM_0002",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -429,7 +429,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "DS-PG_QPM_0002"
+        "DS-0010"
       ],
       "reqIds": [
         "RF_LTR_005"
@@ -458,7 +458,7 @@
       ]
     },
     {
-      "id": "DV-PG_QPM_0003-01",
+      "id": "DV-0011",
       "srcId": "PG_QPM_0003",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -477,7 +477,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "DS-PG_QPM_0003"
+        "DS-0011"
       ],
       "reqIds": [
         "RF_LTR_005"
@@ -500,7 +500,7 @@
       ]
     },
     {
-      "id": "DV-PG_QPM_0004-01",
+      "id": "DV-0012",
       "srcId": "PG_QPM_0004",
       "system": "가입설계/청약",
       "subsystem": "가입설계/청약",
@@ -519,7 +519,7 @@
       "difficulty": "중",
       "priority": "P2",
       "designRef": [
-        "DS-PG_QPM_0004"
+        "DS-0012"
       ],
       "reqIds": [
         "RF_LTR_005"

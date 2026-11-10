@@ -14,7 +14,7 @@
     unit: 'data/unit.json',
     integration: 'data/integration.json'
   };
-  var DRAFT_KEY = 'traceops-simple:';
+  var DRAFT_KEY = 'traceops-simple-v2:';
 
   var PAGES = {
     analysis:    { kind: 'stage', tab: 'detail', file: 'analysis', typesKey: 'analysis', prefix: 'ANL', nameLabel: '분석명', title: '분석단계 조회 및 관리', desc: '분석 항목(현황업무분석)의 계획·실적·증적을 관리합니다.' },
@@ -495,7 +495,8 @@
         return '<button class="v-btn" data-vcheck="1" title="검증 상세 보기">' +
           (msgs.err.length ? TRI + '<span class="check-err">' + msgs.err.length + '</span>' : '') +
           (msgs.info.length ? '<span class="chain-mark">🔗</span>' : '') + '</button>';
-      case 'id': return '<span class="disabled-field">' + esc(it.id) + '</span>';
+      case 'id': return '<span class="disabled-field">' + esc(it.id) + '</span>' +
+        (it.srcId ? '<div class="src-id">원본 ' + esc(it.srcId) + '</div>' : '');
       case 'status': var s = statusOf(it); return '<span class="st ' + STATUS_CLS[s] + '">' + s + '</span>';
       case 'sys': return '<select class="txt-input" data-k="system"' + dis + '>' + opts(sysNames(), v) + '</select>';
       case 'sub': return '<select class="txt-input" data-k="subsystem"' + dis + '>' + opts(subsOf(it.system), v) + '</select>';
@@ -898,27 +899,55 @@
     var tr = $('tbody').querySelector('tr[data-id="' + it.id + '"]');
     if (tr) tr.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
-  function save() {
-    var page = pageOf(), all = items(page), msg = null;
+  function gateMessage(page) {
     if (page.kind === 'stage' && S.mode === 'worker') {
-      // 작업자는 현재 조회된(본인) 행만 대상으로 증적 게이트를 적용한다
-      var mine = all.filter(function (it) { return passes(it, S.applied); });
+      var mine = items(page).filter(function (it) { return passes(it, S.applied); });
       var n = mine.filter(function (it) { return it.wActStart && !arr(it.evidence).length; }).length;
-      if (n) msg = '⚠ 증적 미첨부 ' + n + '건 — 저장할 수 없습니다';
+      if (n) return '⚠ 증적 미첨부 ' + n + '건 — 저장할 수 없습니다';
     }
-    if (!msg && page.kind === 'test') {
-      var f = all.filter(function (it) { return it.result === 'FAIL' && !arr(it.evidence).length; }).length;
-      if (f) msg = '⚠ FAIL 결과 증적 미첨부 ' + f + '건 — 저장할 수 없습니다';
+    if (page.kind === 'test') {
+      var f = items(page).filter(function (it) { return it.result === 'FAIL' && !arr(it.evidence).length; }).length;
+      if (f) return '⚠ FAIL 결과 증적 미첨부 ' + f + '건 — 저장할 수 없습니다';
     }
+    return null;
+  }
+  // 마지막 저장(또는 불러온) 상태와 비교한 변경 요약
+  function changeSummary() {
+    var mod = 0, add = 0, del = 0, files = [];
+    IMPACT_FILES.forEach(function (f) {
+      var base = {}, cur = {}, n = 0;
+      S.baseline[f].items.forEach(function (x) { base[x.id] = JSON.stringify(x); });
+      S.data[f].items.forEach(function (x) { cur[x.id] = JSON.stringify(x); });
+      Object.keys(cur).forEach(function (id) {
+        if (base[id] === undefined) { add++; n++; } else if (base[id] !== cur[id]) { mod++; n++; }
+      });
+      Object.keys(base).forEach(function (id) { if (cur[id] === undefined) { del++; n++; } });
+      if (n) files.push(FILE_LABEL[f] + ' ' + n + '건');
+    });
+    return { add: add, mod: mod, del: del, total: add + mod + del, files: files };
+  }
+  function save() {
+    var msg = gateMessage(pageOf());
     if (msg) { showToast(msg, true); renderTable(); return; }
+    var c = changeSummary();
+    if (!c.total) { showToast('변경된 내용이 없습니다'); return; }
+    var ok = confirm('변경 내용을 저장할까요?\n\n' +
+      '· 추가 ' + c.add + '건 · 수정 ' + c.mod + '건 · 삭제 ' + c.del + '건\n' +
+      '· 대상: ' + c.files.join(', ') + '\n\n' +
+      '저장은 이 브라우저에 반영됩니다. 기본 데이터 파일에 반영하려면 내보내기를 이용하세요.');
+    if (!ok) return;
     try {
-      localStorage.setItem(DRAFT_KEY + page.file, JSON.stringify(S.data[page.file]));
-      S.draft[page.file] = true;
+      IMPACT_FILES.forEach(function (f) {
+        localStorage.setItem(DRAFT_KEY + f, JSON.stringify(S.data[f]));
+        S.draft[f] = true;
+      });
     } catch (e) {
       showToast('브라우저 저장소에 저장하지 못했습니다. 내보내기를 이용하세요.', true);
       return;
     }
+    S.baseline = snapData();
     renderChrome();
+    renderTable();
     showToast('저장되었습니다');
   }
   function exportFile() {
@@ -946,6 +975,7 @@
     }
     renderChrome();
     renderTable();
+    S.baseline[page.file] = JSON.parse(JSON.stringify(S.data[page.file]));
     showToast('원본으로 복원했습니다');
   }
 
@@ -1279,6 +1309,7 @@
         '). 파일을 직접 열지 말고 로컬 서버로 실행하세요: python3 -m http.server 8000</td></tr>';
       return;
     }
+    S.baseline = snapData();
     S.account = S.master.workers[0];
     buildAccountSelect();
     bind();
