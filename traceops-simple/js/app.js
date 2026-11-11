@@ -1,18 +1,19 @@
 /* TraceOps 단순 버전 — 상세공정관리(분석/설계/개발) + 테스트관리(단위/통합)
  * 모든 데이터는 data/*.json 을 읽어서 동작한다. DB 없음.
- * 편집 내용은 브라우저 임시저장(localStorage)에 남고, 내보내기로 JSON을 받아 data/ 원본에 덮어쓸 수 있다.
+ * 편집 내용은 서버 DB(SQLite)에 남고, 내보내기로 JSON을 받아 data/ 원본에 덮어쓸 수 있다.
  */
 (function () {
   'use strict';
 
   var FILES = {
     master: 'data/master.json',
-    asis: 'data/asis.json',
-    analysis: 'data/analysis.json',
-    design: 'data/design.json',
-    dev: 'data/dev.json',
-    unit: 'data/unit.json',
-    integration: 'data/integration.json'
+    asis: '/api/asis',
+    requirements: '/api/requirements',
+    analysis: '/api/analysis',
+    design: '/api/design',
+    dev: '/api/dev',
+    unit: '/api/unit',
+    integration: '/api/integration'
   };
   var DRAFT_KEY = 'traceops-simple-v2:';
 
@@ -48,7 +49,7 @@
   var ACTUAL_KEYS = ['wActStart', 'wActEnd', 'pActStart', 'pActEnd', 'execDate'];
   // 매핑 팝업에서 다른 관리 화면으로 넘어가는 링크 (화면이 만들어지면 master.json 주소만 연결)
   var LINK_TARGETS = {
-    reqIds: { key: 'requirementsUrl', label: '요구사항 관리에서 등록 (TODO)' },
+    reqIds: { key: 'requirementsUrl', label: '요구사항 관리에서 등록' },
     physIds: { key: 'physicalIdsUrl', label: 'AS-IS 목록에서 물리ID 관리' }
   };
 
@@ -140,9 +141,7 @@
       actualErrors(it, err);
     } else {
       if (!it.name) err.push({ t: '테스트명 미입력', h: '테스트명을 입력하세요.', f: 'name' });
-      if (!arr(it.linked).length) err.push(page.multi
-        ? { t: '연계 개발ID 미지정', h: '이 통합테스트가 묶는 개발 항목을 선택하세요.', f: 'linked' }
-        : { t: '개발ID 미연결', h: '이 단위테스트가 검증하는 개발 항목을 선택하세요.', f: 'linked' });
+      if (!page.multi && !arr(it.linked).length) err.push({ t: '개발ID 미연결', h: '이 단위테스트가 검증하는 개발 항목을 선택하세요.', f: 'linked' });
       if (page.multi && !arr(it.units).length) err.push({ t: '묶인 단위테스트 없음', h: '통합테스트에 포함할 단위테스트를 선택하세요.', f: 'units' });
       if (!arr(it.reqIds).length) err.push({ t: '요구사항 미등록', h: '개발 항목의 요구사항에서 상속됩니다. 개발 항목을 확인하세요.', f: null });
       if (!arr(it.physIds).length) err.push({ t: '물리ID 미등록', h: '설계 항목의 물리ID에서 상속됩니다. 설계 항목을 확인하세요.', f: null });
@@ -182,15 +181,18 @@
       u.reqIds = arr(v.reqIds).slice();
       u.physIds = arr(v.physIds).slice();
     });
-    S.data.integration.items.forEach(function (t) {
-      var rs = [], ps = [];
-      arr(t.linked).forEach(function (l) {
-        var v = V[l];
-        if (!v) return;
-        arr(v.reqIds).forEach(function (r) { if (rs.indexOf(r) < 0) rs.push(r); });
-        arr(v.physIds).forEach(function (p) { if (ps.indexOf(p) < 0) ps.push(p); });
+    var U = {};
+    S.data.unit.items.forEach(function (x) { U[x.id] = x; });
+    S.data.integration.items.forEach(function (t) {   // 통합 = 묶인 단위테스트의 합집합
+      var ls = [], rs = [], ps = [];
+      arr(t.units).forEach(function (id) {
+        var u = U[id];
+        if (!u) return;
+        arr(u.linked).forEach(function (l) { if (ls.indexOf(l) < 0) ls.push(l); });
+        arr(u.reqIds).forEach(function (r) { if (rs.indexOf(r) < 0) rs.push(r); });
+        arr(u.physIds).forEach(function (p) { if (ps.indexOf(p) < 0) ps.push(p); });
       });
-      t.reqIds = rs; t.physIds = ps;
+      t.linked = ls; t.reqIds = rs; t.physIds = ps;
     });
   }
   function dependentsOf(file, it) {
@@ -413,7 +415,7 @@
     } else {
       c.push({ k: 'id', label: 'ID', kind: 'id' });
       c.push({ k: 'name', label: '테스트명', kind: 'text', edit: 'pl', w: 170 });
-      c.push({ k: 'linked', label: '연결 개발ID', kind: 'chips', src: 'devIds', max: page.multi ? 0 : 1, edit: 'pl', g: 'mapping' });
+      c.push({ k: 'linked', label: '연결 개발ID', kind: 'chips', src: 'devIds', max: page.multi ? 0 : 1, edit: page.multi ? 'none' : 'pl', g: 'mapping' });
       if (page.multi) c.push({ k: 'units', label: '묶인 단위테스트', kind: 'chips', src: 'unitIds', edit: 'pl', g: 'mapping' });
       c.push({ k: 'reqIds', label: '요구사항ID', kind: 'chips', src: 'reqIds', edit: 'none', g: 'mapping' });
       c.push({ k: 'physIds', label: '물리ID', kind: 'chips', src: 'physIds', edit: 'none', g: 'mapping' });
@@ -466,7 +468,7 @@
     return h;
   }
   function srcOptions(src) {
-    if (src === 'reqIds') return S.master.reqIds.map(function (v) { return { id: v, label: v }; });
+    if (src === 'reqIds') return S.data.requirements.items.map(function (x) { return { id: x.id, label: x.id + ' · ' + x.name }; });
     if (src === 'designIds') return S.data.design.items.map(function (x) { return { id: x.id, label: x.id + ' · ' + x.name }; });
     if (src === 'analysisIds') return S.data.analysis.items.map(function (x) { return { id: x.id, label: x.id + ' · ' + x.name }; });
     if (src === 'physIds') return S.data.asis.items.map(function (x) { return { id: x.id, label: x.id + ' · ' + x.name }; });
@@ -630,9 +632,10 @@
     document.querySelectorAll('[data-go]').forEach(function (b) {
       b.classList.toggle('on', b.getAttribute('data-go') === page.tab);
     });
-    $('subtabs').innerHTML = TABS[page.tab].map(function (t) {
-      return '<button class="subtab' + (t[0] === S.route ? ' on' : '') + '" data-route="' + t[0] + '">' + t[1] + '</button>';
-    }).join('');
+    $('subtabs').innerHTML = (page.tab === 'detail' ? '<button class="subtab badge" onclick="location.href=\'requirements.html\'">📋 요구사항관리</button>' : '') +
+      TABS[page.tab].map(function (t) {
+        return '<button class="subtab' + (t[0] === S.route ? ' on' : '') + '" data-route="' + t[0] + '">' + t[1] + '</button>';
+      }).join('');
     $('crumb').innerHTML = (page.tab === 'detail' ? '상세공정관리' : '테스트관리') + ' · <b>' + page.title + '</b>';
     $('title').textContent = page.title;
     $('desc').textContent = page.desc;
@@ -640,9 +643,11 @@
     $('btnWorker').classList.toggle('active', S.mode === 'worker');
     $('workerAccount').style.display = S.mode === 'worker' ? '' : 'none';
     $('btnSave').textContent = S.mode === 'pl' ? '저장' : '실적 저장';
-    $('dataState').textContent = S.draft[page.file]
-      ? '임시저장본 사용 중 (이 브라우저에만 저장됨)'
-      : '원본 데이터 사용 중 (data/' + page.file + '.json)';
+    $('dataState').textContent = TRACE_FILES.indexOf(page.file) >= 0
+      ? '관계형 DB(traceops.db) 사용 중'
+      : S.draft[page.file]
+        ? '임시저장본 사용 중 (DB에 저장됨)'
+        : '원본 데이터 사용 중 (data/' + page.file + '.json)';
   }
 
   /* ---------- 필터 ---------- */
@@ -821,13 +826,16 @@
   var ITEM_FILES = ['analysis', 'design', 'dev', 'unit', 'integration'];
   function persistFiles(names) {
     var ok = true;
-    names.forEach(function (n) {
+    if (names.some(function (n) { return TRACE_FILES.indexOf(n) >= 0; })) {
+      saveTrace().catch(function (e) { showToast('저장 실패: ' + e.message, true); });
+    }
+    names.filter(function (n) { return TRACE_FILES.indexOf(n) < 0; }).forEach(function (n) {
       try {
-        localStorage.setItem(DRAFT_KEY + n, JSON.stringify(n === 'master' ? S.master : S.data[n]));
+        DB.setItem(DRAFT_KEY + n, JSON.stringify(n === 'master' ? S.master : S.data[n]));
         S.draft[n] = true;
       } catch (e) { ok = false; }
     });
-    if (!ok) showToast('브라우저 저장소에 저장하지 못했습니다. 내보내기를 이용하세요.', true);
+    if (!ok) showToast('DB에 저장하지 못했습니다(서버 실행 중인지 확인). 내보내기를 이용하세요.', true);
   }
   function buildAccountSelect() {
     $('workerAccount').innerHTML = S.master.workers.map(function (w) {
@@ -960,7 +968,7 @@
     });
     return { add: add, mod: mod, del: del, total: add + mod + del, files: files };
   }
-  function save() {
+  async function save() {
     var msg = gateMessage(pageOf());
     if (msg) { showToast(msg, true); renderTable(); return; }
     var c = changeSummary();
@@ -968,15 +976,12 @@
     var ok = confirm('변경 내용을 저장할까요?\n\n' +
       '· 추가 ' + c.add + '건 · 수정 ' + c.mod + '건 · 삭제 ' + c.del + '건\n' +
       '· 대상: ' + c.files.join(', ') + '\n\n' +
-      '저장은 이 브라우저에 반영됩니다. 기본 데이터 파일에 반영하려면 내보내기를 이용하세요.');
+      '저장은 DB(traceops.db)에 반영됩니다. 기본 데이터 파일에 반영하려면 내보내기를 이용하세요.');
     if (!ok) return;
     try {
-      IMPACT_FILES.forEach(function (f) {
-        localStorage.setItem(DRAFT_KEY + f, JSON.stringify(S.data[f]));
-        S.draft[f] = true;
-      });
+      await saveTrace();
     } catch (e) {
-      showToast('브라우저 저장소에 저장하지 못했습니다. 내보내기를 이용하세요.', true);
+      showToast('저장 실패: ' + e.message, true);
       return;
     }
     S.baseline = snapData();
@@ -998,8 +1003,10 @@
   }
   async function restoreOriginal() {
     var page = pageOf();
-    if (!confirm('임시저장본을 버리고 data/' + page.file + '.json 원본으로 되돌릴까요?')) return;
-    try { localStorage.removeItem(DRAFT_KEY + page.file); } catch (e) { /* 저장소 접근 불가 시 무시 */ }
+    var rel = TRACE_FILES.indexOf(page.file) >= 0;
+    if (!confirm(rel ? '저장하지 않은 변경을 버리고 DB에 저장된 내용으로 되돌릴까요?'
+                     : '임시저장본을 버리고 data/' + page.file + '.json 원본으로 되돌릴까요?')) return;
+    try { DB.removeItem(DRAFT_KEY + page.file); } catch (e) { /* 저장소 접근 불가 시 무시 */ }
     S.draft[page.file] = false;
     try {
       S.data[page.file] = await fetchJSON(FILES[page.file]);
@@ -1052,9 +1059,18 @@
     if (!r.ok) throw new Error(path + ' (' + r.status + ')');
     return r.json();
   }
+  // 요구사항·분석·설계·개발은 관계형 DB(API), 나머지는 JSON 문서 저장
+  var TRACE_FILES = ['analysis', 'design', 'dev', 'unit', 'integration'];
+  function isRelational(n) { return n === 'requirements' || n === 'asis' || TRACE_FILES.indexOf(n) >= 0; }
+  function saveTrace() {   // 5단계를 한 트랜잭션으로 저장 (연결 무결성은 DB가 검증)
+    var body = {};
+    TRACE_FILES.forEach(function (f) { body[f] = S.data[f].items; });
+    return api('PUT', '/api/trace', body);
+  }
   async function loadFile(name) {
+    if (isRelational(name)) return { data: await fetchJSON(FILES[name]), draft: false };
     try {
-      var raw = localStorage.getItem(DRAFT_KEY + name);
+      var raw = DB.getItem(DRAFT_KEY + name);
       if (raw) return { data: JSON.parse(raw), draft: true };
     } catch (e) { /* 임시저장본이 깨졌으면 원본 사용 */ }
     return { data: await fetchJSON(FILES[name]), draft: false };
@@ -1341,7 +1357,7 @@
   /* ---------- 시작 ---------- */
   async function boot() {
     try {
-      var names = ['master', 'asis', 'analysis', 'design', 'dev', 'unit', 'integration'];
+      var names = ['master', 'asis', 'requirements', 'analysis', 'design', 'dev', 'unit', 'integration'];
       var res = await Promise.all(names.map(loadFile));
       names.forEach(function (n, i) {
         if (n === 'master') S.master = res[i].data; else S.data[n] = res[i].data;
@@ -1350,7 +1366,7 @@
     } catch (e) {
       $('thead').innerHTML = '';
       $('tbody').innerHTML = '<tr><td class="empty">데이터 파일을 읽지 못했습니다 (' + esc(e.message) +
-        '). 파일을 직접 열지 말고 로컬 서버로 실행하세요: python3 -m http.server 8000</td></tr>';
+        '). 파일을 직접 열지 말고 로컬 서버로 실행하세요: python3 server.py</td></tr>';
       return;
     }
     S.baseline = snapData();

@@ -24,6 +24,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#EEE;pad
 .main{padding:24px 40px 80px;max-width:1560px;margin:0 auto}
 .subtabs{display:flex;gap:6px;margin-bottom:14px}
 .subtab{border:1px solid var(--line2);background:#fff;color:var(--ink2);padding:7px 16px;border-radius:var(--r-pill);font-size:13.5px;font-weight:600}
+.subtab.badge{background:var(--accent-bg);color:var(--accent);border-color:var(--accent)}
 .subtab.on{background:#000;color:#fff;border-color:#000}
 .crumb{font-size:13px;color:var(--ink3);margin-bottom:8px}
 .crumb b{color:var(--ink2);font-weight:600}
@@ -105,6 +106,8 @@ select.txt-input:disabled{padding-right:2px}
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:50;align-items:center;justify-content:center;padding:16px}
 .modal-bg.open{display:flex}
 .modal{background:#fff;border-radius:var(--r-lg);width:520px;max-width:100%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.2)}
+.modal.wide{width:960px;max-height:88vh}
+.meet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
 .modal-hd{display:flex;justify-content:space-between;align-items:flex-start;padding:20px 22px 14px;border-bottom:1px solid var(--line)}
 .modal-hd h3{font-size:16px;font-weight:700}
 .modal-hd p{font-size:12.5px;color:var(--ink3);margin-top:3px}

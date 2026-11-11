@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TraceOps · 요구사항 개정 검토 (ReqSync)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  /* ReqSync 검토 모달 — style.css 공통 클래스와 겹치지 않도록 rv- 접두사 사용 */
+  .rv-layout{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+  @media (max-width:860px){.rv-layout{grid-template-columns:1fr}}
+  .rv-pane{background:#F2F3F1;padding:16px 18px;overflow-y:auto;max-height:62vh}
+  .rv-pane h2{font-size:13px;font-weight:700;color:var(--ink2);margin:0 0 14px;display:flex;align-items:center;gap:8px}
+  .rv-pane h2 .rv-count{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--ink3);background:#fff;border:1px solid var(--line);border-radius:999px;padding:1px 8px}
+  .rv-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 15px;margin-bottom:10px;cursor:pointer;transition:border-color .12s,box-shadow .12s}
+  .rv-card:hover{border-color:var(--ink3)}
+  .rv-card.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+  .rv-card.muted{cursor:default;opacity:.6}
+  .rv-badge{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+  .rv-badge.ok{background:#E7ECF4;color:#2F4B7C}
+  .rv-badge.review{background:#F4EAD4;color:#9A6B1E}
+  .rv-badge.open{background:#F5E4E1;color:#A3463A}
+  .rv-badge.dot::before{content:'●';font-size:8px}
+  .rv-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
+  .rv-top .rv-meta{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--ink3)}
+  .rv-title{font-size:13.5px;font-weight:600;margin:0 0 4px}
+  .rv-decision{font-size:13px;color:var(--ink2);margin:0}
+  .rv-match{display:flex;align-items:center;gap:6px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--line);font-size:12px;color:var(--ink3)}
+  .rv-match .rv-reqid{font-family:ui-monospace,Menlo,monospace;color:var(--ink);font-weight:700}
+  .rv-conf{font-size:11px;padding:1px 6px;border-radius:5px}
+  .rv-conf.high{background:#E7ECF4;color:#2F4B7C}
+  .rv-conf.mid{background:#F4EAD4;color:#9A6B1E}
+  .rv-conf.new{background:#F5E4E1;color:#A3463A}
+  .rv-excerpt{margin-top:9px;padding:9px 11px;background:#F7F7F7;border-radius:7px;font-size:12.5px;color:var(--ink2);border-left:2px solid var(--line)}
+  .rv-excerpt .rv-ts{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:var(--ink3);display:block;margin-bottom:3px}
+  .rv-empty{color:var(--ink3);font-size:13px;padding:40px 4px}
+  .rv-req-head{margin-bottom:16px}
+  .rv-req-head .rv-reqid{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--accent);font-weight:700}
+  .rv-req-head h3{margin:4px 0 0;font-size:16px;font-weight:700}
+  .rv-block-label{font-size:11.5px;font-weight:700;color:var(--ink3);margin-bottom:6px}
+  .rv-orig-box,.rv-diff-box{background:#fff;border:1px solid var(--line);border-radius:9px;padding:12px 13px;font-size:13.5px;line-height:1.7;margin-bottom:16px;white-space:pre-wrap}
+  .rv-diff-box{margin-bottom:10px}
+  .rv-diff-box ins{background:#E1EEDD;color:#2E5D2A;text-decoration:none;border-radius:3px;padding:0 1px}
+  .rv-diff-box del{background:#F6E3E1;color:#8C3A32;text-decoration:line-through;border-radius:3px;padding:0 1px}
+  .rv-edit-box{width:100%;min-height:80px;font:inherit;font-size:13.5px;line-height:1.7;background:#fff;color:var(--ink);border:1px solid var(--line2);border-radius:9px;padding:12px 13px;resize:vertical;margin-bottom:14px}
+  .rv-edit-box:focus{outline:none;border-color:var(--accent)}
+  .rv-action-row{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+  .rv-status-line{font-size:12px;color:var(--ink3);padding:9px 11px;background:#F7F7F7;border-radius:7px;margin-bottom:16px;display:flex;align-items:center;gap:7px}
+  .rv-history{border-top:1px solid var(--line);padding-top:14px}
+  .rv-history-row{display:flex;gap:10px;font-size:12px;color:var(--ink2);padding:7px 0;border-bottom:1px solid var(--line)}
+  .rv-history-row:last-child{border-bottom:none}
+  .rv-history-row .rv-hts{font-family:ui-monospace,Menlo,monospace;color:var(--ink3);white-space:nowrap;min-width:118px}
+  .rv-foot{font-size:12px;color:var(--ink3);padding:10px 20px;border-top:1px solid var(--line);background:#fff;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+  .rv-upload-bar{display:flex;align-items:center;gap:12px;background:var(--accent-bg);border:1px solid var(--accent);border-radius:var(--r-lg);padding:14px 18px;margin-bottom:16px;flex-wrap:wrap}
+  .rv-upload-bar p{font-size:13px;color:#B85315;margin:0;flex:1;min-width:220px}
+  .rv-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:70px 20px;color:var(--ink3);font-size:13px}
+  .rv-loading b{color:var(--ink2);font-weight:600;margin-top:4px}
+  .rv-spin{width:30px;height:30px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:rvspin .8s linear infinite}
+  @keyframes rvspin{to{transform:rotate(360deg)}}
+</style>
+</head><body>
+
+<div class="gnb">
+  <div class="wm">TraceOps</div>
+  <button class="tab on" onclick="location.href='index.html#analysis'">상세공정관리</button>
+  <button class="tab" onclick="location.href='index.html#unit'">테스트관리</button>
+  <button class="tab" onclick="location.href='asis.html'">AS-IS 목록</button>
+  <div class="sp"></div>
+  <div class="util"><span class="noti">알림</span><div class="av">황</div></div>
+</div>
+
+<div class="main">
+  <div class="subtabs">
+    <button class="subtab badge" onclick="location.href='requirements.html'">📋 요구사항관리</button>
+    <button class="subtab" onclick="location.href='index.html#analysis'">분석단계</button>
+    <button class="subtab" onclick="location.href='index.html#design'">설계단계</button>
+    <button class="subtab" onclick="location.href='index.html#dev'">개발단계</button>
+  </div>
+  <div class="crumb">상세공정관리 · 요구사항관리 · <b>요구사항 개정 검토 (ReqSync)</b></div>
+  <div class="page-hd">
+    <div>
+      <h1>요구사항 개정 검토</h1>
+      <p>회의록을 업로드하면 AI가 결정사항·미정사항을 추출해 기존 요구사항과 매칭합니다. 매칭된 항목을 PL이 원문과 비교해 확정하면 해당 요구사항ID의 내역에 반영됩니다.</p>
+    </div>
+  </div>
+
+  <div class="data-bar">
+    <span id="dataState"></span>
+    <button class="btn ghost sm" id="btnExport">요구사항 내보내기</button>
+  </div>
+
+  <div class="rv-upload-bar">
+    <label class="file-attach" style="background:#fff">📎 회의록 업로드 (.txt)
+      <input type="file" accept=".txt" id="uploadInput">
+    </label>
+    <p>이미 분석된 회의는 아래 카드를 클릭하면 바로 결과를 볼 수 있습니다. 새 회의록을 업로드하면 AI가 해당 회의록만 분석합니다.</p>
+  </div>
+
+  <div class="meet-grid" id="meetGrid"></div>
+
+  <div class="foot-note">
+    모달에서 "수용·반영 확정"을 누르면 편집 영역의 최종 문구가 해당 요구사항ID의 <b>요구사항내역</b>에 즉시 반영됩니다(DB 저장).
+    모달을 닫으면 방금 확정한 요구사항으로 이동해 <b>하이라이트</b>됩니다. <b>요구사항 내보내기</b>로 받은 JSON을 <code>data/requirements.json</code>에 덮어쓰면 원본이 바뀝니다.
+    매칭되는 요구사항이 없는 항목(신규 후보)은 PL이 신규 등록 여부만 표시해 두며, 실제 등록은 요구사항관리 화면에서 "+ 추가"로 진행합니다.
+  </div>
+</div>
+
+<div class="modal-bg" id="rrvModal"><div class="modal wide" id="rrvBox">
+  <div class="modal-hd">
+    <div><h3 id="mTitle"></h3><p id="mSub"></p></div>
+    <button class="modal-close" id="mClose">✕</button>
+  </div>
+  <div class="rv-layout">
+    <section class="rv-pane">
+      <h2>이 회의록의 결정사항 <span class="rv-count" id="mCount"></span></h2>
+      <div id="mDecisionList"></div>
+    </section>
+    <section class="rv-pane">
+      <h2>PL 검토 / 편집</h2>
+      <div id="mEditPanel"></div>
+    </section>
+  </div>
+  <div class="rv-foot">
+    <span id="mProgress">회의록 결정사항 추출(1차 생성 → 2차 검증) → 요구사항 매칭 → PL 확정</span>
+    <button class="btn sm" id="mDone">완료 · 닫기</button>
+  </div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+<script src="js/store.js"></script>
+<script src="js/requirements-review.js"></script>
+</body></html>

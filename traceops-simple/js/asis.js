@@ -1,5 +1,5 @@
 /* AS-IS 목록(물리ID 관리) — 조회 / 추가 / 수정 / 삭제
- * 데이터: data/asis.json (임시저장은 localStorage, 내보내기로 파일에 반영)
+ * 데이터: data/asis.json (저장은 DB, 내보내기로 파일에 반영)
  * 사용 중인 물리ID는 삭제·ID 변경 불가 (설계·분석·개발·테스트 매핑 무결성)
  */
 (function () {
@@ -8,7 +8,7 @@
   var KEY = 'traceops-simple:';
   var TYPES = ['화면', '프로그램', '배치', '인터페이스', '기타'];
   var STATUS = ['사용확정', '사용중지'];
-  var SOURCES = { design: 'data/design.json', dev: 'data/dev.json', analysis: 'data/analysis.json', unit: 'data/unit.json', integration: 'data/integration.json' };
+  var SOURCES = { design: '/api/design', dev: '/api/dev', analysis: '/api/analysis', unit: '/api/unit', integration: '/api/integration' };
   var S = { items: [], src: {}, draft: false, filter: { type: '', q: '' } };
 
   function $(id) { return document.getElementById(id); }
@@ -32,8 +32,9 @@
     return r.json();
   }
   async function load(name, path) {
+    if (path.charAt(0) === '/') return { data: await fetchJSON(path), draft: false }; // 관계형 DB(API)
     try {
-      var raw = localStorage.getItem(KEY + name);
+      var raw = DB.getItem(KEY + name);
       if (raw) return { data: JSON.parse(raw), draft: true };
     } catch (e) { /* 임시저장 불가 시 원본 사용 */ }
     return { data: await fetchJSON(path), draft: false };
@@ -103,9 +104,7 @@
     $('banner').innerHTML = v.errs
       ? '<div class="validation-banner">⚠ ' + esc(v.msgs.join(' / ')) + '</div>'
       : '';
-    $('dataState').textContent = S.draft
-      ? '임시저장본 사용 중 (이 브라우저에만 저장됨)'
-      : '원본 데이터 사용 중 (data/asis.json)';
+    $('dataState').textContent = '관계형 DB(traceops.db) 사용 중 · 설계·개발에서 사용 중인 물리ID는 삭제할 수 없음';
   }
 
   function cleanItems() {
@@ -115,14 +114,13 @@
       return o;
     });
   }
-  function save() {
+  async function save() {
     var v = validateAll();
     if (v.errs) { toast('저장 불가: ' + v.msgs[0], true); render(); return; }
     try {
-      localStorage.setItem(KEY + 'asis', JSON.stringify({ kind: 'asis', items: cleanItems() }));
-      S.draft = true;
+      S.items = (await api('PUT', '/api/asis', { items: cleanItems() })).items;
       toast('저장되었습니다');
-    } catch (e) { toast('브라우저 저장소에 저장하지 못했습니다. 내보내기를 이용하세요.', true); }
+    } catch (e) { toast('저장 실패: ' + e.message, true); }
     render();
   }
   function exportFile() {
@@ -137,14 +135,12 @@
     toast('asis.json 내보내기 완료 · data/asis.json에 덮어쓰면 원본이 됩니다');
   }
   async function restore() {
-    if (!confirm('임시저장본을 버리고 data/asis.json 원본으로 되돌릴까요?')) return;
-    try { localStorage.removeItem(KEY + 'asis'); } catch (e) { /* 무시 */ }
+    if (!confirm('저장하지 않은 변경을 버리고 DB에 저장된 내용으로 되돌릴까요?')) return;
     try {
-      var d = await fetchJSON('data/asis.json');
-      S.items = d.items; S.draft = false;
+      S.items = (await fetchJSON('/api/asis')).items;
       render();
-      toast('원본으로 복원했습니다');
-    } catch (e) { toast('원본을 읽지 못했습니다: ' + e.message, true); }
+      toast('DB 저장본으로 되돌렸습니다');
+    } catch (e) { toast('읽지 못했습니다: ' + e.message, true); }
   }
 
   function bind() {
@@ -192,8 +188,7 @@
 
   async function boot() {
     try {
-      var a = await load('asis', 'data/asis.json');
-      S.items = a.data.items; S.draft = a.draft;
+      S.items = (await fetchJSON('/api/asis')).items;
       var keys = Object.keys(SOURCES);
       var res = await Promise.all(keys.map(function (k) { return load(k, SOURCES[k]); }));
       keys.forEach(function (k, i) { S.src[k] = res[i].data.items; });

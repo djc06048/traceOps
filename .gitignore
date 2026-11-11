@@ -21,3 +21,8 @@ infra/pgdata/
 .idea/
 .vscode/
 .DS_Store
+
+# traceops-simple 저장 DB
+traceops-simple/traceops.db
+
+traceops-simple/__pycache__/

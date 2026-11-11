@@ -17,13 +17,6 @@
       ]
     }
   ],
-  "reqIds": [
-    "RF_LTR_001",
-    "RF_LTR_002",
-    "RF_LTR_003",
-    "RF_LTR_004",
-    "RF_LTR_005"
-  ],
   "types": {
     "analysis": [
       "현황업무분석"
