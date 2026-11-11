@@ -1,0 +1,1699 @@
+{
+  "kind": "requirements",
+  "items": [
+    {
+      "id": "RQ_QPM_0001",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "공통",
+      "name": "가입설계 메인 및 관련 팝업 화면",
+      "content": "가입설계 메인 및 관련 팝업 화면 전면 재구축",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0021"
+    },
+    {
+      "id": "RQ_QPM_0002",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "공통",
+      "name": "가입설계 프로세스 구성",
+      "content": "계약사항, 담보설계, 심사요청, 청약, 수납의 5단계로 가입설계 프로세스 구성 · 업계 동향을 파악하여 최적의 가입설계 프로세스 단계 적용",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0022"
+    },
+    {
+      "id": "RQ_QPM_0003",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "공통",
+      "name": "설계 진행 중단 사유 안내, 조치 가능하도록 자동연결",
+      "content": "설계 진행이 중단되는 사유에 대해 사용자에게 안내, 조치 가능하도록 자동연결 기능 구현",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0023"
+    },
+    {
+      "id": "RQ_QPM_0004",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "공통",
+      "name": "가입설계 화면 처리 기능 유지(장기보험)",
+      "content": "기간계/채널계 연계 가입설계 화면 처리 기능 유지(AS-IS 사항) · 장기보험 계약조회 등 유지관리 화면 연계",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0024"
+    },
+    {
+      "id": "RQ_QPM_0005",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "공통",
+      "name": "가입설계 화면 처리 기능 유지(자동차/일반보험)",
+      "content": "기간계/채널계 연계 가입설계 화면 처리 기능 유지(AS-IS 사항) · 자동차/일반보험 가입설계 화면 연계",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0024"
+    },
+    {
+      "id": "RQ_QPM_0006",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "공통",
+      "name": "가입설계 화면 처리 기능 유지(영업지원시스템)",
+      "content": "기간계/채널계 연계 가입설계 화면 처리 기능 유지(AS-IS 사항) · 영업지원시스템 고객조회, 보장분석 화면 연계",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0024"
+    },
+    {
+      "id": "RQ_QPM_0007",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "공통",
+      "name": "가입설계 화면 처리 기능 유지(TM)",
+      "content": "기간계/채널계 연계 가입설계 화면 처리 기능 유지(AS-IS 사항) · TM: 설계상태 변경 후처리 업무, 통신판매 화법 스크립트, TM미러링, QA심사 등",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0024"
+    },
+    {
+      "id": "RQ_QPM_0008",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "공통",
+      "name": "채널계 화면 內 가입설계 화면 Include",
+      "content": "채널계 화면 內 가입설계 화면 Include 기능 구현 · 기간계시스템, 영업지원시스템(PC,Tablet), CS시스템, TM시스템, 제휴TM시스템 간 SSO 및 데이터 통신 처리",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0025"
+    },
+    {
+      "id": "RQ_QPM_0009",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "공통",
+      "name": "PLM시스템 구축에 따른 테스트",
+      "content": "PLM시스템 구축에 따른 테스트 기능 구현 · 전체 담보 가입 테스트시 담보간계 체크 제외후 보험료계산 자동수행",
+      "stage": "분석",
+      "status": "부분수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0026"
+    },
+    {
+      "id": "RQ_QPM_0010",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "상품/플랜 선택",
+      "name": "다른 화면에서 호출 및 재활용",
+      "content": "가입설계 화면 內 구성 및 다른 화면에서 호출, 재활용이 가능한 형태로 구현",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0027"
+    },
+    {
+      "id": "RQ_QPM_0011",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "상품/플랜 선택",
+      "name": "고객 검색 및 선택",
+      "content": "고객 검색 및 선택 기능 구현 · 최근(3개월) 등 고객 목록 조회 및 고객 선택 기능 제공",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0028"
+    },
+    {
+      "id": "RQ_QPM_0012",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "상품/플랜 선택",
+      "name": "고객 질병정보 입력",
+      "content": "고객 질병정보 입력 기능 구현 · 고객의 질병정보 또는 알릴사항 입력 기능 제공",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김민경·백아름",
+        "team": "인수심사"
+      },
+      "kind": "기능",
+      "source": "REP-0029"
+    },
+    {
+      "id": "RQ_QPM_0013",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "상품/플랜 선택",
+      "name": "고객 질병정보 입력",
+      "content": "알릴사항 입력 후 대외기관 지급(사고력) 정보 기준 필수고지 질병 안내",
+      "stage": "분석",
+      "status": "조건부수용",
+      "precondition": "[인수심사] 필수고지 질병 안내정보 (20260320까지 해당 요건 확정시 설계 개발 가능)",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김민경·백아름",
+        "team": "인수심사"
+      },
+      "kind": "기능",
+      "source": "REP-0029"
+    },
+    {
+      "id": "RQ_QPM_0014",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "상품/플랜 선택",
+      "name": "공통기능_선택방법",
+      "content": "선택된 고객이 가입 가능한 상품 선택방법으로 4가지 방안 구현 · 상품선택, 통계 기반 설계, 담보 및 보험료 기반 추천 설계, 보장분석 기반 추천 설계",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0030"
+    },
+    {
+      "id": "RQ_QPM_0015",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "상품/플랜 선택",
+      "name": "공통기능_회사 판매전략",
+      "content": "회사의 판매전략(상품 우선순위, 판매기간 등) 정보 관리 · 추천판매속성 미정의, 신규화면 3개(상품추천순위, 담보추천속성, 성격 조정 시 1개) 목록화면 추가",
+      "stage": "분석",
+      "status": "조건부수용",
+      "precondition": "[가입설계] 상품추천속성 정의 및 확정 필요(요구사항:공통기능_회사 판매전략 참고)",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0031"
+    },
+    {
+      "id": "RQ_QPM_0016",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "상품/플랜 선택",
+      "name": "공통기능_회사 판매전략",
+      "content": "회사의 판매전략을 고려한 설계 추천 및 생성 기능 제공 · 고객의 누적 가입금액을 고려한 가입금액 조정",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0031"
+    },
+    {
+      "id": "RQ_QPM_0017",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "상품/플랜 선택",
+      "name": "공통기능_예상 UW결과 제공",
+      "content": "추천된 설계에 예상 UW결과 제공 기능 구현 · 심사판정결과와 상관없이 다 보여주되 우선순위 > 한아름종합보험 건강고지형 설계 결과 거절인 상품은 제외 가능",
+      "stage": "분석",
+      "status": "조건부수용",
+      "precondition": "[인수심사] 예상 UW결과 정보 제공(20260320까지 해당 요건 확정시 설계 개발 가능)",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김민경·백아름",
+        "team": "인수심사"
+      },
+      "kind": "기능",
+      "source": "REP-0032"
+    },
+    {
+      "id": "RQ_QPM_0018",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "상품/플랜 선택",
+      "name": "상품선택",
+      "content": "상품 검색 기능 구현(상품분류, 가입연령 등) · 사용자별 상품 즐겨찾기 기능 구현 · 상품 선택 기능 구현(미리보기, 플랜목록 표시, 담보 조치)",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0033 REP-0034 REP-0035"
+    },
+    {
+      "id": "RQ_QPM_0019",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "상품/플랜 선택",
+      "name": "통계 기반 추천 설계",
+      "content": "실사례 기반의 통계 생성 및 Top Plan 리스트 조회 기능 구현 · 고객 연령, 성별, 직업 등 고객 상황에 맞는 Top Plan 제공",
+      "stage": "분석",
+      "status": "부분수용",
+      "precondition": "고객 질병정보 기반 인수 가능한 Top Plan은 별도의 유병자 tab이 아닌 고객이나 지점장에 병력을 포함해 관리",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0036 REP-0037 REP-0038"
+    },
+    {
+      "id": "RQ_QPM_0020",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "상품/플랜 선택",
+      "name": "담보 및 보험료 기반 추천 설계",
+      "content": "설계 정보 입력 기능 구현(추천 가입설계 정보: 담보그룹, 담보그룹 가입금액, 영업자험료) · 추천 상품 목록 표시 및 가입설계 화면 이동",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0039 REP-0040 REP-0041"
+    },
+    {
+      "id": "RQ_QPM_0021",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "상품/플랜 선택",
+      "name": "보장분석 기반 추천 설계",
+      "content": "고객정보 기반 보장분석 시스템 연계 기능 구현 · 보장분석 권장 담보/가입금액/상품 도출",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "보장분석 결과 담보맵핑 정보 제공 필요(확정 안 필요: 설계시점 전)",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0042 REP-0043 REP-0044"
+    },
+    {
+      "id": "RQ_QPM_0022",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "계약기본 입력",
+      "name": "고객정보 기반 자동입력",
+      "content": "고객정보 기반 자동입력 기능 구현 · 고객의 질병정보 기반 최적의 고지유형 자동 선택",
+      "stage": "분석",
+      "status": "조건부수용",
+      "precondition": "[인수심사] 고지유형 정보 제공(20260320까지 해당 요건 확정시 설계 개발 가능)",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김민경·백아름",
+        "team": "인수심사"
+      },
+      "kind": "기능",
+      "source": "REP-0044"
+    },
+    {
+      "id": "RQ_QPM_0023",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "계약기본 입력",
+      "name": "고객정보 확인시 기가입 누적위험 산출",
+      "content": "고객정보 확인시 기가입 누적위험 산출 기능 구현 · 당사 기가입 및 타사 가입 계약 전문 조회",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "조경연",
+        "team": "인수기획"
+      },
+      "kind": "기능",
+      "source": "REP-0045"
+    },
+    {
+      "id": "RQ_QPM_0024",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "담보설계",
+      "name": "담보 그리드 성능 및 사용자 편의성",
+      "content": "담보 그리드 성능 및 기능 개선 구현(필터링 속도 개선, 담보 항목 숨기기/펼치기, 그리드 항목 고정) · 보장패키지 정보 관리 및 담보설계 패키지 처리 반영",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0046 REP-0047"
+    },
+    {
+      "id": "RQ_QPM_0025",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "담보설계",
+      "name": "담보 그리드_담보 별 가입 가능금액",
+      "content": "담보 별 가입 가능금액 산출 · 담보 그리드 內 숨기기/펼치기 적용",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "조경연",
+        "team": "인수기획"
+      },
+      "kind": "기능",
+      "source": "REP-0048"
+    },
+    {
+      "id": "RQ_QPM_0026",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "담보설계",
+      "name": "담보 그리드_담보 별 인수가능여부 조회",
+      "content": "담보 별 인수가능여부 조회 기능 · 예상 UW 결과에 따른 담보 가입해제 기능 구현 검토",
+      "stage": "분석",
+      "status": "조건부수용",
+      "precondition": "[인수심사] 담보별 인수판정정보 제공(20260320까지 해당 요건 확정시 설계 개발 가능)",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김민경·백아름",
+        "team": "인수심사"
+      },
+      "kind": "기능",
+      "source": "REP-0049"
+    },
+    {
+      "id": "RQ_QPM_0027",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "담보설계",
+      "name": "담보 그리드_원클릭 누적 해소",
+      "content": "원클릭 누적 초과금액 해소 기능 구현",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "조경연",
+        "team": "인수기획"
+      },
+      "kind": "기능",
+      "source": "REP-0050"
+    },
+    {
+      "id": "RQ_QPM_0028",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "담보설계",
+      "name": "비교설계",
+      "content": "기준 상품과 비교 가능한 상품 또는 사용자 지정 상품의 자동 설계 구현 · 인수지침 위배 체크 및 예상 인수결과 표시",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0052"
+    },
+    {
+      "id": "RQ_QPM_0029",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "담보설계",
+      "name": "조건별로 비교설계",
+      "content": "비교설계 다건의 설계 대상으로 비교 기능 구현 · 계약기본, 담보, 가입한도, 보험료, 예상 인수결과 등 비교 및 보험료 재산출",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0053"
+    },
+    {
+      "id": "RQ_QPM_0030",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "담보설계",
+      "name": "다른상품 설계복사",
+      "content": "가입설계 화면 內 상품 선택 기능 구현(AS-IS 기능 개선) · 복사대상상품을 콤보박스형태로 상품목록조회",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0051"
+    },
+    {
+      "id": "RQ_QPM_0031",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "설계가이드",
+      "name": "설계가이드",
+      "content": "설계화면 內 미처리 업무의 상태 표시 및 가이드 기능 구현(미처리업무: 인수지침, 직업급수 상이, 예상UW결과 등) · 화면연결 버튼 영역 배치, 표시여부 관리 구현",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0054"
+    },
+    {
+      "id": "RQ_QPM_0032",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "설계가이드",
+      "name": "누적위험 인수한도 초과 해소",
+      "content": "누적위험 인수한도 초과 가입 담보의 가입금액 변경 화면 구현 · 인수한도 초과 가입 누적위험 선택 시 사유가 되는 계약/설계, 담보 목록 조회",
+      "stage": "분석",
+      "status": "조건부수용",
+      "precondition": "[인수지침] 누적위험 한산 제외 또는 변경조건부 반영안 확정 필요(20260313까지 해당 요건 확정시 설계 개발 가능)",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "조경연",
+        "team": "인수기획"
+      },
+      "kind": "기능",
+      "source": "REP-0056"
+    },
+    {
+      "id": "RQ_QPM_0033",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "설계가이드",
+      "name": "직업상이 해소",
+      "content": "설계정보의 피보험자 직업과 기가입 계약의 직업정보가 상이한 계약 조회 기능 구현 · 직업정보가 상이한 계약의 배서설계 화면 연계 처리(AS-IS 사항)",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0058"
+    },
+    {
+      "id": "RQ_QPM_0034",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "설계가이드",
+      "name": "예상UW결과",
+      "content": "심사 요청 전 예상UW결과 안내 기능 구현 · 자동심사 유형별 심사결과 안내 화면(메디컬룸, 이글야이, 저위험모델, 동일위험자등, 리스크증가자등, AI자동등)",
+      "stage": "분석",
+      "status": "조건부수용",
+      "precondition": "[인수심사] 예상 UW결과정보제공(20260320까지 해당 요건 확정시 설계 개발 가능)",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김민경·백아름",
+        "team": "인수심사"
+      },
+      "kind": "기능",
+      "source": "REP-0059"
+    },
+    {
+      "id": "RQ_QPM_0035",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "설계가이드",
+      "name": "유리한 대안상품 제시",
+      "content": "고객에게 유리한 대안상품 제시 기능 구현 · UW분류, 상품군별 예상UW결과 산출 후 가입 가능 상품 추천, 다건 상품 추천 또는 성능 저하시 따른 최적화 방안 제시",
+      "stage": "분석",
+      "status": "조건부수용",
+      "precondition": "[인수심사] 대안설계 프로세스 확정 필요(20260313까지 해당 요건 확정시 설계 개발 가능)",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김민경·백아름",
+        "team": "인수심사"
+      },
+      "kind": "기능",
+      "source": "REP-0060"
+    },
+    {
+      "id": "RQ_QPM_0036",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "알릴사항",
+      "name": "외부기관 개인정보 이용 동의",
+      "content": "외부기관 개인정보 이용 동의 기능 구현 · 외부기관(심사평가원, 건강보험공단) 데이터 조회·이용 동의 수취 및 파기 방안 제시",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김민경·백아름",
+        "team": "인수심사"
+      },
+      "kind": "기능",
+      "source": "REP-0064"
+    },
+    {
+      "id": "RQ_QPM_0037",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "알릴사항",
+      "name": "외부기관 개인정보 제공 동의",
+      "content": "외부기관 개인정보 제공 동의 기능 구현 · 모집인에게 외부기관(심사평가원, 건강보험공단, 신용정보원) 사고정보 제공 동의 제시",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김민경·백아름",
+        "team": "인수심사"
+      },
+      "kind": "기능",
+      "source": "REP-0065"
+    },
+    {
+      "id": "RQ_QPM_0038",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "알릴사항",
+      "name": "입력 자동화",
+      "content": "알릴사항 입력 자동화 구현 · ICIS 보험금 지급 정보 데이터 기반 질병력 자동 고지, 알릴사항 질병상세 상품·고지유형별 알릴사항 고지대상 안내 및 선택",
+      "stage": "분석",
+      "status": "조건부수용",
+      "precondition": "[인수심사] 알릴사항 질병고지 정보 제공, 알릴사항 입력자동화 정보 제공(20260320까지 해당 요건 확정시 설계 개발 가능)",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김민경·백아름",
+        "team": "인수심사"
+      },
+      "kind": "기능",
+      "source": "REP-0066"
+    },
+    {
+      "id": "RQ_QPM_0039",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "알릴사항",
+      "name": "입력시 신규 안내_보완 및 필요서류",
+      "content": "알릴사항 입력시 신규 안내 구현 · 심사 요청전 알릴사항 보완 및 필요서류 안내(RGA에서 보완 및 필요서류 정보 제공 예정)",
+      "stage": "분석",
+      "status": "조건부수용",
+      "precondition": "[인수심사] 보완 및 필요서류 관련 정보 제공(20260320까지 해당 요건 확정시 설계 개발 가능)",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김민경·백아름",
+        "team": "인수심사"
+      },
+      "kind": "기능",
+      "source": "REP-0067"
+    },
+    {
+      "id": "RQ_QPM_0040",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "알릴사항",
+      "name": "입력시 신규 안내_고객 맞춤 다빈도 질병",
+      "content": "알릴사항 입력시 신규 안내 구현 · 고객 맞춤 다빈도 질병 안내",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "[인수심사] 고객 맞춤 다빈도 질병 안내정보 API 제공",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김민경·백아름",
+        "team": "인수심사"
+      },
+      "kind": "기능",
+      "source": "REP-0067"
+    },
+    {
+      "id": "RQ_QPM_0041",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "알릴사항",
+      "name": "입력시 신규 안내_상품 및 고지 유형별 지급(사고력)",
+      "content": "알릴사항 입력시 신규 안내 구현 · 상품 및 고지 유형별 지급(사고력) 정보 제공(RGA 컨설팅 이후 상세 요건 가능)",
+      "stage": "분석",
+      "status": "조건부수용",
+      "precondition": "[인수심사] 상품 및 고지유형별 지급(사고력) 정보 제공(20260320까지 해당 요건 확정시 설계 개발 가능)",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김민경·백아름",
+        "team": "인수심사"
+      },
+      "kind": "기능",
+      "source": "REP-0067"
+    },
+    {
+      "id": "RQ_QPM_0042",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "알릴사항",
+      "name": "입력 기능 개선",
+      "content": "알릴사항 입력 기능 개선 · 문항별 답변사항 미리보기 및 선택 가져오기, 이전 알릴사항 질병력 상세내용 미리보기 및 선택 가져오기",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김민경·백아름",
+        "team": "인수심사"
+      },
+      "kind": "기능",
+      "source": "REP-0068"
+    },
+    {
+      "id": "RQ_QPM_0043",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "인수심사",
+      "name": "심사요청화면",
+      "content": "설계화면 內 탭 형태로 심사요청 화면 구현 · 심사요청 및 결과화면 메인 레이아웃 개발, 심사요청 가능 유효성 체크 및 예상 인수결과 안내",
+      "stage": "분석",
+      "status": "조건부수용",
+      "precondition": "[인수심사] 예상 U/W 결과 안내 체공(20260320까지 해당 요건 확정시 설계 개발 가능)",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김민경·백아름",
+        "team": "인수심사"
+      },
+      "kind": "기능",
+      "source": "REP-0069"
+    },
+    {
+      "id": "RQ_QPM_0044",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "인수심사",
+      "name": "심사요청화면",
+      "content": "설계상태 및 심사진행상태에 따른 심사요청, 요청취소, 조건부수용 기능 구현 · 기간계 심사처리 API 호출, 설계조회 API 제공(기간계에서 API 호출, 설계 정보 복제 필요)",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김민경·백아름",
+        "team": "인수심사"
+      },
+      "kind": "기능",
+      "source": "REP-0070"
+    },
+    {
+      "id": "RQ_QPM_0045",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "인수심사",
+      "name": "기간계 심사 처리 연계",
+      "content": "기간계 심사 처리시 설계조회 및 변경 처리 연계 · 기간계 심사요청 및 취소시 필요 API 제공(설계정보 조회, 설계상태 업데이트, 담보변경 적용)",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김민경·백아름",
+        "team": "인수심사"
+      },
+      "kind": "기능",
+      "source": "REP-0071"
+    },
+    {
+      "id": "RQ_QPM_0046",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "청약",
+      "name": "주의사항 안내",
+      "content": "입력 누락사항 및 출력 시 주의사항 안내 기능 구현",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0072"
+    },
+    {
+      "id": "RQ_QPM_0047",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "청약",
+      "name": "청약단계 처리",
+      "content": "청약단계 처리 기능 구현(AS-IS 사항) · 출력물발행, 청약심사요청, 청약서류 스캔, 청약완료 등",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0073"
+    },
+    {
+      "id": "RQ_QPM_0048",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "청약",
+      "name": "사용자 맞춤형 출력",
+      "content": "사용자 맞춤형 출력 구현을 위한 입력 기능 구현(출력물 청금렌 강조, 별표출력기능 등) · 출력물담보순서 변경은 담보설계 화면에서 변경 후 출력물에 반영",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0074"
+    },
+    {
+      "id": "RQ_QPM_0049",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "청약",
+      "name": "처리 제한",
+      "content": "지침위배 해소 부적합한 설계의 처리 제한 구현 · 계약체결시 누적위험 인수한도 증축 불가 대상일 경우 청약단계 기능 처리 제한",
+      "stage": "분석",
+      "status": "조건부수용",
+      "precondition": "[인수지침] 누적위험한산제외 또는 변경조건부 반영안 확정 필요(20260313까지 해당 요건 확정시 설계 개발 가능)",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "조경연",
+        "team": "인수기획"
+      },
+      "kind": "기능",
+      "source": "REP-0075"
+    },
+    {
+      "id": "RQ_QPM_0050",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "청약완료",
+      "name": "지침위배 해소 점검",
+      "content": "지침위배 해소 여부 점검 기능 구현 · 現 조건부설계 프로세스 제외",
+      "stage": "분석",
+      "status": "조건부수용",
+      "precondition": "[인수지침] 누적위험한산제외 또는 변경조건부 반영안 확정 필요(20260313까지 해당 요건 확정시 설계 개발 가능)",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "조경연",
+        "team": "인수기획"
+      },
+      "kind": "기능",
+      "source": "REP-0076"
+    },
+    {
+      "id": "RQ_QPM_0051",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "청약완료",
+      "name": "영수정보생성 및 청약 완료 처리",
+      "content": "영수정보 생성 및 청약 완료 처리 구현 · 기간계 영수정보 생성(수납대기) API 호출",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0077"
+    },
+    {
+      "id": "RQ_QPM_0052",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "수납",
+      "name": "수납화면",
+      "content": "설계화면 內 탭 형태로 수납 화면 구현 · 수납 가능 유효성 체크, 기간계 수납 및 수납후처리 API 호출 · 영수(영수)정보 기반 수납 처리",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0078 REP-0079"
+    },
+    {
+      "id": "RQ_QPM_0053",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "전환개발",
+      "name": "가입설계 팝업 및 연관화면",
+      "content": "가입설계 진행용을 위한 팝업 및 연관화면 전환 개발(61종) · UI/UX 표준 반영, Frontend/Backend F/W 변경에 따른 재개발",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0080"
+    },
+    {
+      "id": "RQ_QPM_0054",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "전환개발",
+      "name": "가입설계 전문 서비스 신규",
+      "content": "新 가입설계 전문 서비스 신규 개발(88종) · 어플리케이션 서버 분리에 따른 現 인터페이스 API 호출 방식의 서비스 호출로 변경",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0081"
+    },
+    {
+      "id": "RQ_QPM_0055",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "전환개발",
+      "name": "채널계 가입설계 전문",
+      "content": "채널계 가입설계 전문 전환 개발(155종→150종) · 가입설계 Biz 로직 변경에 따른 現 전문과 동일한 I/O 구조의 서비스 제공",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0082"
+    },
+    {
+      "id": "RQ_QPM_0056",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "인수지침 등 재구조",
+      "name": "위배시 사유 Factor 보관",
+      "content": "인수지침 위배시 인수한도 및 가입금액(초과금액) 등 위배사유 Factor 보관 구현 · 가입설계 가입가능금액 연계출력, 담보별 지침위배 매핑 표시",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "조경연",
+        "team": "인수기획"
+      },
+      "kind": "기능",
+      "source": "REP-0085"
+    },
+    {
+      "id": "RQ_QPM_0057",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "인수지침 체크 프로세스",
+      "name": "보험료계산 이전 단계에서 실행 가능한 인수지침",
+      "content": "보험료계산 이전 단계에서 실행 가능한 인수지침 등을 분리하여 구현 · 가입설계 프로세스 단계별 인수지침 체크 제어 방안 제시",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "조경연",
+        "team": "인수기획"
+      },
+      "kind": "기능",
+      "source": "REP-0087"
+    },
+    {
+      "id": "RQ_QPM_0058",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "인수지침 체크 프로세스",
+      "name": "인수지침 위배 해소 편의 기능",
+      "content": "인수지침 위배 해소 편의 기능 구현 · 지침위배 메시지 클릭 시 연관 담보 목록 상단으로 이동, 식별이 용이하도록 표시",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "조경연",
+        "team": "인수기획"
+      },
+      "kind": "기능",
+      "source": "REP-0088"
+    },
+    {
+      "id": "RQ_QPM_0059",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "인수지침 체크 프로세스",
+      "name": "설계가이드 미처리 업무 기능과 연계",
+      "content": "가입설계 설계가이드 '미처리 업무' 기능과 연계될 수 있도록 구현 · 가입설계 인수지침 체크 배치처리 결과와 연계 적용",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "조경연",
+        "team": "인수기획"
+      },
+      "kind": "기능",
+      "source": "REP-0089"
+    },
+    {
+      "id": "RQ_QPM_0060",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "인수지침 체크 프로세스",
+      "name": "청약포인트",
+      "content": "청약포인트 비정상 처리 구현(장기/자동차/일반보험 공통 가입설계 등의 프로세스 구현 AS-IS 사항과 동일)",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0090"
+    },
+    {
+      "id": "RQ_QPM_0061",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "가입설계통의",
+      "name": "가입설계통의",
+      "content": "장기/자동차/일반보험 공통 가입설계 등의 프로세스 구현(AS-IS 사항과 동일) · 가입설계통의 DB 모델 최적화 제시",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0114"
+    },
+    {
+      "id": "RQ_QPM_0062",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "설계리스트 조회",
+      "name": "설계리스트 조회 화면",
+      "content": "장기보험 설계조회는 現 기간계 통합설계조회 화면에서 분리하여 장기보험 신계약 가입설계 조회 전용 화면으로 구현",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0115 REP-0116"
+    },
+    {
+      "id": "RQ_QPM_0063",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "대외기관 조회",
+      "name": "한국신용정보원 사전조회",
+      "content": "한국신용정보원 사전조회 업무 등 장기 외 업무와 분리하여 구현 · 가입설계 시스템과 기간계 시스템 중복 호출 가능, 분리 구현 후 향후 대외기관 조회 및 결과 고려",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0117"
+    },
+    {
+      "id": "RQ_QPM_0064",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "출력물",
+      "name": "사용자 맞춤형 출력기능",
+      "content": "사용자 맞춤형 출력기능 구현 · 출력 전 사용자별 강조사항 입력(색상, 이미지 등 활용)",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0118"
+    },
+    {
+      "id": "RQ_QPM_0065",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "출력물",
+      "name": "DB에 문구관리 가능한 부분 확대 적용",
+      "content": "OZ 프로그램 내 하드코딩 로직 중 DB에 문구관리가 가능한 부분을 확대 적용",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0119"
+    },
+    {
+      "id": "RQ_QPM_0066",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "출력물",
+      "name": "출력을 즉시 출력 기능",
+      "content": "출력물 중간팝업 연결 없이 즉시 출력기능 구현 · 가입설계 및 목록화면 內 바로 출력 버튼(PDF, 청약서, 미리보기) 추가",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0120"
+    },
+    {
+      "id": "RQ_QPM_0067",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "전환개발",
+      "name": "설계 기타_연관화면 개발",
+      "content": "가입설계 진행을 위한 팝업 및 연관화면 전환 개발(18종)",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0122"
+    },
+    {
+      "id": "RQ_QPM_0068",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "신규 배치",
+      "name": "설계 조회용 신규 배치",
+      "content": "설계 조회를 위한 신규 배치 생성(3종)",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0123"
+    },
+    {
+      "id": "RQ_QPM_0069",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "배치 대응개발",
+      "name": "단체 설계 프로세스진행",
+      "content": "DB변경으로 인한 단체 설계 프로세스진행 배치 전환개발(2종)",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0124"
+    },
+    {
+      "id": "RQ_QPM_0070",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "배치 대응개발",
+      "name": "전자서명 예약 발송 배치",
+      "content": "DB변경으로 인한 전자서명 예약 발송 배치 전환개발(1종)",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0125"
+    },
+    {
+      "id": "RQ_QPM_0071",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "배치 대응개발",
+      "name": "정보보호 관련 파기배치",
+      "content": "DB변경으로 인한 정보보호 관련 파기배치 등 전환개발(6종)",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0126"
+    },
+    {
+      "id": "RQ_QPM_0072",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "출력물 대응개발",
+      "name": "출력물 PDF 생성 배치",
+      "content": "OZ서버 변경에 따른 출력물 PDF 생성을 배치 프로그램 대응 개발(12종)",
+      "stage": "분석",
+      "status": "부분수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0127"
+    },
+    {
+      "id": "RQ_QPM_0073",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "新 가입설계 대응개발",
+      "name": "기간계 전문 연계",
+      "content": "기간계 전문 연계 솔루션 제공(245종→119종) · 어플리케이션 서버 분리에 따른 現 인터페이스 API 호출용 서비스 개발",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0128"
+    },
+    {
+      "id": "RQ_QPM_0074",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "상품 및 담보추천",
+      "name": "AI 추천 설계의 가입설계 UI 내 연계",
+      "content": "가입설계 UI에 추천 결과 반영되도록 기능 구현 · 담보 및 보험료 기반 설계 화면 내 AI추천설계 기능 제공",
+      "stage": "분석",
+      "status": "조건부수용",
+      "precondition": "[인수심사] 대안설계 프로세스 확정 필요(20260313까지 해당 요건 확정시 설계 개발 가능)",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0135"
+    },
+    {
+      "id": "RQ_QPM_0075",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "상품 및 담보추천",
+      "name": "추천 결과 모니터링 기능 구현",
+      "content": "추천 결과와 모니터링 기능 구현 · 추천 설계정보(동결성, AI) 계약 성립 여부 및 추천 설계정보 수정 여부 조회",
+      "stage": "분석",
+      "status": "조건부수용",
+      "precondition": "[가입설계] 모니터링 화면 안 및 프로세스 확정 필요(확정 안: 설계진입 전까지)",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "김유진·김지연",
+        "team": "상품지원·GA영업지원"
+      },
+      "kind": "기능",
+      "source": "REP-0136"
+    },
+    {
+      "id": "RQ_QPM_0076",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "DB분리 대응개발",
+      "name": "분리 및 복제 테이블의 기간계 등기화 방안 제시",
+      "content": "차세대 가입설계 DB와 기간계 ASIS DB의 물리적 분리로 인해 심사요청 시점에 DB 간 설계데이터 동기화 필요 · Kafka(류) 활용 설계데이터 동기화 방안 확정(20260209)",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "",
+        "team": ""
+      },
+      "kind": "기능",
+      "source": "REP-0132"
+    },
+    {
+      "id": "RQ_QPM_0077",
+      "major": "가입설계시스템",
+      "middle": "가입설계/청약",
+      "minor": "설계리스트 조회",
+      "name": "설계삭제건 조회가능",
+      "content": "설계삭제건도 조회할 수 있게 구현요청, 차세대 가입설계만 대상으로, 담보설계의 여러 버튼 비활성화 하되, 동상품복사와 타상품복사 버튼만 활성화하는 방안으로 구체화방안 설계때 구체화 예정",
+      "stage": "분석",
+      "status": "수용",
+      "precondition": "",
+      "vendorOwner": "김전홍",
+      "custIT": {
+        "owner": "이재원·이광필",
+        "team": "IT고도화TF"
+      },
+      "custBiz": {
+        "owner": "조경연",
+        "team": "인수기획"
+      },
+      "kind": "기능",
+      "source": "REP-신규"
+    }
+  ]
+}

@@ -23,7 +23,8 @@
       "pPlanStart": "2026-04-11",
       "pPlanEnd": "2026-04-13",
       "reqIds": [
-        "RF_LTR_001"
+        "RQ_QPM_0022",
+        "RQ_QPM_0023"
       ],
       "remarks": [],
       "pActStart": "2026-04-11",
@@ -52,7 +53,8 @@
       "pPlanStart": "2026-04-08",
       "pPlanEnd": "2026-04-10",
       "reqIds": [
-        "RF_LTR_001"
+        "RQ_QPM_0043",
+        "RQ_QPM_0044"
       ],
       "remarks": [],
       "pActStart": "2026-04-08",
@@ -81,7 +83,7 @@
       "pPlanStart": "2026-03-18",
       "pPlanEnd": "2026-03-20",
       "reqIds": [
-        "RF_LTR_004"
+        "RQ_QPM_0004"
       ],
       "remarks": [],
       "pActStart": "2026-03-18",
@@ -110,7 +112,7 @@
       "pPlanStart": "2026-04-08",
       "pPlanEnd": "2026-04-10",
       "reqIds": [
-        "RF_LTR_002"
+        "RQ_QPM_0077"
       ],
       "remarks": [],
       "pActStart": "2026-04-08",
@@ -139,7 +141,7 @@
       "pPlanStart": "2026-04-08",
       "pPlanEnd": "2026-04-10",
       "reqIds": [
-        "RF_LTR_002"
+        "RQ_QPM_0062"
       ],
       "remarks": [],
       "pActStart": "2026-04-08",
@@ -168,7 +170,7 @@
       "pPlanStart": "2026-04-08",
       "pPlanEnd": "2026-04-10",
       "reqIds": [
-        "RF_LTR_002"
+        "RQ_QPM_0018"
       ],
       "remarks": [],
       "pActStart": "2026-04-08",
@@ -195,7 +197,7 @@
       "pPlanStart": "2026-10-08",
       "pPlanEnd": "2026-10-10",
       "reqIds": [
-        "RF_LTR_003"
+        "RQ_QPM_0051"
       ],
       "remarks": [
         {
@@ -230,7 +232,7 @@
       "pPlanStart": "2026-10-08",
       "pPlanEnd": "2026-10-10",
       "reqIds": [
-        "RF_LTR_003"
+        "RQ_QPM_0070"
       ],
       "remarks": [
         {
@@ -267,7 +269,7 @@
       "pPlanStart": "2026-03-08",
       "pPlanEnd": "2026-03-10",
       "reqIds": [
-        "RF_LTR_005"
+        "RQ_QPM_0061"
       ],
       "remarks": [],
       "pActStart": "2026-03-08",
@@ -296,7 +298,7 @@
       "pPlanStart": "2026-03-08",
       "pPlanEnd": "2026-03-10",
       "reqIds": [
-        "RF_LTR_005"
+        "RQ_QPM_0002"
       ],
       "remarks": [],
       "pActStart": "2026-03-08",
@@ -325,7 +327,7 @@
       "pPlanStart": "2026-03-08",
       "pPlanEnd": "2026-03-10",
       "reqIds": [
-        "RF_LTR_005"
+        "RQ_QPM_0065"
       ],
       "remarks": [],
       "pActStart": "2026-03-08",
@@ -354,7 +356,7 @@
       "pPlanStart": "2026-03-14",
       "pPlanEnd": "2026-03-16",
       "reqIds": [
-        "RF_LTR_005"
+        "RQ_QPM_0063"
       ],
       "remarks": [],
       "pActStart": "2026-03-14",
@@ -383,7 +385,8 @@
       "pPlanStart": "2026-03-14",
       "pPlanEnd": "2026-03-16",
       "reqIds": [
-        "RF_LTR_005"
+        "RQ_QPM_0036",
+        "RQ_QPM_0037"
       ],
       "remarks": [],
       "pActStart": "2026-03-14",
