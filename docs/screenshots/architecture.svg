@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="620" viewBox="0 0 1100 620" font-family="Pretendard, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+  <defs>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="116%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#1a1a1a" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+  <rect width="1100" height="620" fill="#FAFBFC"/>
+
+  <!-- Browser -->
+  <rect x="340" y="24" rx="12" width="420" height="72" fill="#fff" stroke="#2F6FED" stroke-width="2" filter="url(#shadow)"/>
+  <text x="550" y="54" text-anchor="middle" font-size="16" font-weight="700" fill="#1A1A1A">사용자 브라우저</text>
+  <text x="550" y="76" text-anchor="middle" font-size="12" fill="#5C5C5C">바닐라 HTML / CSS / JS  ·  빌드 도구 없음</text>
+
+  <!-- Arrow down -->
+  <line x1="550" y1="96" x2="550" y2="132" stroke="#767676" stroke-width="1.6"/>
+  <polygon points="550,138 544,126 556,126" fill="#767676"/>
+  <text x="564" y="120" font-size="11" fill="#767676">HTTP  ·  정적 파일 + /api/* JSON</text>
+
+  <!-- traceops-simple -->
+  <rect x="40" y="156" rx="14" width="480" height="250" fill="#fff" stroke="#E5E5E5" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="40" y="156" rx="14" width="480" height="44" fill="#1A1A1A"/>
+  <rect x="40" y="186" width="480" height="14" fill="#1A1A1A"/>
+  <text x="280" y="184" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">traceops-simple</text>
+  <text x="64" y="228" font-size="13" fill="#1A1A1A">Python 표준 라이브러리  http.server</text>
+  <text x="64" y="256" font-size="13" fill="#5C5C5C">· 정적 파일 서빙 (HTML / CSS / JS)</text>
+  <text x="64" y="280" font-size="13" fill="#5C5C5C">· /api/* 요청을 SQLite CRUD로 처리</text>
+  <text x="64" y="304" font-size="13" fill="#5C5C5C">· 연계관리 캔버스 (프로세스 · 노드 · 연결선)</text>
+  <rect x="64" y="328" rx="8" width="432" height="54" fill="#F4F7FF" stroke="#D6E2FB"/>
+  <text x="280" y="350" text-anchor="middle" font-size="12" font-weight="600" fill="#2F6FED">실행: python3 server.py  →  localhost:8000</text>
+  <text x="280" y="368" text-anchor="middle" font-size="11" fill="#5C5C5C">프레임워크 설치 없이 바로 기동</text>
+
+  <!-- ProWin -->
+  <rect x="580" y="156" rx="14" width="480" height="250" fill="#fff" stroke="#E5E5E5" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="580" y="156" rx="14" width="480" height="44" fill="#FB7520"/>
+  <rect x="580" y="186" width="480" height="14" fill="#FB7520"/>
+  <text x="820" y="184" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">ProWin backend</text>
+  <text x="604" y="228" font-size="13" fill="#1A1A1A">Spring Boot 3.3  ·  Java 17</text>
+  <text x="604" y="256" font-size="13" fill="#5C5C5C">· REST API (RFP · 목차 · 검토 · 버전관리)</text>
+  <text x="604" y="280" font-size="13" fill="#5C5C5C">· SQLite 접근 (단일 커넥션)</text>
+  <text x="604" y="304" font-size="13" fill="#5C5C5C">· PPTX 추출 · 미리보기 · 합본 (Apache POI)</text>
+  <rect x="604" y="328" rx="8" width="432" height="54" fill="#FFF6F0" stroke="#F8D4B8"/>
+  <text x="820" y="350" text-anchor="middle" font-size="12" font-weight="600" fill="#C45A10">실행: mvn spring-boot:run  →  localhost:8080</text>
+  <text x="820" y="368" text-anchor="middle" font-size="11" fill="#5C5C5C">정적 UI + REST API를 한 프로세스로 제공</text>
+
+  <!-- arrows to DB -->
+  <line x1="280" y1="406" x2="280" y2="454" stroke="#767676" stroke-width="1.6"/>
+  <polygon points="280,460 274,448 286,448" fill="#767676"/>
+  <line x1="820" y1="406" x2="820" y2="454" stroke="#767676" stroke-width="1.6"/>
+  <polygon points="820,460 814,448 826,448" fill="#767676"/>
+
+  <!-- DBs -->
+  <rect x="90" y="468" rx="12" width="380" height="88" fill="#fff" stroke="#E5E5E5" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="280" y="504" text-anchor="middle" font-size="14" font-weight="700" fill="#1A1A1A">traceops.db  (SQLite)</text>
+  <text x="280" y="528" text-anchor="middle" font-size="12" fill="#5C5C5C">연계 프로세스 · 노드 · 연결선 · 매핑</text>
+
+  <rect x="630" y="468" rx="12" width="380" height="88" fill="#fff" stroke="#E5E5E5" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="820" y="500" text-anchor="middle" font-size="14" font-weight="700" fill="#1A1A1A">prowin.db  (SQLite)</text>
+  <text x="820" y="524" text-anchor="middle" font-size="12" fill="#5C5C5C">RFP · 목차 · 리뷰 · 커밋 이력</text>
+  <text x="820" y="542" text-anchor="middle" font-size="12" fill="#5C5C5C">+ data/uploads  (업로드 PPTX 파일)</text>
+
+  <text x="550" y="592" text-anchor="middle" font-size="12" fill="#767676">공통 원칙: DB가 비어 있을 때만 최초 1회 시드 · 이후 DB가 정본</text>
+</svg>
