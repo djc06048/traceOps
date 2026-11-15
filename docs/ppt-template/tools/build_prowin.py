@@ -61,16 +61,33 @@ PAGE[0] += 1
 def part(t, title, items):
     h = box('pbar', 1.12, t, 5.6, 0.14)
     h += box('ptag', 1.12, t - 0.38, 5, 0.32, e(title))
-    h += box('pitems', 1.12, t + 0.2, 8, 0.9, '<br>'.join(f'<b>{i:02d}</b>&nbsp;&nbsp;{e(s)}' for i, s in items))
+    h += box('pitems', 1.12, t + 0.2, 8, 1.7, '<br>'.join(f'<b>{i:02d}</b>&nbsp;&nbsp;{e(s)}' for i, s in items))
     return h
 slides.append('<section class="slide gray"><div class="coverbg contbg"></div>' +
-    box('ctt', 1.12, 1.62, 5, 0.7, 'CONTENTS') +
-    part(2.95, 'Part. 1  개요', [(1, 'ProWin 소개'), (2, '추진 배경'), (3, '목표'), (4, '기대효과')]) +
+    box('ctt', 1.12, 1.55, 5, 0.95, 'CONTENTS') +
+    part(2.8, 'Part. 1  개요', [(1, '성과 요약'), (2, 'ProWin 소개'), (3, '추진 배경'), (4, '목표 및 기대효과')]) +
     part(5.0, 'Part. 2  구현 내용', [(5, '업무 흐름'), (6, '주요 기능'), (7, '부가 기능 및 기술 구성')]) +
-    part(6.7, 'Part. 3  향후 계획', [(8, '고도화 과제 및 하반기 계획')]) +
+    part(6.7, 'Part. 3  향후 계획', [(8, '고도화 계획')]) +
     box('copy', 0.65, 7.86, 4, 0.15, 'ⓒ Hanwha Systems. All rights reserved') +
     '<img class="a flogo" style="left:10.25in;top:7.84in;height:0.26in" src="assets/logo-footer.png" alt="">' + '</section>')
 PAGE[0] += 1
+
+# ---------- 3 성과 요약 ----------
+body = ''
+cw = 3.25; gp = (CW - 3 * cw) / 2
+sumdata = [('전 과정', '제안 업무 화면 구현', ['제안 현황, 일정, 소통, 조견표 등 제안 업무 전반의 화면 구성', '작성자, PM, 영업대표, 시스템 관리자별 화면과 권한']),
+           ('4종', '핵심 기능 구현', ['RFP · 요구사항, 목차, 제안서 검토, 제안서 관리', '데이터 저장과 PPT 처리까지 실제 동작']),
+           ('4단계', '표준 업무 흐름 정립', ['착수, 작성, 검토, 확정 단계별 역할과 화면의 연결', '역할별 업무가 하나의 흐름으로 연결'])]
+for i, (hero, t, ds) in enumerate(sumdata):
+    l = L + i * (cw + gp)
+    body += box('card', l, 2.1, cw, 3.65)
+    body += box('hero', l + 0.3, 2.35, cw - 0.6, 0.7, e(hero))
+    body += box('ct16', l + 0.3, 3.15, cw - 0.6, 0.4, e(t))
+    body += box('hl-line', l + 0.3, 3.65, cw - 0.6, 0.01)
+    body += box('cd', l + 0.3, 3.82, cw - 0.55, 1.9, ''.join(f'<p>{e(d)}</p>' for d in ds), 'font-size:13pt')
+body += box('rbar brown', L, 5.95, CW, 1.05, '<span class="lb">다음 단계</span><span class="tx">요구사항 자동 추출과 유사 사례 추천을 추후 고도화하여 제안 작성 업무의 효율 제고</span>')
+slides.append(frame('개요', '성과 요약', '연말 성과',
+    '<b>제안 업무 전 과정을 담은 시스템</b>을 구현했고, 핵심 기능 4종은 실제 동작 단계까지 완료했습니다.<br>업무 흐름과 역할별 화면을 정립했으며, 추후 자동 추출과 사례 추천으로 고도화합니다.', body))
 
 # ---------- 3 ProWin 소개 ----------
 body = ''
@@ -90,10 +107,10 @@ slides.append(frame('개요', 'ProWin 소개', '시스템 소개',
 
 # ---------- 4 추진 배경 ----------
 body = ''
-data4 = [('전담 조직 부재', ['RFP마다 임시 TF를 구성', '매 건 처음부터 반복, 담당자 역량에 따라 품질 좌우']),
-         ('수작업 산출물', ['조견표, 합본, 목차를 수작업으로 작성', '휴먼 에러, 버전 꼬임, 마감 리스크 상존']),
-         ('자산의 분산과 사장', ['과거 제안 자산이 개인 단위로 분산', '재활용 불가, 매 제안마다 재작성']),
-         ('구두 중심의 리뷰', ['리뷰와 의사결정이 구두로 진행', '결정 근거가 남지 않아 추적과 이관 곤란'])]
+data4 = [('전담 조직 부재', ['RFP(제안요청서)마다 임시 TF를 구성', '매 건 처음부터 반복, 담당자 역량에 따라 품질 좌우']),
+         ('수작업 산출물', ['조견표, 합본, 목차를 수작업으로 작성', '작성 오류, 버전 혼선, 마감 리스크 상시 발생']),
+         ('자산의 분산과 미활용', ['과거 제안 자산이 개인 단위로 분산', '재활용이 어려워 매 제안마다 재작성']),
+         ('구두 중심의 리뷰', ['리뷰와 의사결정이 구두로 진행', '결정 근거가 남지 않아 추적과 인수인계가 어려움'])]
 cw = (CW - 3 * 0.22) / 4
 for i, (t, ds) in enumerate(data4):
     l = L + i * (cw + 0.22)
@@ -113,13 +130,14 @@ rows5 = [('', '효율화', '제안 전 과정을 표준 절차와 템플릿으�
          ('b', '자산화', '과거 제안 산출물을 검색과 재활용이 가능한 자산 라이브러리로 축적하여 반복 재작성 제거', '재활용 가능한 제안 자산'),
          ('t', '경쟁력', '소수 인력으로 제안 품질을 유지하고 제안 투입 인건비 절감', '제안 경쟁력 강화')]
 for i, (c, t, d, r) in enumerate(rows5):
-    y = 2.1 + i * 1.7
+    y = 2.1 + i * 1.45
     if i: body += box('rowline', L, y - 0.08, CW, 0.01)
-    body += box(f'big {c}', L, y + 0.32, 1.2, 0.7, f'{i+1:02d}')
-    body += box('vrule', 2.0, y + 0.2, 0.01, 1.05)
-    body += box('rt', 2.3, y + 0.15, 5.5, 0.5, e(t))
-    body += box('rd', 2.3, y + 0.68, 5.5, 0.9, e(d))
-    body += box('outp', 8.15, y + 0.42, 2.84, 0.6, e(r))
+    body += box(f'big {c}', L, y + 0.25, 1.2, 0.7, f'{i+1:02d}')
+    body += box('vrule', 2.0, y + 0.12, 0.01, 0.95)
+    body += box('rt', 2.3, y + 0.05, 5.5, 0.5, e(t))
+    body += box('rd', 2.3, y + 0.55, 5.5, 0.85, e(d))
+    body += box('outp', 8.15, y + 0.3, 2.84, 0.6, e(r))
+body += box('rbar sand', L, 6.55, CW, 0.85, '<span class="lb">달성 수단</span><span class="tx">표준 절차, 버전관리, 자산 라이브러리 기능으로 세 가지 목표를 구현</span>', 'font-size:13.5pt')
 slides.append(frame('개요', '목표', '효율화 · 자산화 · 경쟁력',
     '제안 수행 체계를 <b>효율화, 자산화, 경쟁력 확보</b>의 세 방향으로 전환하는 것이 목표입니다.<br>제안을 ‘사람 수’가 아닌 <b>‘축적된 자산과 표준 절차’</b>로 수행합니다.', body))
 
@@ -131,11 +149,11 @@ rows6 = [('수행 방식', '임시 TF 구성, 담당자 역량에 따른 품질 
          ('자산', '개인 단위 분산, 재활용 불가', '자산 라이브러리 축적, 검색과 재활용'),
          ('의사결정', '구두 중심, 결정 근거 미기록', '리뷰 코멘트와 변경 이력으로 근거 기록')]
 for i, (k, a, b) in enumerate(rows6):
-    t = 2.4 + i * 1.25
-    body += box('cat', L, t, 1.35, 1.08, e(k))
-    body += box('pan as', 2.15, t, 3.9, 1.08, e(a))
-    body += box('tri', 6.12, t + 0.38, 0.3, 0.32)
-    body += box('pan tb', 6.6, t, 4.39, 1.08, e(b))
+    t = 2.4 + i * 1.3
+    body += box('cat', L, t, 1.35, 1.15, e(k))
+    body += box('pan as', 2.15, t, 3.9, 1.15, e(a))
+    body += box('tri', 6.12, t + 0.42, 0.3, 0.32)
+    body += box('pan tb', 6.6, t, 4.39, 1.15, e(b))
 slides.append(frame('개요', '기대효과', '도입 전후 비교',
     'ProWin 도입으로 제안 수행이 <b>개인 의존에서 표준 절차와 축적 자산 기반</b>으로 바뀝니다.<br>수행 방식, 산출물, 자산, 의사결정 네 영역에서 변화가 나타납니다.', body))
 
@@ -168,66 +186,67 @@ def detail(title, chip, msg, img, W, H, items, points, effect, path):
     sh_h = SW * H / W
     px = lambda v: SL + v / W * SW
     py = lambda v: sh_t + v / H * sh_h
-    ZX, ZW, CAP = 6.35, 4.64, 1.05
-    # 우측 확대 카드 배치
+    ZX, ZW = 6.35, 4.64
     y = 2.05
     polys = ''; zooms = ''; hls = ''
     for n, it in enumerate(items, 1):
         zx, zy, zw, zh = it['zoom']
-        s = min(ZW / zw, CAP / zh)
-        ph = zh * s; pw = zw * s
+        s = min(ZW / zw, it.get('capH', 9) / zh)
+        ph = zh * s; zcw = zw * s
         zooms += box('ntag', ZX, y, 0.28, 0.28, str(n))
         zooms += box('zt', ZX + 0.4, y - 0.02, ZW - 0.4, 0.32, e(it['t']))
         cy = y + 0.38
         st = (f'background-image:url({SH}{img});background-size:{I(W*s)} {I(H*s)};background-position:-{I(zx*s)} -{I(zy*s)};')
-        zooms += box('zoom', ZX, cy, pw, ph, '', st)
-        zooms += box('zd', ZX, cy + ph + 0.08, ZW, 0.5, e(it['d']))
-        bx, by, bw, bh = zx, zy, zw, zh
-        pts = [(px(bx + bw), py(by)), (px(bx + bw), py(by + bh)), (ZX, cy + ph), (ZX, cy)]
+        zooms += box('zoom', ZX, cy, zcw, ph, '', st)
+        zooms += box('zd', ZX, cy + ph + 0.07, ZW, 0.45, e(it['d']))
+        pts = [(px(zx + zw), py(zy)), (px(zx + zw), py(zy + zh)), (ZX, cy + ph), (ZX, cy)]
         poly = ' '.join(f'{a:.3f},{c:.3f}' for a, c in pts)
         polys += (f'<polygon points="{poly}" fill="rgba(244,106,37,0.10)"/>'
                   f'<line x1="{pts[0][0]:.3f}" y1="{pts[0][1]:.3f}" x2="{pts[3][0]:.3f}" y2="{pts[3][1]:.3f}" stroke="{ORANGE}" stroke-width="0.012" stroke-dasharray="0.05 0.04"/>'
                   f'<line x1="{pts[1][0]:.3f}" y1="{pts[1][1]:.3f}" x2="{pts[2][0]:.3f}" y2="{pts[2][1]:.3f}" stroke="{ORANGE}" stroke-width="0.012" stroke-dasharray="0.05 0.04"/>')
-        hls += (f'<i class="hl" style="left:{bx/W*100:.2f}%;top:{by/H*100:.2f}%;width:{bw/W*100:.2f}%;height:{bh/H*100:.2f}%">'
-                f'<b>{n}</b></i>')
-        y = cy + ph + 0.58 + 0.1
+        hls += (f'<i class="hl" style="left:{zx/W*100:.2f}%;top:{zy/H*100:.2f}%;width:{zw/W*100:.2f}%;height:{zh/H*100:.2f}%"><b>{n}</b></i>')
+        y = cy + ph + 0.52 + 0.1
+    assert y <= 6.45, f'확대 카드가 하단 영역과 겹침: y={y:.2f} ({title})'
     b += f'<svg class="a" viewBox="0 0 11.69 8.27" style="left:0;top:0;width:11.69in;height:8.27in;pointer-events:none">{polys}</svg>'
     b += box('shot', SL, sh_t, SW, sh_h, f'<img src="{SH}{img}" alt="">{hls}', 'overflow:visible')
     b += zooms
-    b += box('pth', SL, sh_t + sh_h + 0.15, SW, 0.3, f'<b>화면 위치</b>{e(path)}')
-    # 하단 포인트 / 기대 효과
-    b += box('pts', L, 6.5, 6.45, 1.0, '<div class="ptl">핵심 포인트</div>' + ''.join(f'<p>{e(p)}</p>' for p in points))
-    b += box('eff', 7.4, 6.45, 3.59, 1.0, f'<div class="ptl">기대 효과</div><div class="t">{e(effect)}</div>')
+    b += box('pth', SL, sh_t + sh_h + 0.12, SW, 0.3, f'<b>화면 위치</b>{e(path)}')
+    # 하단: 핵심 포인트 카드 2개 + 기대 효과
+    pw = 3.2; gp = 0.12
+    for i, (kw, tx) in enumerate(points):
+        b += box('pcard', L + i * (pw + gp), 6.55, pw, 1.0, f'<div class="pk">{e(kw)}</div><p>{e(tx)}</p>')
+    ex = L + 2 * (pw + gp)
+    b += box('effb', ex, 6.55, L + CW - ex, 1.0, f'<div class="pk">기대 효과</div><div class="et">{e(effect)}</div>')
     return frame('구현', title, chip, msg, b)
 
 slides.append(detail('RFP · 요구사항 관리', '핵심 기능 1/4',
-    'RFP와 요구사항을 <b>한 화면에서 정리</b>하여 제안 작업의 기준으로 삼습니다.<br>RFP 문서 정보와 요구사항 목록을 등록하고, 이후 목차와 조견표 작업의 기준으로 활용합니다.',
+    'RFP(제안요청서)와 요구사항을 <b>한 화면에서 정리</b>하여 제안 작업의 기준으로 삼습니다.<br>RFP 문서 정보와 요구사항 목록을 등록하고, 이후 목차와 조견표 작업의 기준으로 활용합니다.',
     'rfp.png', 1440, 900,
-    [dict(t='RFP 문서 정보', d='파일명, 페이지 수, 수령일을 등록하여 제안 대상 문서를 관리합니다', zoom=(257, 214, 440, 100)),
-     dict(t='요구사항 목록', d='코드, 제목, 설명 단위로 등록, 수정, 삭제하며 삭제 사유는 이력으로 남깁니다', zoom=(257, 340, 440, 100))],
-    ['RFP 문서와 요구사항을 같은 화면에서 관리하여 목차와 조견표의 기준으로 활용', '삭제는 사유를 기록하는 방식으로 처리하여 변경 근거를 유지'],
-    '요구사항 기준을 한곳에서 관리', '제안 워크스페이스 > RFP / 요구사항'))
+    [dict(t='RFP 문서 정보', d='파일명, 페이지 수, 수령일을 등록하여 제안 대상 문서를 관리합니다', zoom=(255, 212, 440, 88)),
+     dict(t='요구사항 목록', d='코드, 제목, 설명 단위로 등록, 수정, 삭제하며 삭제 사유는 이력으로 남깁니다', zoom=(255, 370, 440, 135))],
+    [('기준 일원화', '문서와 요구사항을 한 화면에서 관리'), ('변경 근거 보존', '삭제 시 사유를 기록하여 이력 유지')],
+    '요구사항 기준을 한곳에서 관리', '제안 워크스페이스 > RFP / 요구사항  ·  시연용 예시 데이터'))
 slides.append(detail('목차 관리', '핵심 기능 2/4',
     '<b>목차 하나로 담당자와 진척 상태</b>를 일원화합니다.<br>세부 목차가 PPT 업로드와 검토의 단위가 되어 모든 화면이 목차로 연결됩니다.',
     'toc.png', 1440, 900,
-    [dict(t='목차 구성', d='대분류와 세부 목차를 구분하며 세부 목차가 업로드와 검토의 단위입니다', zoom=(257, 545, 440, 100)),
-     dict(t='담당과 진척 현황', d='담당자, 예상 장수, 상태(완료, 진행중, 보완)를 한눈에 관리합니다', zoom=(727, 545, 400, 100))],
-    ['세부 목차가 PPT 업로드와 검토의 단위가 되어 화면 간 흐름이 목차로 연결', '담당자, 예상 장수, 상태를 목차에서 바로 갱신'],
-    '진척 현황을 목차 한 화면에서 확인', '제안 워크스페이스 > 목차'))
+    [dict(t='목차 구성', d='대분류와 세부 목차를 구분하며 세부 목차가 업로드와 검토의 단위입니다', zoom=(255, 562, 440, 112)),
+     dict(t='담당과 진척 현황', d='담당자, 예상 장수, 상태(완료, 진행중, 보완)를 한눈에 관리합니다', zoom=(690, 562, 440, 112))],
+    [('화면 연결', '세부 목차가 업로드와 검토의 단위'), ('즉시 갱신', '담당, 장수, 상태를 목차에서 수정')],
+    '진척 현황을 목차 한 화면에서 확인', '제안 워크스페이스 > 목차  ·  시연용 예시 데이터'))
 slides.append(detail('제안서 검토', '핵심 기능 3/4',
     '슬라이드를 보며 <b>참여 인원 전원이 의견을 남기고</b> 결정 근거를 기록합니다.<br>업로드한 PPT의 제목과 핵심 내용이 검토 화면에 자동으로 반영됩니다.',
     'review_t.png', 1440, 1000,
-    [dict(t='슬라이드 미리보기', d='업로드한 PPT의 제목과 핵심 내용이 자동으로 반영됩니다', zoom=(585, 545, 540, 125)),
-     dict(t='리뷰 코멘트', d='작성자별 의견을 일시와 함께 남겨 결정 근거를 보존합니다', zoom=(585, 795, 440, 100))],
-    ['업로드한 PPT의 제목과 핵심 내용이 검토 노드에 자동 반영', '의견은 작성자와 일시와 함께 남고, 최종 발표에 쓸 슬라이드를 지정'],
-    '구두 중심 리뷰를 기록 중심으로 전환', '제안 워크스페이스 > 제안서 검토'))
+    [dict(t='슬라이드 미리보기', d='업로드한 PPT의 제목과 핵심 내용이 자동으로 반영됩니다', zoom=(583, 556, 512, 172), capH=1.15),
+     dict(t='리뷰 코멘트', d='작성자별 의견을 일시와 함께 남겨 결정 근거를 보존합니다', zoom=(583, 852, 520, 132))],
+    [('자동 반영', 'PPT의 제목과 핵심 내용을 자동 반영'), ('의견 기록', '작성자와 일시를 남기고 발표 자료 지정')],
+    '구두 중심 리뷰를 기록 중심으로 전환', '제안 워크스페이스 > 제안서 검토  ·  시연용 예시 데이터'))
 slides.append(detail('제안서 관리 (버전 · 합본)', '핵심 기능 4/4',
     '<b>PPT 업로드만으로 이력이 쌓이고 합본이 자동으로 완성</b>됩니다.<br>세부 목차별 최신본이 목차 순서대로 묶여 하나의 제안서가 됩니다.',
     'versions.png', 1440, 900,
-    [dict(t='업로드와 합본', d='세부 목차 단위로 PPT를 올리고, 합본으로 전체 제안서를 만듭니다', zoom=(246, 205, 440, 100)),
-     dict(t='버전 이력과 스냅샷', d='누가 언제 무엇을 올렸는지 추적하고 합본은 불변 스냅샷으로 보관합니다', zoom=(256, 340, 440, 120))],
-    ['세부 목차 단위 업로드가 커밋으로 쌓여 누가 언제 무엇을 올렸는지 추적', '합본은 목차 순서로 최신본을 묶어 불변 스냅샷으로 보관'],
-    '수작업 합치기와 버전 혼선 해소', '제안 워크스페이스 > 제안서 관리'))
+    [dict(t='업로드와 합본', d='세부 목차 단위로 PPT를 올리고, 합본으로 전체 제안서를 만듭니다', zoom=(246, 206, 440, 80)),
+     dict(t='버전 이력(커밋)', d='누가 언제 어떤 목차를 올렸는지 이력으로 남고, 합본은 변경 불가한 스냅샷으로 보관합니다', zoom=(256, 480, 372, 108))],
+    [('이력 추적', '업로드마다 누가 언제 올렸는지 기록'), ('스냅샷 보관', '목차 순서 합본을 변경 불가로 보관')],
+    '수작업 합치기와 버전 혼선 해소', '제안 워크스페이스 > 제안서 관리  ·  시연용 예시 데이터'))
 
 # ---------- 12~13 타일 갤러리 ----------
 def gallery(msg, title, chip, items, cols, rows, ih):
@@ -252,57 +271,68 @@ slides.append(gallery('핵심 기능 외에도 <b>제안 업무 전반을 지원
     [('제안 현황', '기간별 제안 진행 현황', 'proposals.png', full), ('제안서 홈', '제안 개요, 오늘 할 일, 지연 항목', 'home.png', full),
      ('제안 일정', '일정 등록과 색상 구분', 'schedule.png', full), ('커뮤니케이션', '제안팀 공지, 공유 게시판', 'comm.png', full),
      ('RFP Q&A, 참고 자료', '제안 전용 게시판', 'board-1.png', full), ('조견표', '요구사항과 목차 매핑', 'matrix.png', full),
-     ('자산 라이브러리', '과거 제안서 페이지 적재, 검색', 'assets.png', full), ('워크스페이스 관리', '제안 전용 게시판 관리', 'workspace.png', full)], 4, 2, 1.7))
+     ('자산 라이브러리', '과거 제안서 페이지 적재, 검색', 'assets.png', full), ('워크스페이스 관리', '제안 전용 게시판 관리', 'workspace.png', full)], 4, 2, 1.8))
 slides.append(gallery('<b>비용, 인력, 권한, 이력</b>까지 하나의 시스템에서 관리합니다.<br>경비와 공수, 제안·시스템 단위 권한, 변경 이력을 제공합니다.', '부가 기능 (2/2)', '비용 · 권한 · 운영',
     [('제안 경비 관리', '자사, 외주 인건비, 디자인·인쇄비', 'expense.png', full), ('수행 공수 관리', '투입 M/M, 직급별 공수', 'effort.png', full),
      ('제안 권한관리', '제안 단위 멤버와 권한', 'wsperm.png', full), ('시스템 접근 권한관리', '프로젝트와 무관한 시스템 권한', 'sysperm.png', full),
-     ('사용 가이드', '사이트 사용법 통합 안내', 'guide.png', full), ('변경 이력', '추가, 수정, 삭제 이력', 'history.png', full)], 3, 2, 1.8))
+     ('사용 가이드', '사이트 사용법 통합 안내', 'guide.png', full), ('변경 이력', '추가, 수정, 삭제 이력', 'history.png', full)], 3, 2, 1.85))
 
 # ---------- 14 기술 구성 ----------
 body = ''
-T0 = 2.1
-body += box('blk', L, T0, 2.5, 2.6, '')
-body += box('', L + 0.3, T0 + 0.3, 0.6, 0.6, svg(ICON['window'], 0.6))
-body += box('bt', L + 0.3, T0 + 1.1, 2.0, 0.4, '사용자 브라우저')
-body += box('bs', L + 0.3, T0 + 1.55, 2.0, 0.8, 'HTML, CSS, JavaScript')
-body += box('arrl', 3.3, T0 + 1.35, 0.6, 0.02) + box('arrh', 3.86, T0 + 1.28, 0.12, 0.16) + box('alb', 3.1, T0 + 0.95, 1.0, 0.3, 'REST API')
-body += box('blk sd', 4.05, T0, 4.1, 2.6, '')
-body += box('bt', 4.35, T0 + 0.2, 3.6, 0.4, 'ProWin Backend')
-body += box('bs', 4.35, T0 + 0.62, 3.6, 0.3, 'Spring Boot 3.3 · Java 17')
+T0 = 2.0; BH = 2.3
+body += box('blk', L, T0, 2.5, BH, '')
+body += box('', L + 0.3, T0 + 0.25, 0.55, 0.55, svg(ICON['window'], 0.55))
+body += box('bt', L + 0.3, T0 + 0.95, 2.0, 0.4, '사용자 브라우저')
+body += box('bs', L + 0.3, T0 + 1.4, 2.0, 0.6, 'HTML, CSS, JavaScript')
+body += box('arrl', 3.3, T0 + 1.15, 0.6, 0.02) + box('arrh', 3.86, T0 + 1.08, 0.12, 0.16) + box('alb', 3.1, T0 + 0.75, 1.0, 0.3, 'REST API')
+body += box('blk sd', 4.05, T0, 4.1, BH, '')
+body += box('bt', 4.35, T0 + 0.15, 3.6, 0.4, 'ProWin Backend')
+body += box('bs', 4.35, T0 + 0.55, 3.6, 0.3, 'Spring Boot 3.3 · Java 17')
 for k, nm in enumerate(['RFP', '목차', '검토', '버전관리']):
-    body += box('chipw', 4.35 + (k % 2) * 1.82, T0 + 1.05 + (k // 2) * 0.55, 1.7, 0.45, nm)
-body += box('chipw', 4.35, T0 + 2.15, 3.52, 0.38, 'PPTX 추출, 미리보기, 합본 (Apache POI)', 'font-size:11pt')
-body += box('arrl', 8.2, T0 + 1.35, 0.45, 0.02) + box('arrh', 8.6, T0 + 1.28, 0.12, 0.16) + box('alb', 8.0, T0 + 0.95, 0.9, 0.3, 'JDBC')
-body += box('blk', 8.75, T0, 2.24, 2.6, '')
-body += box('bt', 9.0, T0 + 0.2, 1.9, 0.4, '저장소')
-body += box('chipw', 9.0, T0 + 0.85, 1.75, 0.7, '<div>SQLite<br><span style="font-size:10pt;font-weight:400;color:#6B6B6B">RFP, 목차, 리뷰, 이력</span></div>')
-body += box('chipw', 9.0, T0 + 1.7, 1.75, 0.7, '<div>파일 저장소<br><span style="font-size:10pt;font-weight:400;color:#6B6B6B">업로드 PPTX</span></div>')
-body += box('lab', L, 4.95, 3, 0.3, '기술 스택')
+    body += box('chipw', 4.35 + (k % 2) * 1.82, T0 + 0.95 + (k // 2) * 0.5, 1.7, 0.42, nm)
+body += box('chipw', 4.35, T0 + 1.92, 3.52, 0.34, 'PPTX 추출, 미리보기, 합본 (Apache POI)', 'font-size:10.5pt')
+body += box('arrl', 8.2, T0 + 1.15, 0.45, 0.02) + box('arrh', 8.6, T0 + 1.08, 0.12, 0.16) + box('alb', 8.0, T0 + 0.75, 0.9, 0.3, 'JDBC')
+body += box('blk', 8.75, T0, 2.24, BH, '')
+body += box('bt', 9.0, T0 + 0.15, 1.9, 0.4, '저장소')
+body += box('chipw', 9.0, T0 + 0.7, 1.75, 0.62, '<div>SQLite<br><span style="font-size:10pt;font-weight:400;color:#6B6B6B">RFP, 목차, 리뷰, 이력</span></div>')
+body += box('chipw', 9.0, T0 + 1.45, 1.75, 0.62, '<div>파일 저장소<br><span style="font-size:10pt;font-weight:400;color:#6B6B6B">업로드 PPTX</span></div>')
+body += box('lab', L, 4.5, 3, 0.3, '기술 스택')
 tech = [('프론트엔드', 'HTML, CSS, JavaScript'), ('백엔드', 'Spring Boot 3.3.5'), ('언어', 'Java 17'), ('데이터', 'SQLite (JDBC)'), ('문서 처리', 'Apache POI 5.3.0')]
 tw = (CW - 4 * 0.13) / 5
 for i, (c, v) in enumerate(tech):
-    body += box('tchip', L + i * (tw + 0.13), 5.3, tw, 0.85, f'<div class="tcat">{e(c)}</div><div class="tval">{e(v)}</div>')
-body += box('rbar sand', L, 6.5, CW, 0.8, '<span class="lb">구성의 특징</span><span class="tx">별도 빌드 도구 없이 단일 서버가 화면과 API를 함께 제공</span>', 'font-size:13.5pt')
+    body += box('tchip', L + i * (tw + 0.13), 4.82, tw, 0.8, f'<div class="tcat">{e(c)}</div><div class="tval" style="font-size:12pt">{e(v)}</div>')
+body += box('lab', L, 5.8, 4, 0.3, '상용화 시 보완 방향')
+comm = [('데이터 저장', 'SQLite를 서버형 DB로 전환하여 동시 접속, 백업, 이중화 확보'),
+        ('인증과 보안', '사내 계정 연동, 서버 측 권한 검증, 접근 이력 관리'),
+        ('파일과 미리보기', '사내 파일 스토리지 이관, 서버 글꼴 설치로 PPT 표시 품질 확보'),
+        ('운영 체계', '배포 자동화, 모니터링, 정기 백업 체계 구축')]
+mw = (CW - 3 * 0.15) / 4
+for i, (a, t) in enumerate(comm):
+    body += box('mini', L + i * (mw + 0.15), 6.15, mw, 1.3, f'<b>{e(a)}</b><span>{e(t)}</span>')
 slides.append(frame('구현', '기술 구성', '시스템 구성',
-    '<b>단일 서버</b>가 화면과 API를 함께 제공하여 가볍게 구축하고 빠르게 확장할 수 있습니다.<br>Spring Boot, SQLite, Apache POI로 구성했습니다.', body))
+    '<b>단일 서버</b>가 화면과 API를 함께 제공하여 가볍게 구축했습니다.<br>상용화 단계에서는 데이터, 보안, 운영 영역을 보완합니다.', body))
 
 # ---------- 15 향후 계획 ----------
-body = box('lab', L, 2.1, 4, 0.3, '고도화 과제')
-for i, t in enumerate(['RFP 업로드 시 요구사항 자동 추출', '제안서 목차 자동 인식', '요구사항 기반 유사 과거 사례 추천과 의미 기반 검색', '경비, 공수 자동 합계', '전 화면 데이터 연동 확대와 권한 체계 정비']):
-    y = 2.6 + i * 0.75
-    body += box('dot', L, y + 0.1, 0.1, 0.1)
-    body += box('li14', L + 0.3, y, 4.4, 0.7, e(t))
-body += box('lab', 5.95, 2.1, 4, 0.3, '하반기 계획')
-plan = [('상세 설계', '화면별 상세 규격과 잔여 설계 과제 확정'), ('구현 방안 검증 (PoC)', '핵심 기술 요소의 실현성 검증'), ('정량 성과 측정', '개선 전후 효율과 적용 결과, 구현 방안 확정 후 착수')]
-body += box('vrule', 6.55, 2.6, 0.01, 3.4)
-for i, (t, d) in enumerate(plan):
-    y = 2.6 + i * 1.5
-    body += box('big' + ('' if i == 0 else ' b' if i == 1 else ' t'), 5.95, y, 0.7, 0.5, f'{i+1:02d}', 'font-size:22pt')
-    body += box('rst', 6.85, y - 0.02, 4.1, 0.4, e(t))
-    body += box('rsd', 6.85, y + 0.4, 4.1, 0.8, e(d))
-body += box('rbar sand', L, 6.55, CW, 0.85, '<span class="lb">추진 방향</span><span class="tx">상반기 설계와 프로토타입 성과를 구현 단계로 확대하고, 자동 추출과 사례 추천으로 작성 업무의 효율을 고도화</span>', 'font-size:13.5pt')
-slides.append(frame('계획', '향후 계획', '고도화 · 하반기',
-    '<b>자동 추출과 사례 추천</b>으로 제안 작성 업무를 한 단계 더 고도화합니다.<br>하반기에는 상세 설계와 구현 방안 검증을 진행하고, 이후 정량 성과를 측정합니다.', body))
+body = ''
+fut = [('업무 흐름 STEP 01', 'RFP 요구사항 자동 추출', 'RFP 업로드 시 요구사항 후보를 추출하여 목록에 반영하고, 담당자가 확인하여 확정합니다.', '수작업 정리 부담 완화'),
+       ('업무 흐름 STEP 02', '유사 과거 사례 추천', '요구사항별로 유사한 과거 제안 사례를 의미 기반으로 검색하여 작성자에게 제시합니다.', '과거 자산 재활용 확대')]
+for i, (tag, t, d, eff) in enumerate(fut):
+    y = 2.1 + i * 2.15
+    body += box('fut', L, y, 6.4, 1.95, '')
+    body += box('', L + 0.3, y + 0.22, 2.0, 0.3, f'<span class="futtag">{e(tag)}</span>')
+    body += box('futt', L + 0.3, y + 0.55, 5.8, 0.5, e(t))
+    body += box('futd', L + 0.3, y + 1.05, 5.8, 0.55, e(d))
+    body += box('outp', L + 3.9, y + 0.2, 2.25, 0.4, e(eff), 'font-size:11pt')
+body += box('lab', 7.4, 2.1, 3.5, 0.3, '추가 고도화')
+adds = [('제안서 목차 자동 인식', '제안서 슬라이드 제목을 인식하여 목차와 연결'), ('경비, 공수 자동 합계', '입력값을 항목별, 전체 합계로 자동 계산'), ('데이터 연동과 권한 정비', '전 화면 데이터 연동 확대, 권한 체계 정비')]
+for i, (t, d) in enumerate(adds):
+    y = 2.55 + i * 1.3
+    body += box('sq', 7.4, y + 0.1, 0.1, 0.1)
+    body += box('rst', 7.65, y - 0.05, 3.35, 0.4, e(t), 'font-size:14.5pt')
+    body += box('rsd', 7.65, y + 0.38, 3.35, 0.75, e(d), 'font-size:12.5pt')
+body += box('rbar sand', L, 6.55, CW, 0.85, '<span class="lb">추진 방향</span><span class="tx">핵심 기능을 안정화한 뒤 자동 추출과 사례 추천을 단계적으로 적용</span>', 'font-size:13.5pt')
+slides.append(frame('계획', '고도화 계획', '추후 추진',
+    '<b>요구사항 자동 추출과 유사 사례 추천</b>을 추후 고도화하여 제안 작성 업무의 효율을 높이겠습니다.<br>업무 흐름의 STEP 01, STEP 02에 적용되는 과제이며, 상용화 보완 사항은 기술 구성에 정리했습니다.', body))
 
 # ---------- 16 엔딩 ----------
 slides.append('''<section class="slide endslide"><div class="coverbg endbg"></div>
