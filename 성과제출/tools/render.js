@@ -7,7 +7,7 @@ const { pathToFileURL } = require('url');
 const args = process.argv.slice(2);
 const pdfIdx = args.indexOf('--pdf');
 const pdfOut = pdfIdx >= 0 ? path.resolve(args[pdfIdx + 1]) : null;
-const pos = args.filter((a, i) => !a.startsWith('--') && i !== pdfIdx + 1);
+const pos = args.filter((a, i) => !a.startsWith('--') && (pdfIdx < 0 || i !== pdfIdx + 1));
 const target = path.resolve(pos[0] || path.join(__dirname, '..', 'prowin', '성과제출_ProWin.html'));
 const outDir = path.resolve(pos[1] || path.join(process.cwd(), 'slides_png'));
 (async () => {

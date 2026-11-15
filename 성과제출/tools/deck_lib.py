@@ -39,11 +39,11 @@ def box(cls, l, t, w=None, h=None, inner='', style=''):
     return f'<div class="a {cls}" style="{st}{style}">{inner}</div>'
 
 PAGE = [0]
-def frame(badge, title, chip, msg, body):
+def frame(badge, title, chip, msg, body, ai=False):
     PAGE[0] += 1
     h = '<section class="slide">'
     h += box('badge', L, 0.55, 0.78, 0.36, e(badge))
-    h += box('ttl', 1.65, 0.45, 7.2, 0.56, e(title))
+    h += box('ttl', 1.65, 0.45, 7.4, 0.56, e(title) + ('<i class="aitag">AI 활용</i>' if ai else ''))
     if chip: h += box('chip', 9.19, 0.55, 1.8, 0.34, e(chip))
     h += box('msg', L, 1.18, CW, 0.8, e(msg))
     h += body
@@ -58,6 +58,7 @@ ICON = {
  'check': '<rect x="8" y="6" width="32" height="36" rx="5"/><path d="M15 17l3 3 5-6M27 18h9M15 30l3 3 5-6M27 31h9"/>',
  'branch': '<circle cx="14" cy="10" r="5"/><circle cx="14" cy="38" r="5"/><circle cx="35" cy="20" r="5"/><path d="M14 15v18M14 30c14 0 21-3 21-10"/>',
  'stack': '<rect x="6" y="7" width="36" height="9" rx="3"/><rect x="6" y="20" width="36" height="9" rx="3"/><rect x="6" y="33" width="36" height="9" rx="3"/>',
+ 'spark': '<path d="M24 5l4.6 13.4L42 23l-13.4 4.6L24 41l-4.6-13.4L6 23l13.4-4.6z"/><path d="M38 6v8M34 10h8"/>',
  'window': '<rect x="5" y="9" width="38" height="30" rx="4"/><path d="M5 17h38M11 13h.1M16 13h.1"/>',
 }
 
@@ -82,7 +83,7 @@ def cover(subtitle, title_html, info):
 def contents(parts):
     """parts: [(y, '파트 제목', [(번호, '항목'), ...]), ...]  (y는 파트 띠의 세로 위치, 예: 2.8, 5.0, 6.7)"""
     PAGE[0] += 1
-    out = '<section class="slide gray"><div class="coverbg contbg"></div>' + box('ctt', 1.12, 1.55, 5, 0.95, 'CONTENTS')
+    out = '<section class="slide gray"><div class="coverbg contbg"></div>' + box('ctt', 1.12, 1.4, 5, 0.95, 'CONTENTS')
     for t, title, items in parts:
         out += box('pbar', 1.12, t, 5.6, 0.14)
         out += box('ptag', 1.12, t - 0.38, 5, 0.32, e(title))
@@ -99,7 +100,7 @@ def ending():
 
 
 # ---------- 화면 상세 (패턴 P6) ----------
-def detail(title, chip, msg, img, W, H, items, points, effect, path, badge='구현'):
+def detail(title, chip, msg, img, W, H, items, points, effect, path, badge='구현', ai=False):
     b = ''
     SL, SW = L, 5.0
     sh_t = 2.1
@@ -137,7 +138,7 @@ def detail(title, chip, msg, img, W, H, items, points, effect, path, badge='구�
         b += box('pcard', L + i * (pw + gp), 6.55, pw, 1.0, f'<div class="pk">{e(kw)}</div><p>{e(tx)}</p>')
     ex = L + 2 * (pw + gp)
     b += box('effb', ex, 6.55, L + CW - ex, 1.0, f'<div class="pk">기대 효과</div><div class="et">{e(effect)}</div>')
-    return frame(badge, title, chip, msg, b)
+    return frame(badge, title, chip, msg, b, ai)
 
 
 # ---------- 타일 갤러리 (패턴 P7) ----------
