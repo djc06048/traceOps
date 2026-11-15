@@ -19,9 +19,9 @@ slides.append(D.cover('AI-ASSISTED TRACEABILITY MANAGEMENT', 'TraceOps · ReqSyn
 
 # ---------- 2 목차 ----------
 slides.append(D.contents([
-    (2.7, 'Part. 1  개요', [(1, '성과 요약'), (2, 'TraceOps · ReqSync 소개'), (3, '추진 배경'), (4, '목표 및 기대효과')]),
-    (4.55, 'Part. 2  AI 활용과 구현 내용', [(5, 'AI 활용 구조'), (6, '업무 흐름'), (7, '주요 기능'), (8, '단계별 화면 및 기술 구성')]),
-    (6.45, 'Part. 3  향후 계획', [(9, '고도화 계획')])]))
+    (2.7, 'Part. 1  개요', [(1, '성과 요약'), (2, 'TraceOps · ReqSync 소개'), (3, '프로젝트 수행주기와 적용 지점'), (4, '추진 배경'), (5, '목표 및 기대효과')]),
+    (4.85, 'Part. 2  AI 활용과 구현 내용', [(6, 'AI 활용 구조'), (7, '업무 흐름'), (8, '주요 기능'), (9, '단계별 화면 및 기술 구성')]),
+    (6.75, 'Part. 3  향후 계획', [(10, '고도화 계획')])]))
 
 # ---------- 3 성과 요약 ----------
 body = ''
@@ -57,24 +57,46 @@ body += box('rbar brown', L, 5.95, CW, 1.05, '<span class="lb">구성 원칙</sp
 slides.append(frame('개요', 'TraceOps · ReqSync 소개', '플랫폼 구성',
     '<b>요구사항부터 연계까지 추적</b>하는 TraceOps에 <b>AI 요구사항 어시스턴트(ReqSync)</b>를 더한 플랫폼입니다.<br>회의 결정사항이 요구사항에 근거와 함께 반영되고, 하위 단계가 같은 기준을 사용하도록 합니다.', body, ai=True))
 
-# ---------- 5 추진 배경 ----------
+# ---------- 수행주기 ----------
 body = ''
-data4 = [('엑셀 · PMS 이원 관리', ['요구사항, 분석, 설계, 개발, 테스트를 엑셀과 PMS로 나누어 수작업 관리', '단계 간 정합성을 보장하기 어렵고 제출 산출물과도 따로 관리']),
-         ('매핑 누락 위험', ['요구사항을 분석, 설계, 개발에 매핑해 관리', '개발 목록을 실수로 삭제하면 요구사항이 어디에도 매핑되지 않아 누락될 수 있음']),
+cwp = (CW - 5 * 0.12) / 6
+stg = [('착수', '프로젝트 시작', 'o'), ('기술협상', '요구사항 상세화', 'o'), ('분석', '현황업무분석', 'b'), ('설계', '화면·프로그램 설계', 'b'), ('개발 · 단위테스트', '개발과 단위 검증', 't'), ('통합테스트', '프로세스 전체 검증', 't')]
+def colx(n): return L + n * (cwp + 0.12)
+for n, (t, sub, c) in enumerate(stg):
+    x = colx(n)
+    body += box(f'cbar {c}', x, 2.05, cwp, 0.06)
+    body += box(f'stp {c}', x, 2.2, cwp, 0.22, f'STEP {n+1:02d}')
+    body += box('st', x, 2.4, cwp, 0.4, e(t), 'font-size:13pt')
+    body += box('scr', x, 2.78, cwp, 0.3, e(sub), 'font-size:10pt')
+body += box('flowbox aibox', colx(1), 3.25, cwp * 2 + 0.12, 1.1, '<div><b><span class="aitag o sm">AI</span>ReqSync</b>회의록으로 요구사항 보완·확정<small>고객사 협의 내용을 근거와 함께 반영</small></div>')
+body += box('flowbox aibox', colx(3), 3.25, cwp * 3 + 0.24, 1.1, '<div><b>연계관리</b>프로세스 설계(PL) → 개발 항목 배분 → 통합테스트로 프로세스 완결 확인<small>메서드 누락이 없는지 프로세스 단위로 확인</small></div>')
+body += box('flowbox card', colx(1), 4.5, cwp * 5 + 0.48, 0.75, '<div><b>요구사항 → 분석 → 설계 → 개발 → 테스트 정합성 관리 (상시)</b>삭제·변경 시 영향 안내, 하위 연결 누락과 재검증 표시</div>')
+for n in range(2, 6):
+    body += box('flowbox', colx(n), 5.4, cwp, 0.82, f'<div><b style="font-size:11pt">산출물 스냅샷</b>{["분석", "설계", "개발·단위", "통합"][n-2]} 확정 <em class="tg">고도화</em></div>', 'background:#fff;border:1.5px solid #AF947E;font-size:10.5pt;padding:0.06in 0.1in;')
+body += box('flowbox card', colx(0), 5.4, cwp, 0.82, '<div><b style="font-size:11pt">현황</b>엑셀·PMS 수작업 관리</div>', 'font-size:10.5pt;padding:0.06in 0.1in;')
+body += box('rbar sand', L, 6.4, CW, 0.95, '<span class="lb">확정 후 수정</span><span class="tx">단계 산출물은 스냅샷으로 확정하고, 확정 이후에 수정할 때는 <b>품질 검토를 거치도록</b> 합니다 <em class="tg">고도화</em></span>', 'font-size:13pt')
+slides.append(frame('개요', '프로젝트 수행주기와 적용 지점', '수행주기 관점',
+    '프로젝트는 <b>착수, 기술협상, 분석, 설계, 개발·단위테스트, 통합테스트</b> 순서로 진행되며 단계마다 산출물이 확정됩니다.<br><b>ReqSync는 기술협상·분석</b>에서 요구사항을 확정하고, <b>연계관리는 설계부터 통합테스트까지</b> 프로세스 완결을 확인합니다.', body, ai=True))
+
+# ---------- 추진 배경 ----------
+body = ''
+data4 = [('요구사항 상세화와 증적', ['RFP 요구사항은 상세화되어 있지 않아 기술협상과 분석 단계에서 고객사와 협의하며 보완', '보완 근거가 회의록에만 남고 반영은 수작업']),
          ('프로세스 단위 연계 누락', ['한 프로세스에 여러 메서드가 있고 담당 개발자가 서로 다름', '메서드 하나가 개발 대상에서 빠지면 프로세스 전체가 동작하지 않음']),
-         ('요구사항 상세화와 증적', ['RFP 요구사항은 상세화되어 있지 않아 분석 단계에서 고객사와 협의하며 보완', '보완 근거가 회의록에만 남고 반영은 수작업'])]
-cw = (CW - 3 * 0.22) / 4
+         ('수작업 관리와 매핑 누락', ['요구사항, 분석, 설계, 개발, 테스트를 엑셀과 PMS로 수작업 관리해 정합성 보장이 어려움', '개발 목록을 실수로 삭제하면 요구사항이 어디에도 매핑되지 않아 누락될 수 있음'])]
+cw3 = (CW - 2 * 0.25) / 3
+tags = ['ReqSync', '연계관리', '정합성']
 for i, (t, ds) in enumerate(data4):
-    l = L + i * (cw + 0.22)
-    body += box('card', l, 2.1, cw, 3.5)
-    body += box('idx', l + 0.25, 2.3, 1.2, 0.5, f'{i+1:02d}')
-    body += box('ct16', l + 0.25, 2.95, cw - 0.45, 0.6, e(t))
-    body += box('hl-line', l + 0.25, 3.58, cw - 0.5, 0.01)
-    body += box('cd', l + 0.25, 3.72, cw - 0.45, 1.85, ''.join(f'<p>{e(d)}</p>' for d in ds), 'font-size:11.5pt')
-imps = [('단계 간 정합성 보장', '요구사항부터 테스트까지 하나의 체계로 관리'), ('검토와 제출에 활용', '단계말 검토와 제출 산출물에 그대로 활용'), ('누락 안내와 증적', '누락 가능성을 안내하고 회의 근거를 이력으로 보존')]
+    l = L + i * (cw3 + 0.25)
+    body += box('card', l, 2.1, cw3, 3.45, '', 'border:2px solid #F46A25;' if i < 2 else '')
+    body += box('idx', l + 0.28, 2.3, 1.2, 0.5, f'{i+1:02d}')
+    body += box('', l + cw3 - 1.5, 2.4, 1.25, 0.34, f'<span class="aitag o sm" style="font-size:10pt">{tags[i]}</span>', 'text-align:right;')
+    body += box('ct16', l + 0.28, 2.95, cw3 - 0.5, 0.45, e(t), 'font-size:15pt')
+    body += box('hl-line', l + 0.28, 3.55, cw3 - 0.56, 0.01)
+    body += box('cd', l + 0.28, 3.7, cw3 - 0.5, 1.8, ''.join(f'<p>{e(d)}</p>' for d in ds), 'font-size:12.5pt')
+imps = [('회의 기반 요구사항 확정', 'ReqSync로 보완하고 증적 이력으로 보존'), ('프로세스 단위 완결 확인', '연계관리로 메서드 누락을 사전에 확인'), ('정합성과 제출 활용', '요구사항~테스트 정합성 보장, 단계말 검토와 제출 산출물 활용')]
 body += box('rbar brown', L, 5.8, CW, 1.3, '<span class="lb">해결 방향</span><div class="imp3">' + ''.join(f'<div>{e(a)}<span>{e(b)}</span></div>' for a, b in imps) + '</div>')
 slides.append(frame('개요', '추진 배경', '현행 업무의 불편',
-    '엑셀과 PMS로 나누어 수작업 관리하다 보니 <b>요구사항부터 테스트까지 정합성을 보장하기 어렵습니다</b>.<br>정합성이 보장되고, 단계말 검토와 제출 산출물에도 활용할 수 있는 체계가 필요했습니다.', body))
+    '요구사항 상세화, 프로세스 연계, 단계 간 정합성이 <b>회의록과 엑셀·PMS 중심의 수작업</b>에 의존하고 있습니다.<br><b>ReqSync와 연계관리</b>로 상세화와 연계 누락을 해결하고, 정합성이 보장되는 체계를 만들고자 했습니다.', body))
 
 # ---------- 6 목표 ----------
 body = ''
