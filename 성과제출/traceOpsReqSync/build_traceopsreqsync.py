@@ -205,37 +205,38 @@ slides.append(detail('테스트관리', '핵심 기능 4/5',
      dict(t='요구사항 · 물리ID 자동 연결', d='묶인 단위테스트의 요구사항ID와 물리ID가 합집합으로 자동 반영됩니다', zoom=(803, 523, 330, 100), padx=3)],
     [('자동 연결', '개발ID, 요구사항ID, 물리ID를 묶은 단위에서 계산'), ('변경 영향 안내', '연결 변경과 삭제 시 영향 범위를 팝업으로 안내')],
     '요구사항부터 통합테스트까지 한 줄로 추적', '테스트관리 > 통합테스트'))
-# ---------- 연계관리가 필요한 이유 ----------
+# ---------- 연계관리 1/3: 개념과 필요성 ----------
 body = ''
-# 프로세스 덩어리와 메서드
-body += box('card', L, 2.05, CW, 2.25)
-body += box('lab', L + 0.3, 2.15, 6, 0.3, '하나의 프로세스 (예: 인수지침검사)')
-mx = L + 0.3; mw = 1.6; mg = 0.24
-meths = [('메서드 1', '담당 A', 0), ('메서드 2', '담당 B', 0), ('메서드 3', '담당 C', 1), ('메서드 4', '담당 D', 0)]
-for n, (m, o, miss) in enumerate(meths):
-    x = mx + n * (mw + mg)
-    if miss:
-        body += box('flowbox', x, 2.55, mw, 1.1, f'<div><b>{m}</b>{o}<small>개발 대상에서 누락</small></div>', 'background:#fff;border:2px dashed #F46A25;')
-    else:
-        body += box('flowbox card', x, 2.55, mw, 1.1, f'<div><b>{m}</b>{o}<small>분석·설계·개발 완료</small></div>', 'background:#fff;border:1px solid #E5E0DB;')
-    if n < 3: body += box('tri', x + mw + 0.06, 2.95, 0.16, 0.3)
-body += box('flowbox', mx + 4 * (mw + mg) - 0.1, 2.55, 2.45, 1.1, '<div><b>프로세스 동작 불가</b>한 메서드만 빠져도 전체가 멈춤</div>', 'background:#FFF0E6;border:2px solid #F46A25;')
-body += box('cap', mx, 3.8, CW - 0.6, 0.3, 'PL(메인 설계자)이 프로세스를 설계하고, 하위 메서드는 개발 항목이 되어 개발자별로 배분됩니다', 'text-align:left;')
+body += box('card', L, 2.0, CW, 2.2)
+body += box('lab', L + 0.3, 2.1, 6, 0.3, '관리 범위')
+sw = [1.95, 4.95, 1.95]; sg = 0.36
+sx = L + 0.3
+body += box('flowbox', sx, 2.5, sw[0], 1.45, '<div><b>채널</b>CM, TM, 콜센터 등<small>기간계 바깥의 요청</small></div>', 'background:#F3ECE5;border:2px solid #6E5744;')
+body += box('tri', sx + sw[0] + 0.11, 3.1, 0.16, 0.3)
+mx0 = sx + sw[0] + sg
+body += box('flowbox', mx0, 2.5, sw[1], 1.45, '', 'background:#fff;border:2px solid #F46A25;')
+body += box('', mx0 + 0.2, 2.55, 4.6, 0.3, '<b style="font-size:12pt">기간계 메인 프로세스</b>')
+for n, (t, miss) in enumerate([('메서드 1', 0), ('메서드 2', 0), ('메서드 3', 1), ('메서드 4', 0)]):
+    bx = mx0 + 0.2 + n * 1.13
+    body += box('flowbox', bx, 2.95, 1.0, 0.85, f'<div><b style="font-size:11.5pt">{t}</b><small>{"누락" if miss else "담당 개발자"}</small></div>', 'background:#fff;border:2px dashed #F46A25;' if miss else 'background:#F7F5F3;border:1px solid #E5E0DB;')
+body += box('tri', mx0 + sw[1] + 0.11, 3.1, 0.16, 0.3)
+ax = mx0 + sw[1] + sg
+body += box('flowbox aibox', ax, 2.5, sw[2], 1.45, '<div><b><span class="aitag o sm">AI</span>AI Agent</b>호출하는 기간계 기능<small>AI 기능의 의존 관계</small></div>')
 cw3 = (CW - 2 * 0.2) / 3
-why = [('필요한 이유 1', '프로세스는 여러 메서드의 연결', ['담당 개발자가 서로 달라 전체 누락 여부를 한 사람이 파악하기 어려움']),
-       ('필요한 이유 2', '한 곳의 누락이 전체 장애', ['분석, 설계, 개발 대상에서 메서드 하나가 빠지면 프로세스가 동작하지 않음']),
-       ('필요한 이유 3', '통합테스트는 프로세스 단위', ['연계 관점에서는 프로세스 전체가 끝까지 동작해야 정상으로 판단'])]
-for i, (k1, t, ds) in enumerate(why):
-    l = L + i * (cw3 + 0.2)
-    body += box('pcard', l, 4.5, cw3, 1.2, f'<div class="pk">{e(k1)}</div><p style="font-weight:700">{e(t)}</p><p style="font-size:11pt;color:#555">{e(ds[0])}</p>')
-body += box('rbar sand', L, 5.9, CW, 1.45, '<span class="lb">TraceOps 대응</span><div class="tx" style="font-size:12.5pt;line-height:1.5">프로세스를 호출 관계(클래스·메서드)에 맞춰 캔버스로 설계하고, 각 메서드를 <b>개발 항목과 연결해 개발 대상에서 빠지지 않도록</b> 관리합니다.<br>캔버스에서 메서드별 <b>개발 완료 여부</b>를 확인합니다. 프로세스 단위 통합테스트 연결은 <em class="tg">보완 필요</em></div>')
-slides.append(frame('구현', '연계관리가 필요한 이유', '연계 관점',
-    '프로세스 안의 <b>메서드 하나만 빠져도 프로세스는 동작하지 않기</b> 때문에, 프로세스 단위로 누락을 확인해야 합니다.<br>통합테스트도 연계 프로세스 전체가 동작하는지로 판단합니다.', body))
+why = [('필요한 이유 1', '메서드 누락 방지', '메인 프로세스의 메서드는 담당 개발자가 서로 달라 한 사람이 전체를 파악하기 어렵고, 하나만 빠져도 프로세스가 동작하지 않음'),
+       ('필요한 이유 2', '통합테스트 대상 파악', '연계 프로세스 전체가 동작해야 정상이므로, 어떤 프로세스를 통합테스트해야 하는지 알 수 있음'),
+       ('필요한 이유 3', '기간계 외 연계 관리', '채널이 기간계의 어떤 메서드를 호출하는지, AI 기능이 어떤 기간계 호출에 의존하는지 확인')]
+for n, (k1, t, d) in enumerate(why):
+    l = L + n * (cw3 + 0.2)
+    body += box('pcard', l, 4.4, cw3, 1.65, f'<div class="pk">{e(k1)}</div><p style="font-weight:700;font-size:13.5pt">{e(t)}</p><p style="font-size:11pt;color:#555;margin-top:0.04in">{e(d)}</p>')
+body += box('rbar sand', L, 6.25, CW, 1.1, '<span class="lb">운영 방식</span><div class="tx" style="font-size:12.5pt;line-height:1.5">PL(메인 설계자)이 프로세스를 설계하고, 하위 메서드는 개발 항목이 되어 개발자별로 배분됩니다.<br>프로세스 단위 통합테스트 연결은 <em class="tg">보완 필요</em></div>')
+slides.append(frame('구현', '연계관리란 무엇이고 왜 필요한가', '개념과 필요성',
+    '연계관리는 <b>기간계의 메인 프로세스</b>뿐 아니라 <b>채널과 AI Agent 등 기간계 바깥의 연계</b>까지 프로세스로 관리하는 기능입니다.<br>프로세스 안의 메서드가 하나만 빠져도 동작하지 않으므로, 누락을 막고 통합테스트 대상을 파악하기 위해 필요합니다.', body, ai=True))
 
-# ---------- 연계관리 범위: 채널, 기간계, AI Agent ----------
+# ---------- 연계관리 2/3: 관리 예시 ----------
 body = ''
-def chain(y, label, items, ai_last=False):
-    out = box('lab', L, y, 8, 0.3, label)
+def chain(y, label, items):
+    out = box('lab', L, y, 9, 0.3, label)
     n = len(items); gap = 0.3
     w = (CW - gap * (n - 1)) / n
     for i, (kind, title, sub) in enumerate(items):
@@ -249,25 +250,29 @@ def chain(y, label, items, ai_last=False):
         else:
             cls, st = 'flowbox card', 'background:#fff;border:1px solid #E5E0DB;'
         tag = '<span class="aitag o sm">AI</span>' if kind == 'ai' else ''
-        out += box(cls, x, y + 0.38, w, 1.25, f'<div><b>{tag}{e(title)}</b>{e(sub)}</div>', st)
-        if i < n - 1: out += box('tri', x + w + 0.07, y + 0.38 + 0.47, 0.16, 0.3)
+        out += box(cls, x, y + 0.34, w, 0.95, f'<div><b style="font-size:12.5pt">{tag}{e(title)}</b><span style="font-size:11pt">{e(sub)}</span></div>', st)
+        if i < n - 1: out += box('tri', x + w + 0.07, y + 0.34 + 0.33, 0.16, 0.28)
     return out
-body += chain(2.0, '예 1. 콜센터에서 설계 목록 조회를 요청한 경우', [
+body += chain(1.95, '예 1. 기간계 내부 메인 프로세스 (인수지침검사)', [
+    ('m', '보험료 체크', '프로세스의 첫 메서드'),
+    ('m', '담보 인수지침', 'inquireCvrUdchk'),
+    ('m', '위배내용 저장', 'saveVioDtl'),
+    ('ret', '프로세스 완료', '3개 메서드가 모두 개발 대상이어야 동작')])
+body += chain(3.4, '예 2. 채널에서 요청한 경우 (콜센터 설계 목록 조회)', [
     ('ch', '채널: 콜센터', '설계 목록 조회 요청'),
     ('m', '기간계 메서드', '설계 대상건 조회'),
     ('m', '기간계 메서드', '설계 내용 조회'),
-    ('m', '기간계 메서드', '조회 결과 조립'),
-    ('ret', '채널로 리턴', '어떤 메서드가 수행되어 응답했는지 확인')])
-body += chain(3.8, '예 2. AI 인수지침 위배해소 기능을 구현하는 경우', [
+    ('ret', '채널로 리턴', '수행된 메서드 확인')])
+body += chain(4.85, '예 3. AI 기능을 구현하는 경우 (AI 인수지침 위배해소)', [
     ('ch', '프론트', 'AI 인수지침 위배해소 액션'),
     ('m', '기간계: Input 생성', '설계 대상건 조회 → 위배내용 조회 → …'),
-    ('ai', 'AI 인수지침 위배해소 Agent', 'Agent가 호출하는 기간계 메서드까지 연결')])
-body += box('rbar sand', L, 5.75, CW, 1.6, '<span class="lb">관리 대상</span><div class="tx" style="font-size:12.5pt;line-height:1.55">채널 요청이 <b>기간계의 어떤 메서드를 거쳐 응답</b>되는지, AI 기능이 <b>어떤 기간계 호출을 거쳐 Agent에 도달</b>하는지를 하나의 연계 캔버스에서 관리합니다.<br>연계 캔버스는 노드를 서비스, 대외계 연결, 채널계 연결로 구분합니다. 채널 종류(CM, TM, 콜센터)와 <b>AI Agent 노드</b>의 구분은 <em class="tg">보완 필요</em></div>')
-slides.append(frame('구현', '연계관리의 범위', '채널 · 기간계 · AI Agent',
-    '연계관리는 <b>채널에서 기간계까지</b>, 그리고 <b>AI Agent가 호출하는 기능까지</b> 프로세스로 관리하는 개념입니다.<br>어떤 요청이 어떤 메서드를 거쳐 응답되는지, AI 기능은 어떤 기간계 호출에 의존하는지를 한 화면에서 파악합니다.', body, ai=True))
+    ('ai', 'AI Agent', 'AI 인수지침 위배해소')])
+body += box('rbar sand', L, 6.4, CW, 0.95, '<span class="lb">관리 효과</span><span class="tx" style="font-size:12.5pt">세 경우 모두 호출 경로에 빠진 메서드가 없는지 확인하고, <b>어떤 프로세스를 통합테스트해야 하는지</b> 알 수 있습니다.</span>')
+slides.append(frame('구현', '연계관리 예시', '기간계 · 채널 · AI Agent',
+    '기간계 내부의 <b>메인 프로세스</b>, 채널의 요청, AI Agent의 호출을 모두 <b>프로세스</b>로 관리할 수 있습니다.<br>각 프로세스가 어떤 메서드를 거쳐 응답되는지 보여 주므로 누락 확인과 통합테스트 대상 파악에 활용합니다.', body, ai=True))
 
-slides.append(detail('연계관리', '핵심 기능 5/5',
-    '업무 프로세스를 <b>연계 캔버스</b>에 노드와 연결선으로 그려, 메서드 단위로 설계하고 관리합니다.<br>호출구조 정적분석 POC로 추출한 AS-IS 콜트리(클래스·메서드)를 캔버스 노드에 매핑합니다.',
+slides.append(detail('연계관리 화면', '핵심 기능 5/5',
+    '실제 화면에서는 프로세스를 <b>연계 캔버스</b>에 노드와 연결선으로 그려, 메서드 단위로 설계하고 관리합니다.<br>호출구조 정적분석 POC로 추출한 AS-IS 콜트리(클래스·메서드)를 캔버스 노드에 매핑합니다.',
     'linkage_asis.png', 1440, 900,
     [dict(t='연계 프로세스 캔버스', d='업무 흐름을 노드와 연결선으로 그리고 동기·비동기 호출을 구분합니다', zoom=(95, 300, 700, 120)),
      dict(t='AS-IS 콜트리 매핑', d='정적분석으로 추출한 호출구조를 캔버스 노드에 매핑합니다', zoom=(1100, 250, 300, 112), capH=1.2)],
