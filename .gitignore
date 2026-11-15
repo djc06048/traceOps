@@ -26,3 +26,4 @@ infra/pgdata/
 traceops-simple/traceops.db
 
 traceops-simple/__pycache__/
+__pycache__/
