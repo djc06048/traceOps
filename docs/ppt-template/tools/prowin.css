@@ -1,3 +1,6 @@
+@font-face{ font-family:'NanumBarunGothic'; font-weight:400; src:url('../nanum-barun-gothic/NanumBarunGothic.ttf') format('truetype'); }
+@font-face{ font-family:'NanumBarunGothic'; font-weight:700; src:url('../nanum-barun-gothic/NanumBarunGothicBold.ttf') format('truetype'); }
+@font-face{ font-family:'NanumBarunGothic'; font-weight:300; src:url('../nanum-barun-gothic/NanumBarunGothicLight.ttf') format('truetype'); }
 @page { size: 297mm 210mm; margin: 0; }
 :root{
   --orange:#F46A25; --orange-2:#F8931F; --orange-4:#EA5519; --orange-bg:#FFF0E6;
@@ -9,7 +12,7 @@ html,body{ margin:0; background:#8a8a8a; }
 .slide{
   position:relative; width:11.69in; height:8.27in; overflow:hidden; background:#fff; color:var(--text);
   margin:0 auto 0.3in; page-break-after:always; break-after:page; font-size:14pt; line-height:1.4;
-  font-family:'NanumBarunGothic','나눔바른고딕','Nanum Barun Gothic','Pretendard','Noto Sans KR','Malgun Gothic','WenQuanYi Zen Hei',sans-serif;
+  font-family:'NanumBarunGothic','나눔바른고딕','Malgun Gothic',sans-serif;
 }
 @media print{ html,body{ background:none; } .slide{ margin:0; } *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; } }
 .slide{ word-break:keep-all; }
@@ -127,3 +130,27 @@ p{ margin:0; }
 .li14{ font-size:14pt; line-height:1.45; }
 .vline{ width:2px; background:#E0D6CC; }
 .rst{ font-size:16pt; font-weight:700; } .rsd{ font-size:13pt; color:#555; line-height:1.45; }
+
+/* ===== v3 ===== */
+.badge{ background:var(--orange); color:#fff; border-radius:0.08in; font-size:12pt; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.ttl{ font-size:26pt; font-weight:700; display:flex; align-items:center; line-height:1.1; white-space:nowrap; }
+.chip{ background:var(--gray-bg); border:1px solid var(--line); color:var(--sub); border-radius:0.16in; font-size:10.5pt; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.msg{ font-size:14pt; line-height:1.6; color:#333; }
+.msg b{ color:#111; background:linear-gradient(transparent 62%, #FFE3D1 62%); }
+.big{ font-size:36pt; font-weight:700; color:var(--orange); line-height:1; letter-spacing:-0.02em; }
+.big.b{ color:var(--brown); } .big.t{ color:var(--tan); }
+.vrule{ background:var(--line); width:1px; }
+.stp{ font-size:10.5pt; font-weight:700; letter-spacing:0.08em; }
+.stp.o{ color:var(--orange); } .stp.b{ color:var(--brown); } .stp.t{ color:var(--tan); }
+.cbar{ height:0.06in; border-radius:0.03in; } .cbar.o{ background:var(--orange); } .cbar.b{ background:var(--brown); } .cbar.t{ background:var(--tan); }
+.ntag{ background:var(--orange); color:#fff; border-radius:0.06in; font-weight:700; font-size:11pt; display:flex; align-items:center; justify-content:center; }
+.pth{ font-size:10.5pt; color:var(--sub); }
+.pth b{ color:var(--tan); letter-spacing:0.04em; margin-right:0.1in; }
+.ptl{ font-size:10.5pt; font-weight:700; color:var(--sub); letter-spacing:0.04em; margin-bottom:0.06in; }
+.pts p{ position:relative; padding-left:0.22in; margin:0 0 0.07in; font-size:13pt; line-height:1.45; }
+.pts p::before{ content:'\203A'; position:absolute; left:0.03in; top:0; color:var(--orange); font-weight:700; font-size:13pt; }
+.eff{ background:var(--sand); border-left:0.06in solid var(--orange); border-radius:0.04in; padding:0.14in 0.25in; }
+.eff .ptl{ color:var(--brown); }
+.eff div.t{ font-size:14pt; font-weight:700; line-height:1.45; }
+.zt{ font-size:14pt; font-weight:700; display:flex; align-items:center; }
+.zd{ font-size:12pt; color:#555; line-height:1.4; }
