@@ -229,8 +229,8 @@ why = [('필요한 이유 1', '메서드 누락 방지', '메인 프로세스의
 for n, (k1, t, d) in enumerate(why):
     l = L + n * (cw3 + 0.2)
     body += box('pcard', l, 4.4, cw3, 1.65, f'<div class="pk">{e(k1)}</div><p style="font-weight:700;font-size:13.5pt">{e(t)}</p><p style="font-size:11pt;color:#555;margin-top:0.04in">{e(d)}</p>')
-body += box('rbar sand', L, 6.25, CW, 1.1, '<span class="lb">운영 방식</span><div class="tx" style="font-size:12.5pt;line-height:1.5">PL(메인 설계자)이 프로세스를 설계하고, 하위 메서드는 개발 항목이 되어 개발자별로 배분됩니다.<br>프로세스 단위 통합테스트 연결은 <em class="tg">보완 필요</em></div>')
-slides.append(frame('구현', '연계관리란 무엇이고 왜 필요한가', '개념과 필요성',
+body += box('rbar sand', L, 6.25, CW, 1.1, '<span class="lb">운영 방식</span><div class="tx" style="font-size:12.5pt;line-height:1.5">PL(메인 설계자)이 프로세스를 설계하고, 하위 메서드는 개발 항목이 되어 개발자별로 배분됩니다.<br>프로세스 단위로 통합테스트를 연결하여 테스트 대상과 결과를 확인합니다.</div>')
+slides.append(frame('구현', '연계관리 개요', '개념과 필요성',
     '연계관리는 <b>기간계의 메인 프로세스</b>뿐 아니라 <b>채널과 AI Agent 등 기간계 바깥의 연계</b>까지 프로세스로 관리하는 기능입니다.<br>프로세스 안의 메서드가 하나만 빠져도 동작하지 않으므로, 누락을 막고 통합테스트 대상을 파악하기 위해 필요합니다.', body, ai=True))
 
 # ---------- 연계관리 2/3: 관리 예시 ----------
@@ -329,12 +329,12 @@ for i, (tag, t, d, eff) in enumerate(fut):
     body += box('futd', L + 0.3, y + 1.05, 5.8, 0.8, e(d))
     body += box('outp', L + 4.9, y + 0.2, 1.25, 0.4, e(eff), 'font-size:11pt')
 body += box('lab', 7.4, 2.1, 3.5, 0.3, '추가 고도화')
-adds = [('채널 · AI Agent 연계 확장', '채널 종류(CM, TM, 콜센터)와 AI Agent를 노드로 구분하여 호출 경로 관리'), ('변경 영향 추적', '변경 영향을 추적해 인터페이스 누락을 사전 차단'), ('수행관리 자동화', '단계말 스냅샷 확정, 제출 산출물 생성, 진척 모니터링, 통합테스트 시나리오 구성')]
+adds = [('채널 · AI Agent 연계 확장', '채널 종류(CM, TM, 콜센터)와 AI Agent를 노드로 구분하여 호출 경로 관리'), ('변경 영향 추적', '변경 영향을 추적해 인터페이스 누락을 사전 차단'), ('수행관리 자동화', '단계말 스냅샷 확정, 제출 산출물 생성, 진척 모니터링, 통합테스트 시나리오 구성'), ('프로세스 단위 통합테스트 연결', '연계 프로세스와 통합테스트를 연결하여 테스트 대상과 결과를 프로세스 단위로 확인')]
 for i, (t, d) in enumerate(adds):
-    y = 2.55 + i * 1.3
+    y = 2.45 + i * 1.0
     body += box('sq', 7.4, y + 0.1, 0.1, 0.1)
     body += box('rst', 7.65, y - 0.05, 3.35, 0.4, e(t), 'font-size:14.5pt')
-    body += box('rsd', 7.65, y + 0.38, 3.35, 0.75, e(d), 'font-size:12.5pt')
+    body += box('rsd', 7.65, y + 0.33, 3.35, 0.6, e(d), 'font-size:11pt;line-height:1.3')
 body += box('rbar sand', L, 6.55, CW, 0.85, '<span class="lb">추진 방향</span><span class="tx">AI 추출 연동과 호출구조 분석 통합을 우선 추진하고, 이후 수행관리 자동화로 확대합니다</span>', 'font-size:13.5pt')
 slides.append(frame('계획', '고도화 계획', '추후 추진',
     '<b>로컬 LLM 기반 결정사항 추출과 호출구조 분석 통합</b>을 보완하여 AI 활용을 완성하겠습니다.<br>두 과제의 구현 방안은 TraceOps 담당 개발자가 작성하며, 보완 사항은 별도 문서로 전달합니다.', body, ai=True))
