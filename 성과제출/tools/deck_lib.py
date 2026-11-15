@@ -110,9 +110,20 @@ def detail(title, chip, msg, img, W, H, items, points, effect, path, badge='구�
     ZX, ZW = 6.35, 4.64
     y = 2.05
     polys = ''; zooms = ''; hls = ''
+    rects = []
     for n, it in enumerate(items, 1):
         zx, zy, zw, zh = it['zoom']
-        s = min(ZW / zw, it.get('capH', 9) / zh)
+        # 글자가 테두리에 닿거나 잘리지 않도록 확대 영역에 여백을 더한다(이미지 경계 안으로 제한)
+        px_, py_ = it.get('padx', 10), it.get('pady', 8)
+        x0, y0 = max(0, zx - px_), max(0, zy - py_)
+        x1, y1 = min(W, zx + zw + px_), min(H, zy + zh + py_)
+        zx, zy, zw, zh = x0, y0, x1 - x0, y1 - y0
+        for r0, t0 in rects:
+            ox = min(zx + zw, r0[0] + r0[2]) - max(zx, r0[0]); oy = min(zy + zh, r0[1] + r0[3]) - max(zy, r0[1])
+            if ox > 0 and oy > 0:
+                print(f'  [경고] 강조 영역 겹침: {title} / "{t0}" x "{it["t"]}" ({ox:.0f}x{oy:.0f}px)')
+        rects.append(((zx, zy, zw, zh), it['t']))
+        s = min(ZW / zw, it.get('capH', 1.1) / zh)
         ph = zh * s; zcw = zw * s
         zooms += box('ntag', ZX, y, 0.28, 0.28, str(n))
         zooms += box('zt', ZX + 0.4, y - 0.02, ZW - 0.4, 0.32, e(it['t']))
