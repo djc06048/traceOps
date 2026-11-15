@@ -69,7 +69,7 @@ for n, (t, sub, c) in enumerate(stg):
     body += box('st', x, 2.4, cwp, 0.4, e(t), 'font-size:13pt')
     body += box('scr', x, 2.78, cwp, 0.3, e(sub), 'font-size:10pt')
 body += box('flowbox aibox', colx(1), 3.25, cwp * 2 + 0.12, 1.1, '<div><b><span class="aitag o sm">AI</span>ReqSync</b>회의록으로 요구사항 보완·확정<small>고객사 협의 내용을 근거와 함께 반영</small></div>')
-body += box('flowbox aibox', colx(3), 3.25, cwp * 3 + 0.24, 1.1, '<div><b>연계관리</b>프로세스 설계(PL) → 개발 항목 배분 → 통합테스트로 프로세스 완결 확인<small>메서드 누락이 없는지 프로세스 단위로 확인</small></div>')
+body += box('flowbox aibox', colx(3), 3.25, cwp * 3 + 0.24, 1.1, '<div><b>연계관리</b>프로세스 설계(PL·메인 설계자) → 개발 항목 배분 → 통합테스트로 프로세스 완결 확인<small>메서드 누락이 없는지 프로세스 단위로 확인</small></div>')
 body += box('flowbox card', colx(1), 4.5, cwp * 5 + 0.48, 0.75, '<div><b>요구사항 → 분석 → 설계 → 개발 → 테스트 정합성 관리 (상시)</b>삭제·변경 시 영향 안내, 하위 연결 누락과 재검증 표시</div>')
 for n in range(2, 6):
     body += box('flowbox', colx(n), 5.4, cwp, 0.82, f'<div><b style="font-size:11pt">산출물 스냅샷</b>{["분석", "설계", "개발·단위", "통합"][n-2]} 확정 <em class="tg">고도화</em></div>', 'background:#fff;border:1.5px solid #AF947E;font-size:10.5pt;padding:0.06in 0.1in;')
@@ -159,7 +159,7 @@ slides.append(frame('AI', 'AI 활용 구조', 'KPI 핵심',
 body = ''
 steps = [('o', '요구사항 개정', 'PL', ['회의록 업로드', '결정사항 추출, 요구사항 매칭 {{AI}}', '원문과 비교해 확정'], '요구사항 개정 검토(ReqSync)'),
          ('b', '상세공정 관리', '작업자 · PL', ['분석, 설계, 개발 항목에 요구사항 연결', '계획, 실적, 증적 관리', '삭제·변경 시 영향 안내'], '분석 · 설계 · 개발단계'),
-         ('o', '연계 관리', 'PL', ['프로세스 설계(기간계, 채널, AI Agent)', '메서드를 개발 항목으로 연결해 개발자에게 배분', '호출구조 기반 AS-IS 연계 조회'], '연계관리, AS-IS 목록'),
+         ('o', '연계 관리', 'PL · 메인 설계자', ['프로세스 설계(기간계, 채널, AI Agent)', '메서드를 개발 항목으로 연결해 개발자에게 배분', '호출구조 기반 AS-IS 연계 조회'], '연계관리, AS-IS 목록'),
          ('t', '테스트 관리', '작업자', ['단위테스트 등록과 수행', '통합테스트로 프로세스 전체를 검증', '요구사항, 물리ID 자동 연결'], '단위 · 통합테스트')]
 sw = 2.31; sg = (CW - 4 * sw) / 3
 for i, (c, t, role, acts, scr) in enumerate(steps):
@@ -229,7 +229,7 @@ why = [('필요한 이유 1', '메서드 누락 방지', '메인 프로세스의
 for n, (k1, t, d) in enumerate(why):
     l = L + n * (cw3 + 0.2)
     body += box('pcard', l, 4.4, cw3, 1.65, f'<div class="pk">{e(k1)}</div><p style="font-weight:700;font-size:13.5pt">{e(t)}</p><p style="font-size:11pt;color:#555;margin-top:0.04in">{e(d)}</p>')
-body += box('rbar sand', L, 6.25, CW, 1.1, '<span class="lb">운영 방식</span><div class="tx" style="font-size:12.5pt;line-height:1.5">PL(메인 설계자)이 프로세스를 설계하고, 하위 메서드는 개발 항목이 되어 개발자별로 배분됩니다.<br>프로세스 단위로 통합테스트를 연결하여 테스트 대상과 결과를 확인합니다.</div>')
+body += box('rbar sand', L, 6.25, CW, 1.1, '<span class="lb">운영 방식</span><div class="tx" style="font-size:12.5pt;line-height:1.5">PL과 메인 설계자가 프로세스를 등록·설계하고, 하위 메서드는 개발 항목이 되어 개발자별로 배분됩니다.<br>프로세스 단위로 통합테스트를 연결하여 테스트 대상과 결과를 확인합니다.</div>')
 slides.append(frame('구현', '연계관리 개요', '개념과 필요성',
     '연계관리는 <b>기간계의 메인 프로세스</b>뿐 아니라 <b>채널과 AI Agent 등 기간계 바깥의 연계</b>까지 프로세스로 관리하는 기능입니다.<br>프로세스 안의 메서드가 하나만 빠져도 동작하지 않으므로, 누락을 막고 통합테스트 대상을 파악하기 위해 필요합니다.', body, ai=True))
 
@@ -276,7 +276,7 @@ slides.append(detail('연계관리 화면', '핵심 기능 5/5',
     'linkage_asis.png', 1440, 900,
     [dict(t='연계 프로세스 캔버스', d='업무 흐름을 노드와 연결선으로 그리고 동기·비동기 호출을 구분합니다', zoom=(95, 300, 700, 120)),
      dict(t='AS-IS 콜트리 매핑', d='정적분석으로 추출한 호출구조를 캔버스 노드에 매핑합니다', zoom=(1100, 250, 300, 112), capH=1.2)],
-    [('호출구조 기반', '클래스·메서드 호출 관계를 노드와 연결'), ('조회와 설계 분리', 'AS-IS는 조회 전용, TO-BE는 PL이 설계')],
+    [('호출구조 기반', '클래스·메서드 호출 관계를 노드와 연결'), ('조회와 설계 분리', 'AS-IS는 조회 전용, TO-BE는 PL·메인 설계자가 설계')],
     '프로세스를 메서드 단위로 설계해 개발 누락 방지', '연계관리 > AS-IS 프로세스 (POC 추출 데이터)'))
 
 # ---------- 15 단계별 화면 ----------
