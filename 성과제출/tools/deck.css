@@ -1,6 +1,6 @@
-@font-face{ font-family:'NanumBarunGothic'; font-weight:400; src:url('../nanum-barun-gothic/NanumBarunGothic.ttf') format('truetype'); }
-@font-face{ font-family:'NanumBarunGothic'; font-weight:700; src:url('../nanum-barun-gothic/NanumBarunGothicBold.ttf') format('truetype'); }
-@font-face{ font-family:'NanumBarunGothic'; font-weight:300; src:url('../nanum-barun-gothic/NanumBarunGothicLight.ttf') format('truetype'); }
+@font-face{ font-family:'NanumBarunGothic'; font-weight:400; src:url('{{FONTS}}NanumBarunGothic.ttf') format('truetype'); }
+@font-face{ font-family:'NanumBarunGothic'; font-weight:700; src:url('{{FONTS}}NanumBarunGothicBold.ttf') format('truetype'); }
+@font-face{ font-family:'NanumBarunGothic'; font-weight:300; src:url('{{FONTS}}NanumBarunGothicLight.ttf') format('truetype'); }
 @page { size: 297mm 210mm; margin: 0; }
 :root{
   --orange:#F46A25; --orange-2:#F8931F; --orange-4:#EA5519; --orange-bg:#FFF0E6;
@@ -27,21 +27,21 @@ p{ margin:0; }
 .pgno{ font-size:10pt; color:var(--sub); text-align:right; }
 
 /* 표지 / 목차 / 엔딩 (템플릿 유지) */
-.coverbg{ position:absolute; left:0; top:0; width:11.69in; height:5.0in; background:url(assets/bg-title-art.jpg) no-repeat top left / 11.69in auto; }
+.coverbg{ position:absolute; left:0; top:0; width:11.69in; height:5.0in; background:url({{ASSETS}}bg-title-art.jpg) no-repeat top left / 11.69in auto; }
 .ctab{ left:1.0in; top:0; width:1.4in; }
 .csub{ font-size:24pt; font-weight:300; color:#fff; }
 .ctitle{ font-size:40pt; font-weight:700; color:#fff; line-height:1.2; }
 .cinfo{ font-size:14pt; font-weight:700; }
 .cline{ position:absolute; left:0.65in; top:7.74in; width:10.39in; border-top:2px solid #EC7000; }
 .gray{ background:#EAEAEA; }
-.contbg{ height:8.27in; background:url(assets/bg-contents-art.jpg) no-repeat top left / 11.69in 8.27in; }
+.contbg{ height:8.27in; background:url({{ASSETS}}bg-contents-art.jpg) no-repeat top left / 11.69in 8.27in; }
 .ctt{ font-size:40pt; font-weight:700; }
 .pbar{ background:var(--orange-2); }
 .ptag{ font-size:15pt; font-weight:700; }
 .pitems{ font-size:14pt; line-height:1.5; }
 .pitems b{ color:var(--orange-2); }
 .endslide{ background:#EC7000; }
-.endbg{ height:8.27in; background:url(assets/bg-title-art.jpg) no-repeat top left / 11.69in 8.27in; }
+.endbg{ height:8.27in; background:url({{ASSETS}}bg-title-art.jpg) no-repeat top left / 11.69in 8.27in; }
 .endbox{ background:#fff; display:flex; flex-direction:column; justify-content:center; padding-left:0.4in; }
 .endbox span{ font-size:14pt; } .endbox b{ font-size:32pt; }
 .copy{ font-size:7pt; color:#7F7F7F; }
