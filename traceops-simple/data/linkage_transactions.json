@@ -1,0 +1,27 @@
+{
+  "transactions": [
+    { "id": "TX_QPM_ACMLM1", "name": "누적위험 한도확인" },
+    { "id": "TX_QPM_RELPC1", "name": "담보변경 지침검사" },
+    { "id": "TX_QPM_UDCHK1", "name": "인수지침검사" }
+  ],
+  "callNodes": [
+    { "id": "CN-0001", "transactionId": "TX_QPM_ACMLM1", "parentId": null, "method": "FcdLtrUtgu#executeacmLmAplCpltImprChek", "order": 0 },
+    { "id": "CN-0002", "transactionId": "TX_QPM_ACMLM1", "parentId": "CN-0001", "method": "LtrUtguAcmRk#inquireNrdpsAcmRkAmt", "order": 0 },
+    { "id": "CN-0003", "transactionId": "TX_QPM_ACMLM1", "parentId": "CN-0002", "method": "LtrUtguPlRltnAdm#inquirePlRltnAdm", "order": 0 },
+    { "id": "CN-0004", "transactionId": "TX_QPM_ACMLM1", "parentId": "CN-0002", "method": "ec.VcIgdAcmRkDA0#selectIgdAcmRk014", "order": 1 },
+    { "id": "CN-0005", "transactionId": "TX_QPM_ACMLM1", "parentId": "CN-0002", "method": "ec.VcIgdAcmRkDA0#selectIgdAcmRk015", "order": 2 },
+    { "id": "CN-0006", "transactionId": "TX_QPM_ACMLM1", "parentId": "CN-0001", "method": "LtrUtguRuleCall#inquireLtrRuleCall", "order": 1 },
+
+    { "id": "CN-0007", "transactionId": "TX_QPM_RELPC1", "parentId": null, "method": "FcdLtrRelpc#executeRelpcGuideChek", "order": 0 },
+    { "id": "CN-0008", "transactionId": "TX_QPM_RELPC1", "parentId": "CN-0007", "method": "LtrRelpcDtl#inquireRelpcDtl", "order": 0 },
+
+    { "id": "CN-0009", "transactionId": "TX_QPM_UDCHK1", "parentId": null, "method": "FcdLtrUdchk#executeUdchkGuideChek", "order": 0 },
+    { "id": "CN-0010", "transactionId": "TX_QPM_UDCHK1", "parentId": "CN-0009", "method": "LtrUdchkCvr#inquireCvrUdchk", "order": 0 },
+    { "id": "CN-0011", "transactionId": "TX_QPM_UDCHK1", "parentId": "CN-0009", "method": "LtrUdchkVioSave#saveVioDtl", "order": 1 }
+  ],
+  "mappings": [
+    { "callNodeId": "CN-0009", "nodeId": "ND-0004" },
+    { "callNodeId": "CN-0010", "nodeId": "ND-0005" },
+    { "callNodeId": "CN-0011", "nodeId": "ND-0006" }
+  ]
+}

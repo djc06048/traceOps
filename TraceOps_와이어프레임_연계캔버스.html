@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>TraceOps — 연계 캔버스 v7 (목록·생성·AS-IS 불러오기)</title>
+<style>
+  :root{--line:#d7dbe0;--line-strong:#aab0b8;--dim:#6b7280;--accent:#3b5bdb;--accent-soft:#e8ecfd;
+    --ok:#2f9e57;--warn:#c9852b;--danger:#c94b3f;--purple:#7a4bc9;--asis:#c9852b;--tobe:#3b5bdb;--bg:#f6f7f9;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:#2b2f36;overflow:hidden;
+    font-family:"Segoe UI","Malgun Gothic",-apple-system,sans-serif;font-size:13px;}
+  .frame{display:flex;flex-direction:column;height:100vh;}
+  .hide{display:none !important;}
+
+  .zA{height:44px;flex:none;background:#fff;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:10px;padding:0 16px;}
+  .zA h1{font-size:15px;margin:0;font-weight:700;}
+  .badge{font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:12px;white-space:nowrap;}
+  .badge.stage{background:#e8f6ec;color:var(--ok);}
+  .badge.miss{background:#fdeceb;color:var(--danger);}
+  .badge.model-asis{background:#fff4e5;color:var(--asis);}
+  .badge.model-tobe{background:#eaf1ff;color:var(--tobe);}
+  .ov{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--dim);}
+  .switch{width:32px;height:17px;border-radius:9px;background:var(--asis);position:relative;cursor:pointer;}
+  .switch::after{content:"";position:absolute;top:2px;right:2px;width:13px;height:13px;border-radius:50%;background:#fff;}
+
+  .btn{border:1px solid var(--line);background:#fff;border-radius:4px;padding:6px 13px;
+    font-size:11.5px;font-weight:600;cursor:pointer;color:#2b2f36;display:inline-block;}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .btn.sm{padding:3px 9px;font-size:10.5px;}
+  .pill{display:inline-block;padding:1px 7px;border-radius:9px;font-size:9.5px;font-weight:700;}
+  .pill.bad{background:#fdeceb;color:var(--danger);}
+  .pill.done{background:#e8f6ec;color:var(--ok);}
+  .pill.warn{background:#fff4e5;color:var(--warn);}
+  .pill.info{background:#eaf1ff;color:var(--accent);}
+
+  /* ============ 화면 1: 프로세스 목록 ============ */
+  .list-wrap{flex:1;overflow:auto;padding:20px 24px;}
+  .searchbar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
+  .search{flex:1;min-width:260px;max-width:480px;border:1px solid var(--line);border-radius:6px;background:#fff;
+    padding:8px 12px;font-size:12.5px;color:#8b93a3;display:flex;gap:8px;align-items:center;}
+  .fchip{font-size:10.5px;font-weight:700;padding:4px 11px;border-radius:12px;border:1px solid var(--line);
+    color:var(--dim);cursor:pointer;background:#fff;}
+  .fchip.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+  table.grid{width:100%;border-collapse:collapse;font-size:11.8px;background:#fff;}
+  table.grid th{background:#f1f3f6;border:1px solid var(--line);padding:8px 10px;text-align:left;font-weight:700;}
+  table.grid td{border:1px solid var(--line);padding:7px 10px;}
+  table.grid tr.row{cursor:pointer;}
+  table.grid tr.row:hover td{background:#f4f7ff;}
+  .indent{color:var(--line-strong);letter-spacing:-1px;}
+
+  /* ============ 화면 2: 캔버스 (v6 계승) ============ */
+  .zB{height:44px;flex:none;background:#fafbfc;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:6px;padding:0 16px;font-size:12px;font-weight:600;}
+  .zB .c{color:var(--accent);cursor:pointer;}
+  .zB .c:hover{text-decoration:underline;}
+  .zB .sep{color:var(--line-strong);}
+  .toolbar{margin-left:auto;display:flex;align-items:center;gap:4px;}
+  .tool{height:30px;min-width:30px;padding:0 8px;border:1.5px solid #c9ced6;border-radius:6px;background:#fff;
+    display:flex;align-items:center;justify-content:center;gap:4px;font-size:13px;cursor:pointer;color:#4b5563;}
+  .tool small{font-size:9.5px;font-weight:700;}
+  .tool.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .tool.import{border-color:var(--asis);color:var(--asis);}
+  .tool-sep{width:1px;height:20px;background:#e2e5ea;margin:0 4px;}
+  .mid{flex:1;display:flex;min-height:0;}
+  .zD{flex:1;min-width:0;position:relative;overflow:auto;padding:30px 24px 44px;}
+  .flow{display:flex;align-items:center;min-height:170px;}
+  .arrow{padding:0 8px;color:var(--line-strong);font-size:19px;flex:none;}
+  .node{min-width:158px;max-width:185px;flex:none;border:2px solid var(--line-strong);border-radius:9px;
+    background:#fff;cursor:pointer;position:relative;padding:13px 14px;box-shadow:0 1px 2px rgba(0,0,0,.06);}
+  .node.sel{outline:2.5px solid var(--accent);outline-offset:2px;}
+  .node .nm{font-weight:700;font-size:12.6px;}
+  .node.st-ok{border-color:var(--ok);}
+  .node.st-warn{border-color:var(--warn);}
+  .node.st-bad{border-color:var(--danger);}
+  .node .sub{position:absolute;top:-9px;right:-7px;background:var(--purple);color:#fff;
+    font-size:8.8px;font-weight:700;border-radius:9px;padding:2px 7px;}
+  .node .mth{font-family:Consolas,monospace;font-size:9.3px;color:var(--asis);margin-top:6px;
+    background:#fffaf2;border:1px solid #f0d9b5;border-radius:3px;padding:2px 6px;word-break:break-all;}
+  .drop-ghost{min-width:120px;flex:none;border:2px dashed var(--accent);border-radius:8px;background:#f4f7ff;
+    color:var(--accent);font-size:10.5px;font-weight:700;text-align:center;padding:18px 8px;}
+  .cv-note{position:absolute;bottom:10px;left:24px;right:24px;font-size:10.4px;color:var(--dim);line-height:1.6;}
+
+  .zE{width:380px;flex:none;background:#fff;border-left:1px solid var(--line);display:flex;flex-direction:column;}
+  .zE .tabs{display:flex;border-bottom:1px solid var(--line);background:#fafbfc;align-items:center;flex:none;}
+  .ztab{padding:9px 13px;font-size:11.8px;font-weight:700;color:var(--dim);cursor:pointer;border-bottom:2px solid transparent;}
+  .ztab.on{color:var(--accent);border-color:var(--accent);}
+  .zE .body{flex:1;overflow-y:auto;padding:12px;}
+  /* 트랜잭션 그룹 트리 */
+  .txg{border:1px solid var(--line);border-radius:6px;margin-bottom:8px;overflow:hidden;}
+  .txg-head{background:#fafbfc;padding:7px 10px;display:flex;align-items:center;gap:7px;cursor:pointer;
+    font-size:11px;font-weight:700;}
+  .txg-head .tx{font-family:Consolas,monospace;font-size:9.6px;color:var(--dim);font-weight:400;}
+  .txg-head .tag{margin-left:auto;}
+  .txg-body{padding:6px 8px;border-top:1px solid var(--line);}
+  .txg.closed .txg-body{display:none;}
+  .tn{display:flex;align-items:center;gap:5px;padding:2px 5px;border-radius:4px;cursor:grab;font-size:10.4px;}
+  .tn:hover{background:#fffaf2;}
+  .tn .mono{font-family:Consolas,monospace;font-size:9.8px;color:#3b3f46;word-break:break-all;}
+  .tn .tag{margin-left:auto;flex:none;}
+  .kids{margin-left:13px;border-left:1px dashed var(--line);padding-left:4px;}
+  .fnote{margin-top:10px;font-size:10.2px;color:var(--dim);border-top:1px dashed var(--line);padding-top:7px;line-height:1.6;}
+  .zF{height:28px;flex:none;background:#fff;border-top:1px solid var(--line);
+    display:flex;align-items:center;gap:16px;padding:0 16px;font-size:10.6px;color:var(--dim);}
+  .zF .r{margin-left:auto;}
+
+  /* ============ 모달: 새 프로세스 ============ */
+  .overlay{position:fixed;inset:0;background:rgba(20,22,28,.45);z-index:50;display:none;
+    align-items:center;justify-content:center;}
+  .overlay.on{display:flex;}
+  .modal{background:#fff;border-radius:10px;width:560px;max-width:94%;box-shadow:0 12px 40px rgba(0,0,0,.25);}
+  .modal-head{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;
+    align-items:center;font-weight:700;font-size:14px;}
+  .modal-body{padding:16px 20px;}
+  .opt{border:1.5px solid var(--line);border-radius:8px;padding:13px 15px;margin-bottom:10px;cursor:pointer;
+    display:flex;gap:12px;align-items:flex-start;}
+  .opt:hover{border-color:var(--accent);background:#f8faff;}
+  .opt .ic{font-size:20px;flex:none;width:30px;text-align:center;}
+  .opt .t{font-weight:700;font-size:12.6px;}
+  .opt .d{font-size:11px;color:var(--dim);margin-top:3px;line-height:1.55;}
+  .opt .d b{color:#2b2f36;}
+  .modal .field{margin:4px 0 12px;}
+  .modal .field label{font-size:10.5px;color:var(--dim);display:block;margin-bottom:4px;}
+  .modal .box{border:1px solid var(--line);border-radius:4px;padding:7px 10px;font-size:12px;color:#555;background:#fff;}
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <!-- ===================== 화면 1: 프로세스 목록 (진입) ===================== -->
+  <div id="scrList" class="frame" style="height:100vh;">
+    <div class="zA">
+      <h1>프로세스 목록</h1>
+      <span class="badge stage">설계 단계</span>
+      <span class="badge miss">⚠ 미매핑 AS-IS 14</span>
+      <div class="ov"><div class="btn primary" onclick="openModal()">＋ 새 프로세스</div></div>
+    </div>
+    <div class="list-wrap">
+      <div class="searchbar">
+        <div class="search">🔍 프로세스명 · 거래코드 · 매핑 메서드로 검색…</div>
+        <span class="fchip on">전체</span>
+        <span class="fchip">TO-BE 모델</span>
+        <span class="fchip">AS-IS 모델</span>
+        <span class="fchip">업무그룹 ▾</span>
+        <span class="fchip">담당자 ▾</span>
+      </div>
+      <table class="grid">
+        <tr><th style="width:34%;">프로세스 (계층)</th><th>모델</th><th>거래코드</th><th>담당</th><th>매핑</th><th>상태</th></tr>
+        <tr class="row"><td>▾ 인수심사 업무흐름 <small style="color:#9aa;">L1</small></td>
+          <td><span class="badge model-tobe">TO-BE</span></td><td>—</td><td>김전종</td><td>—</td><td><span class="pill warn">진행중</span></td></tr>
+        <tr class="row" onclick="openCanvas()"><td><span class="indent">├─</span> 인수지침검사 <small style="color:#9aa;">L2</small></td>
+          <td><span class="badge model-tobe">TO-BE</span></td><td style="font-family:Consolas,monospace;font-size:10.5px;">TX_QPM_UDCHK1</td>
+          <td>김전종</td><td>리프 5/6</td><td><span class="pill warn">진행중</span></td></tr>
+        <tr class="row"><td><span class="indent">├─</span> 설계정보 저장 <small style="color:#9aa;">L2</small></td>
+          <td><span class="badge model-tobe">TO-BE</span></td><td style="font-family:Consolas,monospace;font-size:10.5px;">TX_QPM_PLSAVE</td>
+          <td>박혜림</td><td>리프 4/4</td><td><span class="pill done">완료</span></td></tr>
+        <tr class="row"><td>▸ 인수지침검사 <small style="color:#9aa;">L2</small> <small style="color:var(--asis);">(분석단계 원본)</small></td>
+          <td><span class="badge model-asis">AS-IS</span></td><td style="font-family:Consolas,monospace;font-size:10.5px;">TX_QPM_UDCHK1</td>
+          <td>—</td><td>리프 6/6</td><td><span class="pill done">확정</span></td></tr>
+        <tr class="row"><td>▸ 누적위험 한도확인 <small style="color:#9aa;">L2</small></td>
+          <td><span class="badge model-asis">AS-IS</span></td><td style="font-family:Consolas,monospace;font-size:10.5px;">TX_QPM_ACMLM1</td>
+          <td>—</td><td><span class="pill bad">미착수</span></td><td><span class="pill bad">TO-BE 없음</span></td></tr>
+      </table>
+      <div class="fnote" style="max-width:820px;">
+        행 클릭 → 캔버스 진입. AS-IS 모델 = 분석단계에서 도출한 원본(확정 후 읽기전용),
+        TO-BE 모델 = 설계단계 산출물. <b>「TO-BE 없음」인 AS-IS 프로세스가 설계 누락 후보</b>로 자동 표시됩니다.
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== 화면 2: 캔버스 ===================== -->
+  <div id="scrCanvas" class="frame hide" style="height:100vh;">
+    <div class="zA">
+      <h1>연계 캔버스</h1>
+      <span class="badge model-tobe">TO-BE 모델</span>
+      <span class="badge stage">설계 단계</span>
+      <span class="badge" style="background:#eef1f5;color:var(--dim);">유래: AS-IS 인수지침검사 (복사본)</span>
+      <div class="ov">AS-IS 오버레이 <div class="switch"></div></div>
+    </div>
+    <div class="zB">
+      <span class="c" onclick="backToList()">⌂ 목록</span><span class="sep">›</span>
+      <span class="c">인수심사 업무흐름</span><span class="sep">›</span>
+      <span style="color:#2b2f36;">인수지침검사 <small style="color:#9aa;">L2</small></span>
+      <div class="toolbar">
+        <div class="tool on" title="선택/이동">⬚</div>
+        <div class="tool" title="프로세스 추가">＋<small>노드</small></div>
+        <div class="tool" title="분기">◇</div>
+        <div class="tool" title="연결선">↦<small>연결</small></div>
+        <div class="tool-sep"></div>
+        <div class="tool" title="하위 조립 만들기">▦<small>하위</small></div>
+        <div class="tool import" title="AS-IS 모델 구조를 현재 캔버스로 복사" onclick="alert('AS-IS 프로세스(동일 거래코드) 구조를 복사해 TO-BE 초안 생성 — 유래 링크 기록')">⤵<small>AS-IS 불러오기</small></div>
+        <div class="tool-sep"></div>
+        <div class="tool" title="실행취소">↶</div>
+        <div class="tool" title="삭제">🗑</div>
+      </div>
+    </div>
+    <div class="mid">
+      <div class="zD">
+        <div class="flow">
+          <div class="node st-ok"><span class="sub">하위 2 ▸</span><div class="nm">보험료 체크</div></div>
+          <div class="arrow">→</div>
+          <div class="node st-warn sel"><span class="sub">하위 3 ▸</span><div class="nm">담보 인수지침</div></div>
+          <div class="arrow">→</div>
+          <div class="node st-bad"><div class="nm">위배내용 저장</div></div>
+          <div class="arrow">→</div>
+          <div class="drop-ghost">＋ 추가<br><small style="font-weight:400;">도구 or 드래그</small></div>
+        </div>
+        <div class="cv-note">
+          TO-BE 캔버스. <b>⤵ AS-IS 불러오기</b> = 같은 거래코드의 AS-IS 프로세스 구조를 복사해 초안으로 —
+          크게 안 바뀌는 트랜잭션은 불러와서 수정, 많이 바뀌면 빈 캔버스에서 새로. 복사 시 유래 링크가 남아 AS-IS↔TO-BE 추적 자동 확보.
+        </div>
+      </div>
+      <div class="zE">
+        <div class="tabs">
+          <div class="ztab on">AS-IS 콜트리 (트랜잭션별)</div>
+          <div class="ztab">선택: 담보 인수지침</div>
+        </div>
+        <div class="body">
+          <span class="fchip on" style="font-size:10px;">미매핑 트랜잭션 (3)</span>
+          <span class="fchip" style="font-size:10px;">전체 (35)</span>
+
+          <!-- 트랜잭션 그룹 1 (펼침) -->
+          <div class="txg">
+            <div class="txg-head" onclick="this.parentElement.classList.toggle('closed')">
+              ▾ 누적위험 한도확인 <span class="tx">TX_QPM_ACMLM1</span>
+              <span class="tag pill bad">미매핑 19</span>
+            </div>
+            <div class="txg-body">
+              <div class="tn" draggable="true"><span class="mono">FcdLtrUtgu#executeacmLmAplCpltImprChek</span>
+                <span class="tag pill info">진입점</span></div>
+              <div class="kids">
+                <div class="tn" draggable="true"><span class="mono">LtrUtguAcmRk#inquireNrdpsAcmRkAmt</span></div>
+                <div class="kids">
+                  <div class="tn" draggable="true"><span class="mono">LtrUtguPlRltnAdm#inquirePlRltnAdm</span></div>
+                  <div class="tn" draggable="true"><span class="mono">ec.VcIgdAcmRkDA0#selectIgdAcmRk014 <span style="color:#9aa;">외 8</span></span></div>
+                </div>
+                <div class="tn" draggable="true"><span class="mono">LtrUtguRuleCall#inquireLtrRuleCall</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 트랜잭션 그룹 2 (접힘) -->
+          <div class="txg closed">
+            <div class="txg-head" onclick="this.parentElement.classList.toggle('closed')">
+              ▸ 담보변경 지침검사 <span class="tx">TX_QPM_RELPC1</span>
+              <span class="tag pill bad">미매핑 22</span>
+            </div>
+            <div class="txg-body"></div>
+          </div>
+
+          <!-- 트랜잭션 그룹 3 (매핑 완료 — 흐림) -->
+          <div class="txg closed" style="opacity:.5;">
+            <div class="txg-head" onclick="this.parentElement.classList.toggle('closed')">
+              ▸ 인수지침검사 <span class="tx">TX_QPM_UDCHK1</span>
+              <span class="tag pill done">매핑 완료</span>
+            </div>
+            <div class="txg-body"></div>
+          </div>
+
+          <div class="fnote">
+            트리가 <b>트랜잭션 단위 그룹</b>으로 정리 — 그룹 헤더 = 진입점(거래코드), 펼치면 콜트리.
+            그룹째 드래그 = 트랜잭션 프로세스+리프 초안 생성 · 메서드 드래그 = 리프 1:1 매핑.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="zF">
+      <span>선택: 담보 인수지침</span>
+      <span>리프 매핑률 98.7% · 미매핑 14</span>
+      <span class="r">자동저장 · 방금 전</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== 모달: 새 프로세스 만들기 ===================== -->
+<div class="overlay" id="ov">
+  <div class="modal">
+    <div class="modal-head">새 프로세스 만들기 <span style="cursor:pointer;color:#9aa;" onclick="closeModal()">✕</span></div>
+    <div class="modal-body">
+      <div class="field"><label>프로세스명 / 상위 프로세스 / 업무그룹</label>
+        <div class="box">예: 청약심사 결과처리　·　상위: 인수심사 업무흐름 ▾　·　가입설계/청약 ▾</div></div>
+
+      <div class="opt" onclick="closeModal();openCanvas()">
+        <div class="ic">📝</div>
+        <div><div class="t">빈 캔버스에서 새로 그리기</div>
+        <div class="d">AS-IS에 없는 신규 업무 — 처음부터 프로세스를 그리고, 매핑은 나중에.</div></div>
+      </div>
+      <div class="opt" onclick="closeModal();openCanvas()">
+        <div class="ic">🌲</div>
+        <div><div class="t">AS-IS 트랜잭션에서 시작</div>
+        <div class="d">콜트리에서 트랜잭션을 고르면 <b>리프 프로세스 + 조립 초안 + 매핑</b>이 자동 생성 —
+          이름만 업무 용어로 다듬으면 됨. (분석 단계 권장)</div></div>
+      </div>
+      <div class="opt" onclick="closeModal();openCanvas()">
+        <div class="ic">⤵</div>
+        <div><div class="t">AS-IS 프로세스 복사 (TO-BE 설계용)</div>
+        <div class="d">분석단계에 확정한 AS-IS 프로세스 모델을 복사해 TO-BE로 시작 —
+          크게 안 바뀌는 트랜잭션에 적합. <b>유래 링크가 기록되어 AS-IS↔TO-BE 추적 자동 확보.</b> (설계 단계 권장)</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openModal(){ document.getElementById('ov').classList.add('on'); }
+  function closeModal(){ document.getElementById('ov').classList.remove('on'); }
+  function openCanvas(){
+    document.getElementById('scrList').classList.add('hide');
+    document.getElementById('scrCanvas').classList.remove('hide');
+  }
+  function backToList(){
+    document.getElementById('scrCanvas').classList.add('hide');
+    document.getElementById('scrList').classList.remove('hide');
+  }
+</script>
+</body>
+</html>

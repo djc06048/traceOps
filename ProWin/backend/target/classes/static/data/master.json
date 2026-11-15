@@ -1,0 +1,205 @@
+{
+  "roles": {
+    "writer": "작성자",
+    "pm": "PM·사업관리",
+    "sales": "영업대표",
+    "admin": "시스템관리자"
+  },
+  "project": {
+    "name": "한화손해보험 장기 차세대 가입설계 구축",
+    "client": "한화손해보험",
+    "summary": "장기보험 가입설계 기능을 차세대 시스템으로 재구축하는 제안",
+    "start": "2026-10-20",
+    "deadline": "2026-11-27",
+    "presentation": "2026-11-28",
+    "team": {
+      "pm": "PM",
+      "biz": "사업관리",
+      "sales": "영업대표"
+    }
+  },
+  "members": [
+    {
+      "id": "201803176",
+      "pw": "0000",
+      "name": "황금빛",
+      "title": "시스템관리자",
+      "role": "admin"
+    },
+    {
+      "id": "202600001",
+      "pw": "1111",
+      "name": "제안멤버1",
+      "title": "제안 작성",
+      "role": "writer"
+    },
+    {
+      "id": "202600002",
+      "pw": "2222",
+      "name": "제안멤버2",
+      "title": "제안 작성",
+      "role": "writer"
+    },
+    {
+      "id": "202600003",
+      "pw": "3333",
+      "name": "제안멤버3",
+      "title": "제안 작성",
+      "role": "writer"
+    },
+    {
+      "id": "202600004",
+      "pw": "4444",
+      "name": "PM",
+      "title": "PM",
+      "role": "pm"
+    },
+    {
+      "id": "202600005",
+      "pw": "5555",
+      "name": "사업관리",
+      "title": "사업관리",
+      "role": "pm"
+    },
+    {
+      "id": "202600006",
+      "pw": "6666",
+      "name": "영업대표",
+      "title": "영업대표",
+      "role": "sales"
+    }
+  ],
+  "perms": {
+    "proposals": {
+      "writer": "none",
+      "pm": "edit",
+      "sales": "view",
+      "admin": "edit"
+    },
+    "home": {
+      "writer": "view",
+      "pm": "edit",
+      "sales": "view",
+      "admin": "edit"
+    },
+    "comm": {
+      "writer": "edit",
+      "pm": "edit",
+      "sales": "view",
+      "admin": "edit"
+    },
+    "schedule": {
+      "writer": "view",
+      "pm": "edit",
+      "sales": "view",
+      "admin": "edit"
+    },
+    "board-1": {
+      "writer": "edit",
+      "pm": "edit",
+      "sales": "view",
+      "admin": "edit"
+    },
+    "board-2": {
+      "writer": "edit",
+      "pm": "edit",
+      "sales": "view",
+      "admin": "edit"
+    },
+    "rfp": {
+      "writer": "view",
+      "pm": "edit",
+      "sales": "view",
+      "admin": "edit"
+    },
+    "toc": {
+      "writer": "edit",
+      "pm": "edit",
+      "sales": "view",
+      "admin": "edit"
+    },
+    "review": {
+      "writer": "view",
+      "pm": "edit",
+      "sales": "view",
+      "admin": "edit"
+    },
+    "versions": {
+      "writer": "view",
+      "pm": "edit",
+      "sales": "none",
+      "admin": "edit"
+    },
+    "matrix": {
+      "writer": "view",
+      "pm": "edit",
+      "sales": "view",
+      "admin": "edit"
+    },
+    "workspace": {
+      "writer": "none",
+      "pm": "edit",
+      "sales": "none",
+      "admin": "edit"
+    },
+    "wsperm": {
+      "writer": "none",
+      "pm": "edit",
+      "sales": "none",
+      "admin": "edit"
+    },
+    "expense": {
+      "writer": "none",
+      "pm": "edit",
+      "sales": "none",
+      "admin": "edit"
+    },
+    "effort": {
+      "writer": "none",
+      "pm": "edit",
+      "sales": "none",
+      "admin": "edit"
+    },
+    "assets": {
+      "writer": "view",
+      "pm": "edit",
+      "sales": "view",
+      "admin": "edit"
+    },
+    "sysperm": {
+      "writer": "none",
+      "pm": "view",
+      "sales": "none",
+      "admin": "edit"
+    },
+    "guide": {
+      "writer": "view",
+      "pm": "view",
+      "sales": "view",
+      "admin": "edit"
+    },
+    "history": {
+      "writer": "none",
+      "pm": "view",
+      "sales": "none",
+      "admin": "view"
+    }
+  },
+  "sysUsers": [
+    {
+      "name": "황금빛",
+      "note": "시스템 전체 관리 (관리자)",
+      "on": true
+    },
+    {
+      "name": "PM",
+      "note": "전체 프로젝트 열람 (팀장 겸직)",
+      "on": false
+    },
+    {
+      "name": "사업관리",
+      "note": "전체 프로젝트 열람",
+      "on": false
+    }
+  ]
+}

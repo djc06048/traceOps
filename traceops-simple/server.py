@@ -2,6 +2,10 @@
 관계형: /api/requirements, /api/meetings, /api/decisions, /api/reviews[/<id>],
        /api/analysis, /api/design, /api/dev, /api/unit, /api/integration (GET) + /api/trace (PUT, 한 번에 저장),
        /api/asis (물리ID: GET/PUT)
+연계관리(기존 추적 체인과 독립): /api/linkage/processes (GET/POST), /api/linkage/processes/<id> (GET/PUT/DELETE),
+       /api/linkage/processes/<id>/canvas (PUT), /api/linkage/transactions (GET, AS-IS 콜트리),
+       /api/linkage/map (POST), /api/linkage/map/<callNodeId> (DELETE)
+       TO-BE 프로세스는 nodeSource('free'|'design'|'dev')를 가지며, free가 아니면 캔버스 노드가 /api/design, /api/dev 항목(refId)을 참조한다.
 그 외(마스터 등)는 JSON 문서 저장: /api/store[/<key>]
 """
 import json, os, sqlite3
@@ -60,9 +64,28 @@ class H(SimpleHTTPRequestHandler):
                 return self._json({'kind': 'decisions', 'items': reqdb.decisions(c)})
             if p == '/api/reviews':
                 return self._json(reqdb.reviews(c))
+            if p == '/api/linkage/processes':
+                return self._json({'kind': 'processes', 'items': reqdb.lk_processes(c)})
+            if p == '/api/linkage/transactions':
+                return self._json({'kind': 'transactions', 'items': reqdb.lk_transactions(c)})
+            k = self._tail('/api/linkage/processes/')
+            if k:
+                return self._json(reqdb.lk_process_detail(c, k))
             self._send(404)
         finally:
             c.close()
+
+    def do_POST(self):
+        def run():
+            p = self.path.split('?')[0]
+            b = self._body()
+            if p == '/api/linkage/processes':
+                return self._json(reqdb.create_process(b))
+            if p == '/api/linkage/map':
+                reqdb.save_mapping(b['callNodeId'], b['nodeId'])
+                return self._send(204)
+            self._send(404)
+        self._api(run)
 
     def do_PUT(self):
         def run():
@@ -79,6 +102,11 @@ class H(SimpleHTTPRequestHandler):
             if k:
                 reqdb.save_review(k, b)
                 return self._send(204)
+            k = self._tail('/api/linkage/processes/')
+            if k and k.endswith('/canvas'):
+                return self._json(reqdb.save_canvas(k[:-len('/canvas')], b.get('nodes'), b.get('edges')))
+            if k:
+                return self._json(reqdb.update_process(k, b))
             k = self._tail('/api/store/')
             if k:
                 json.dumps(b)  # 유효한 JSON만 (본문은 이미 파싱됨)
@@ -93,6 +121,14 @@ class H(SimpleHTTPRequestHandler):
 
     def do_DELETE(self):
         def run():
+            k = self._tail('/api/linkage/map/')
+            if k:
+                reqdb.delete_mapping(k)
+                return self._send(204)
+            k = self._tail('/api/linkage/processes/')
+            if k:
+                reqdb.delete_process(k)
+                return self._send(204)
             k = self._tail('/api/store/')
             if not k:
                 return self._send(404)

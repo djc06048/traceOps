@@ -1,0 +1,25 @@
+{
+  "processes": [
+    { "id": "LP-0004", "parentId": null, "model": "asis", "name": "인수지침검사", "txCode": "TX_QPM_UDCHK1", "owner": "", "status": "확정", "originProcessId": null },
+    { "id": "LP-0005", "parentId": null, "model": "asis", "name": "누적위험 한도확인", "txCode": "TX_QPM_ACMLM1", "owner": "", "status": "미착수", "originProcessId": null },
+    { "id": "LP-0006", "parentId": null, "model": "tobe", "name": "보험료 체크 세부", "txCode": "", "owner": "", "status": "미착수", "originProcessId": null },
+    { "id": "LP-0007", "parentId": null, "model": "tobe", "name": "담보 인수지침 세부", "txCode": "", "owner": "", "status": "미착수", "originProcessId": null },
+    { "id": "LP-0001", "parentId": null, "model": "tobe", "name": "인수심사 업무흐름", "txCode": "", "owner": "김전종", "status": "진행중", "originProcessId": null },
+    { "id": "LP-0002", "parentId": "LP-0001", "model": "tobe", "name": "인수지침검사", "txCode": "TX_QPM_UDCHK1", "owner": "김전종", "status": "진행중", "originProcessId": "LP-0004" },
+    { "id": "LP-0003", "parentId": "LP-0001", "model": "tobe", "name": "설계정보 저장", "txCode": "TX_QPM_PLSAVE", "owner": "박혜림", "status": "완료", "originProcessId": null }
+  ],
+  "nodes": [
+    { "id": "ND-0001", "processId": "LP-0004", "kind": "step", "name": "보험료 체크", "x": 60, "y": 80, "status": "ok", "subProcessId": null },
+    { "id": "ND-0002", "processId": "LP-0004", "kind": "step", "name": "담보 인수지침", "x": 320, "y": 80, "status": "ok", "subProcessId": null },
+    { "id": "ND-0003", "processId": "LP-0004", "kind": "step", "name": "위배내용 저장", "x": 580, "y": 80, "status": "ok", "subProcessId": null },
+    { "id": "ND-0004", "processId": "LP-0002", "kind": "step", "name": "보험료 체크", "x": 60, "y": 80, "status": "ok", "subProcessId": "LP-0006" },
+    { "id": "ND-0005", "processId": "LP-0002", "kind": "step", "name": "담보 인수지침", "x": 320, "y": 80, "status": "warn", "subProcessId": "LP-0007" },
+    { "id": "ND-0006", "processId": "LP-0002", "kind": "step", "name": "위배내용 저장", "x": 580, "y": 80, "status": "bad", "subProcessId": null }
+  ],
+  "edges": [
+    { "processId": "LP-0004", "from": "ND-0001", "to": "ND-0002" },
+    { "processId": "LP-0004", "from": "ND-0002", "to": "ND-0003" },
+    { "processId": "LP-0002", "from": "ND-0004", "to": "ND-0005" },
+    { "processId": "LP-0002", "from": "ND-0005", "to": "ND-0006" }
+  ]
+}

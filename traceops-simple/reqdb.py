@@ -215,6 +215,67 @@ CREATE VIEW IF NOT EXISTS integration_requirements AS
   SELECT DISTINCT iu.integration_id, ur.req_id FROM integration_units iu JOIN unit_requirements ur ON ur.unit_id = iu.unit_id;
 CREATE VIEW IF NOT EXISTS integration_physical AS
   SELECT DISTINCT iu.integration_id, up.phys_id FROM integration_units iu JOIN unit_physical up ON up.unit_id = iu.unit_id;
+
+-- ===== 연계관리(연계 캔버스): AS-IS/TO-BE 프로세스 — 기존 추적 체인과는 독립된 부가 관리 =====
+CREATE TABLE IF NOT EXISTS lk_process (
+  id TEXT PRIMARY KEY,
+  parent_id TEXT REFERENCES lk_process(id) ON DELETE CASCADE,   -- 목록 화면의 L1 그룹핑(선택)
+  model TEXT NOT NULL CHECK (model IN ('asis','tobe')),
+  name TEXT NOT NULL DEFAULT '',
+  tx_code TEXT NOT NULL DEFAULT '',          -- 거래코드 (AS-IS↔TO-BE 짝 찾기 기준, 선택)
+  owner TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT '진행중' CHECK (status IN ('미착수','진행중','완료','확정')),
+  origin_process_id TEXT REFERENCES lk_process(id),   -- "AS-IS 프로세스 복사"로 만들어졌을 때 유래
+  node_source TEXT NOT NULL DEFAULT 'free',   -- 'free'(자유 텍스트) | 'dev' (노드가 개발항목을 참조). AS-IS는 항상 'free'
+  domain TEXT NOT NULL DEFAULT '',   -- 업무 분류: '인수지침'|'인수심사'|'가입설계'|'대응개발' (선택)
+  created_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+);
+CREATE INDEX IF NOT EXISTS ix_lkproc_parent ON lk_process(parent_id);
+
+-- 캔버스 노드/연결선 (프로세스가 소유)
+CREATE TABLE IF NOT EXISTS lk_node (
+  id TEXT PRIMARY KEY,
+  process_id TEXT NOT NULL REFERENCES lk_process(id) ON DELETE CASCADE,
+  kind TEXT NOT NULL CHECK (kind IN ('step','branch')) DEFAULT 'step',
+  name TEXT NOT NULL DEFAULT '',
+  x REAL NOT NULL DEFAULT 0, y REAL NOT NULL DEFAULT 0,
+  status TEXT NOT NULL CHECK (status IN ('ok','warn','bad')) DEFAULT 'ok',
+  sub_process_id TEXT REFERENCES lk_process(id),   -- "하위 조립" (이 노드를 열면 들어가는 서브 캔버스)
+  ref_id TEXT,   -- process.node_source != 'free'일 때: 이 노드가 가리키는 design_items.id 또는 dev_items.id
+  note TEXT NOT NULL DEFAULT '',   -- 짧은 설명(메모)
+  category TEXT NOT NULL DEFAULT 'service'   -- 'service' | 'if_external'(대외계 연결) | 'if_channel'(채널계 연결)
+);
+CREATE INDEX IF NOT EXISTS ix_lknode_process ON lk_node(process_id);
+CREATE TABLE IF NOT EXISTS lk_edge (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  process_id TEXT NOT NULL REFERENCES lk_process(id) ON DELETE CASCADE,
+  from_node TEXT NOT NULL REFERENCES lk_node(id) ON DELETE CASCADE,
+  to_node   TEXT NOT NULL REFERENCES lk_node(id) ON DELETE CASCADE,
+  is_async INTEGER NOT NULL DEFAULT 0   -- 1이면 비동기 호출(점선 + "비동기" 표시)
+);
+CREATE INDEX IF NOT EXISTS ix_lkedge_process ON lk_edge(process_id);
+
+-- AS-IS 콜트리 (목업 시드 — 조회 전용, 화면에서 직접 편집하지 않음)
+CREATE TABLE IF NOT EXISTS lk_transaction (
+  id TEXT PRIMARY KEY, name TEXT NOT NULL DEFAULT ''
+);
+CREATE TABLE IF NOT EXISTS lk_call_node (
+  id TEXT PRIMARY KEY,
+  transaction_id TEXT NOT NULL REFERENCES lk_transaction(id) ON DELETE CASCADE,
+  parent_id TEXT REFERENCES lk_call_node(id) ON DELETE CASCADE,
+  method TEXT NOT NULL DEFAULT '',
+  order_index INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS ix_lkcall_tx ON lk_call_node(transaction_id);
+
+-- 콜트리 노드 ↔ TO-BE/AS-IS 캔버스 노드 매핑 (드래그로 생성)
+CREATE TABLE IF NOT EXISTS lk_mapping (
+  call_node_id TEXT PRIMARY KEY REFERENCES lk_call_node(id) ON DELETE CASCADE,
+  node_id      TEXT NOT NULL REFERENCES lk_node(id) ON DELETE CASCADE,
+  mapped_at TEXT NOT NULL, mapped_by TEXT NOT NULL DEFAULT ''
+);
+CREATE INDEX IF NOT EXISTS ix_lkmap_node ON lk_mapping(node_id);
 """
 
 COLS = ['major', 'middle', 'minor', 'name', 'content', 'stage', 'status', 'precondition', 'kind', 'source']
@@ -224,6 +285,11 @@ LABEL = {'major': '대분류', 'middle': '중분류', 'minor': '소분류', 'nam
          'vendorOwner': '업체담당', 'custITOwner': '고객IT담당자', 'custITTeam': '고객IT담당팀',
          'custBizOwner': '고객업무담당자', 'custBizTeam': '고객업무담당팀'}
 ROLES = [('vendor', 'vendorOwner', None), ('cust_it', 'custITOwner', 'custITTeam'), ('cust_biz', 'custBizOwner', 'custBizTeam')]
+LK_STATUSES = ('미착수', '진행중', '완료', '확정')
+LK_NODE_SOURCES = ('free', 'dev')
+LK_SOURCE_TABLE = {'dev': 'dev_items'}
+LK_NODE_CATEGORIES = ('service', 'if_external', 'if_channel')
+LK_PROCESS_DOMAINS = ('AI', '인수지침', '인수심사', '가입설계', '대응개발')
 
 
 def connect():
@@ -264,7 +330,35 @@ def init():
         empty = [k for k in KINDS if not c.execute('SELECT 1 FROM %s' % SPEC[k]['table']).fetchone()]
         if empty:
             _write_trace(c, {k: _seed_file(k) for k in empty})
+        if not c.execute('SELECT 1 FROM lk_process').fetchone():
+            _seed_linkage(c)
+        _migrate_lk_columns(c)
     c.close()
+
+
+def _seed_linkage(c):
+    p = json.load(open(os.path.join(ROOT, 'data', 'linkage_processes.json'), encoding='utf-8'))
+    for x in p['processes']:
+        c.execute('INSERT INTO lk_process (id,parent_id,model,name,tx_code,owner,status,origin_process_id) VALUES (?,?,?,?,?,?,?,?)',
+                  (x['id'], x.get('parentId'), x['model'], x.get('name', ''), x.get('txCode', ''),
+                   x.get('owner', ''), x.get('status', '진행중'), x.get('originProcessId')))
+    for x in p['nodes']:
+        c.execute('INSERT INTO lk_node (id,process_id,kind,name,x,y,status,sub_process_id) VALUES (?,?,?,?,?,?,?,?)',
+                  (x['id'], x['processId'], x.get('kind', 'step'), x.get('name', ''), x.get('x', 0), x.get('y', 0),
+                   x.get('status', 'ok'), x.get('subProcessId')))
+    for x in p['edges']:
+        c.execute('INSERT INTO lk_edge (process_id,from_node,to_node) VALUES (?,?,?)',
+                  (x['processId'], x['from'], x['to']))
+    t = json.load(open(os.path.join(ROOT, 'data', 'linkage_transactions.json'), encoding='utf-8'))
+    for x in t['transactions']:
+        c.execute('INSERT INTO lk_transaction (id,name) VALUES (?,?)', (x['id'], x.get('name', '')))
+    for x in t['callNodes']:
+        c.execute('INSERT INTO lk_call_node (id,transaction_id,parent_id,method,order_index) VALUES (?,?,?,?,?)',
+                  (x['id'], x['transactionId'], x.get('parentId'), x.get('method', ''), x.get('order', 0)))
+    ts = now()
+    for x in t['mappings']:
+        c.execute('INSERT INTO lk_mapping (call_node_id,node_id,mapped_at,mapped_by) VALUES (?,?,?,?)',
+                  (x['callNodeId'], x['nodeId'], ts, '시스템'))
 
 
 # ---------- 요구사항 ----------
@@ -623,3 +717,334 @@ def _migrate_phys_columns(c):
             for p in own:
                 c.execute('INSERT OR IGNORE INTO %s (%s, phys_id) VALUES (?, ?)' % (ltab, fk), (rid, p))
         c.execute('ALTER TABLE %s DROP COLUMN phys_ids' % table)
+
+
+# ---------- 연계관리(연계 캔버스): AS-IS/TO-BE 프로세스 ----------
+def _migrate_lk_columns(c):
+    """이전 버전(node_source/domain/ref_id/note/category/is_async 컬럼 없음) DB에 컬럼을 추가한다."""
+    proc_cols = [r[1] for r in c.execute('PRAGMA table_info(lk_process)')]
+    if 'node_source' not in proc_cols:
+        c.execute("ALTER TABLE lk_process ADD COLUMN node_source TEXT NOT NULL DEFAULT 'free'")
+    if 'domain' not in proc_cols:
+        c.execute("ALTER TABLE lk_process ADD COLUMN domain TEXT NOT NULL DEFAULT ''")
+    node_cols = [r[1] for r in c.execute('PRAGMA table_info(lk_node)')]
+    if 'ref_id' not in node_cols:
+        c.execute('ALTER TABLE lk_node ADD COLUMN ref_id TEXT')
+    if 'note' not in node_cols:
+        c.execute("ALTER TABLE lk_node ADD COLUMN note TEXT NOT NULL DEFAULT ''")
+    if 'category' not in node_cols:
+        c.execute("ALTER TABLE lk_node ADD COLUMN category TEXT NOT NULL DEFAULT 'service'")
+    if 'is_async' not in [r[1] for r in c.execute('PRAGMA table_info(lk_edge)')]:
+        c.execute('ALTER TABLE lk_edge ADD COLUMN is_async INTEGER NOT NULL DEFAULT 0')
+
+
+def _lk_new_id(c, table, prefix):
+    n = 0
+    for (rid,) in c.execute('SELECT id FROM %s' % table):
+        try:
+            n = max(n, int(str(rid).rsplit('-', 1)[-1]))
+        except ValueError:
+            continue
+    return '%s-%04d' % (prefix, n + 1)
+
+
+def _lk_fk_error(e):
+    if 'FOREIGN KEY' in str(e):
+        return ValueError('다른 프로세스·노드가 참조 중입니다 (유래 프로세스, 하위 조립, 매핑된 콜트리 등)')
+    return ValueError('입력값 오류: ' + str(e))
+
+
+def _lk_mapping_counts(c):
+    """거래코드(트랜잭션)별 콜트리 전체 노드 수 / 매핑된 노드 수."""
+    total, mapped = {}, {}
+    for (tx,) in c.execute('SELECT transaction_id FROM lk_call_node'):
+        total[tx] = total.get(tx, 0) + 1
+    for (tx,) in c.execute('SELECT cn.transaction_id FROM lk_mapping m JOIN lk_call_node cn ON cn.id = m.call_node_id'):
+        mapped[tx] = mapped.get(tx, 0) + 1
+    return total, mapped
+
+
+def _lk_dev_progress(c):
+    """node_source='dev' 캔버스별: 참조하는 개발항목 전체 수 / 실적종료일이 입력된(완료) 수."""
+    total, done = {}, {}
+    for r in c.execute("SELECT n.process_id AS pid, d.w_act_end AS end FROM lk_node n "
+                        "JOIN lk_process p ON p.id = n.process_id JOIN dev_items d ON d.id = n.ref_id "
+                        "WHERE p.node_source = 'dev'"):
+        total[r['pid']] = total.get(r['pid'], 0) + 1
+        if r['end']:
+            done[r['pid']] = done.get(r['pid'], 0) + 1
+    return total, done
+
+
+def lk_processes(c):
+    total, mapped = _lk_mapping_counts(c)
+    dev_total, dev_done = _lk_dev_progress(c)
+    tobe_tx = {r[0] for r in c.execute("SELECT tx_code FROM lk_process WHERE model = 'tobe' AND tx_code != ''")}
+    out = []
+    for r in c.execute('SELECT * FROM lk_process ORDER BY rowid'):
+        out.append({
+            'id': r['id'], 'parentId': r['parent_id'], 'model': r['model'], 'name': r['name'],
+            'txCode': r['tx_code'], 'owner': r['owner'], 'status': r['status'], 'originProcessId': r['origin_process_id'],
+            'nodeSource': r['node_source'], 'domain': r['domain'],
+            'leafTotal': total.get(r['tx_code'], 0), 'leafMapped': mapped.get(r['tx_code'], 0),
+            'devTotal': dev_total.get(r['id'], 0), 'devDone': dev_done.get(r['id'], 0),
+            'missingToBe': bool(r['model'] == 'asis' and r['tx_code'] and r['tx_code'] not in tobe_tx),
+            'createdAt': r['created_at'], 'updatedAt': r['updated_at'],
+        })
+    return out
+
+
+def lk_process_detail(c, pid):
+    r = c.execute('SELECT * FROM lk_process WHERE id = ?', (pid,)).fetchone()
+    if not r:
+        raise ValueError('존재하지 않는 프로세스입니다: ' + pid)
+    node_source = r['node_source']
+    nodes = [{'id': n['id'], 'kind': n['kind'], 'name': n['name'], 'x': n['x'], 'y': n['y'],
+              'status': n['status'], 'subProcessId': n['sub_process_id'], 'refId': n['ref_id'],
+              'note': n['note'], 'category': n['category']}
+             for n in c.execute('SELECT * FROM lk_node WHERE process_id = ? ORDER BY rowid', (pid,))]
+    for n in nodes:
+        if node_source == 'free':
+            n['refMissing'] = False
+            continue
+        row = c.execute('SELECT name, w_act_end FROM %s WHERE id = ?' % LK_SOURCE_TABLE[node_source], (n['refId'],)).fetchone() if n['refId'] else None
+        n['refMissing'] = not row
+        n['devDone'] = bool(row and row['w_act_end']) if node_source == 'dev' else False
+        if row:
+            n['name'] = row['name']
+    edges = [{'from': e['from_node'], 'to': e['to_node'], 'async': bool(e['is_async'])} for e in c.execute(
+        'SELECT * FROM lk_edge WHERE process_id = ? ORDER BY id', (pid,))]
+    mapped = {}
+    for m in c.execute('SELECT m.call_node_id, m.node_id, cn.method, cn.transaction_id FROM lk_mapping m '
+                        'JOIN lk_call_node cn ON cn.id = m.call_node_id JOIN lk_node n ON n.id = m.node_id '
+                        'WHERE n.process_id = ?', (pid,)):
+        mapped.setdefault(m['node_id'], []).append(
+            {'callNodeId': m['call_node_id'], 'method': m['method'], 'transactionId': m['transaction_id']})
+    for n in nodes:
+        n['mapped'] = mapped.get(n['id'], [])
+    process = {'id': r['id'], 'parentId': r['parent_id'], 'model': r['model'], 'name': r['name'], 'txCode': r['tx_code'],
+               'owner': r['owner'], 'status': r['status'], 'originProcessId': r['origin_process_id'],
+               'nodeSource': node_source, 'domain': r['domain'], 'createdAt': r['created_at'], 'updatedAt': r['updated_at']}
+    return {'process': process, 'nodes': nodes, 'edges': edges}
+
+
+def _lk_seed_nodes_from_transaction(c, process_id, tx_id):
+    """트랜잭션의 콜트리 리프를 좌→우로 이어 캔버스 초안을 만들고 1:1로 매핑한다."""
+    leaves = [r[0] for r in c.execute(
+        'SELECT id FROM lk_call_node WHERE transaction_id = ? AND id NOT IN '
+        '(SELECT DISTINCT parent_id FROM lk_call_node WHERE parent_id IS NOT NULL) ORDER BY order_index', (tx_id,))]
+    ts, prev = now(), None
+    for i, cn in enumerate(leaves):
+        method = c.execute('SELECT method FROM lk_call_node WHERE id = ?', (cn,)).fetchone()[0]
+        nid = _lk_new_id(c, 'lk_node', 'ND')
+        name = method.rsplit('#', 1)[-1] if method else cn
+        c.execute('INSERT INTO lk_node (id,process_id,kind,name,x,y,status) VALUES (?,?,?,?,?,?,?)',
+                  (nid, process_id, 'step', name, 60 + i * 220, 80, 'warn'))
+        c.execute('INSERT INTO lk_mapping (call_node_id,node_id,mapped_at,mapped_by) VALUES (?,?,?,?)', (cn, nid, ts, '시스템'))
+        if prev:
+            c.execute('INSERT INTO lk_edge (process_id,from_node,to_node) VALUES (?,?,?)', (process_id, prev, nid))
+        prev = nid
+
+
+def _lk_copy_canvas(c, src_id, dst_id):
+    idmap = {}
+    for r in c.execute('SELECT * FROM lk_node WHERE process_id = ? ORDER BY rowid', (src_id,)):
+        nid = _lk_new_id(c, 'lk_node', 'ND')
+        idmap[r['id']] = nid
+        c.execute('INSERT INTO lk_node (id,process_id,kind,name,x,y,status,ref_id,note,category) VALUES (?,?,?,?,?,?,?,?,?,?)',
+                  (nid, dst_id, r['kind'], r['name'], r['x'], r['y'], r['status'], r['ref_id'], r['note'], r['category']))
+    for r in c.execute('SELECT * FROM lk_edge WHERE process_id = ?', (src_id,)):
+        if r['from_node'] in idmap and r['to_node'] in idmap:
+            c.execute('INSERT INTO lk_edge (process_id,from_node,to_node,is_async) VALUES (?,?,?,?)',
+                      (dst_id, idmap[r['from_node']], idmap[r['to_node']], r['is_async']))
+
+
+def create_process(body):
+    c = connect()
+    try:
+        with c:
+            model = body.get('model')
+            if model not in ('asis', 'tobe'):
+                raise ValueError('model은 asis 또는 tobe여야 합니다')
+            name = (body.get('name') or '').strip()
+            tx_code = (body.get('txCode') or '').strip()
+            origin_id, from_tx = None, body.get('fromTransactionId')
+            copy_from = body.get('copyFromProcessId')
+            node_source = body.get('nodeSource') if body.get('nodeSource') in LK_NODE_SOURCES else 'free'
+            if model == 'asis':
+                node_source = 'free'   # AS-IS는 항상 콜트리에서 나온 자유 텍스트 노드
+            if from_tx:
+                tx = c.execute('SELECT * FROM lk_transaction WHERE id = ?', (from_tx,)).fetchone()
+                if not tx:
+                    raise ValueError('존재하지 않는 트랜잭션입니다: ' + from_tx)
+                name, tx_code = name or tx['name'], from_tx
+            domain = body.get('domain') if body.get('domain') in LK_PROCESS_DOMAINS else ''
+            if copy_from:
+                src = c.execute('SELECT * FROM lk_process WHERE id = ?', (copy_from,)).fetchone()
+                if not src:
+                    raise ValueError('존재하지 않는 프로세스입니다: ' + copy_from)
+                name = name or (src['name'] + ' (복사본)')
+                tx_code, origin_id, node_source = tx_code or src['tx_code'], copy_from, src['node_source']
+                domain = domain or src['domain']
+            if not name:
+                raise ValueError('프로세스명을 입력하세요')
+            pid, ts = _lk_new_id(c, 'lk_process', 'LP'), now()
+            c.execute('INSERT INTO lk_process (id,parent_id,model,name,tx_code,owner,status,origin_process_id,node_source,domain,created_at,updated_at) '
+                      'VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+                      (pid, body.get('parentId'), model, name, tx_code, body.get('owner') or '', body.get('status') or '진행중',
+                       origin_id, node_source, domain, ts, ts))
+            if from_tx:
+                _lk_seed_nodes_from_transaction(c, pid, from_tx)
+            if copy_from:
+                _lk_copy_canvas(c, copy_from, pid)
+        c2 = connect()
+        try:
+            return lk_process_detail(c2, pid)
+        finally:
+            c2.close()
+    except sqlite3.IntegrityError as e:
+        raise _lk_fk_error(e)
+    finally:
+        c.close()
+
+
+def update_process(pid, body):
+    """프로세스 메타데이터(이름·담당자·상태·거래코드·상위 그룹) 수정. 캔버스·매핑은 건드리지 않음."""
+    c = connect()
+    try:
+        with c:
+            r = c.execute('SELECT * FROM lk_process WHERE id = ?', (pid,)).fetchone()
+            if not r:
+                raise ValueError('존재하지 않는 프로세스입니다: ' + pid)
+            name = (body.get('name') or '').strip() or r['name']
+            owner = body['owner'] if 'owner' in body else r['owner']
+            status = body.get('status') or r['status']
+            if status not in LK_STATUSES:
+                raise ValueError('잘못된 상태입니다: ' + status)
+            tx_code = body['txCode'] if 'txCode' in body else r['tx_code']
+            parent_id = body['parentId'] if 'parentId' in body else r['parent_id']
+            if parent_id == pid:
+                raise ValueError('자기 자신을 상위 그룹으로 설정할 수 없습니다')
+            domain = body['domain'] if 'domain' in body else r['domain']
+            if domain and domain not in LK_PROCESS_DOMAINS:
+                raise ValueError('잘못된 카테고리입니다: ' + domain)
+            c.execute('UPDATE lk_process SET name=?, owner=?, status=?, tx_code=?, parent_id=?, domain=?, updated_at=? WHERE id=?',
+                      (name, owner or '', status, tx_code or '', parent_id, domain, now(), pid))
+        c2 = connect()
+        try:
+            return lk_process_detail(c2, pid)
+        finally:
+            c2.close()
+    except sqlite3.IntegrityError as e:
+        raise _lk_fk_error(e)
+    finally:
+        c.close()
+
+
+def save_canvas(pid, nodes, edges):
+    c = connect()
+    try:
+        with c:
+            proc = c.execute('SELECT * FROM lk_process WHERE id = ?', (pid,)).fetchone()
+            if not proc:
+                raise ValueError('존재하지 않는 프로세스입니다: ' + pid)
+            node_source = proc['node_source']
+            seen, seen_ref = [], set()
+            for n in nodes or []:
+                if not n.get('id'):
+                    raise ValueError('노드ID 미입력')
+                if n['id'] in seen:
+                    raise ValueError('중복 노드ID: ' + n['id'])
+                seen.append(n['id'])
+                ref_id = n.get('refId')
+                if node_source != 'free':
+                    if not ref_id:
+                        raise ValueError('이 캔버스의 노드는 설계·개발 항목을 선택해야 합니다')
+                    if not c.execute('SELECT 1 FROM %s WHERE id = ?' % LK_SOURCE_TABLE[node_source], (ref_id,)).fetchone():
+                        raise ValueError('존재하지 않는 항목입니다: ' + ref_id)
+                    if ref_id in seen_ref:
+                        raise ValueError('이미 이 캔버스에 추가된 항목입니다: ' + ref_id)
+                    seen_ref.add(ref_id)
+                else:
+                    ref_id = None
+                category = n.get('category') if n.get('category') in LK_NODE_CATEGORIES else 'service'
+                c.execute('INSERT INTO lk_node (id,process_id,kind,name,x,y,status,sub_process_id,ref_id,note,category) VALUES (?,?,?,?,?,?,?,?,?,?,?) '
+                          'ON CONFLICT(id) DO UPDATE SET kind=excluded.kind, name=excluded.name, x=excluded.x, y=excluded.y, '
+                          'status=excluded.status, sub_process_id=excluded.sub_process_id, ref_id=excluded.ref_id, '
+                          'note=excluded.note, category=excluded.category',
+                          (n['id'], pid, n.get('kind') or 'step', n.get('name') or '', n.get('x') or 0, n.get('y') or 0,
+                           n.get('status') or 'ok', n.get('subProcessId'), ref_id, n.get('note') or '', category))
+            for (rid,) in c.execute('SELECT id FROM lk_node WHERE process_id = ?', (pid,)).fetchall():
+                if rid not in seen:
+                    c.execute('DELETE FROM lk_node WHERE id = ?', (rid,))
+            c.execute('DELETE FROM lk_edge WHERE process_id = ?', (pid,))
+            for e in edges or []:
+                if e.get('from') not in seen or e.get('to') not in seen:
+                    raise ValueError('존재하지 않는 노드를 연결했습니다')
+                c.execute('INSERT INTO lk_edge (process_id,from_node,to_node,is_async) VALUES (?,?,?,?)',
+                          (pid, e['from'], e['to'], 1 if e.get('async') else 0))
+            c.execute('UPDATE lk_process SET updated_at = ? WHERE id = ?', (now(), pid))
+        c2 = connect()
+        try:
+            return lk_process_detail(c2, pid)
+        finally:
+            c2.close()
+    except sqlite3.IntegrityError as e:
+        raise _lk_fk_error(e)
+    finally:
+        c.close()
+
+
+def delete_process(pid):
+    c = connect()
+    try:
+        with c:
+            if not c.execute('SELECT 1 FROM lk_process WHERE id = ?', (pid,)).fetchone():
+                raise ValueError('존재하지 않는 프로세스입니다: ' + pid)
+            c.execute('DELETE FROM lk_process WHERE id = ?', (pid,))
+    except sqlite3.IntegrityError as e:
+        raise _lk_fk_error(e)
+    finally:
+        c.close()
+
+
+def lk_transactions(c):
+    mapped = {}
+    for r in c.execute('SELECT m.call_node_id AS cn, n.id AS node_id, n.name AS node_name, n.process_id AS pid, p.name AS pname '
+                        'FROM lk_mapping m JOIN lk_node n ON n.id = m.node_id JOIN lk_process p ON p.id = n.process_id'):
+        mapped[r['cn']] = {'nodeId': r['node_id'], 'nodeName': r['node_name'], 'processId': r['pid'], 'processName': r['pname']}
+    nodes = {}
+    for r in c.execute('SELECT * FROM lk_call_node ORDER BY transaction_id, order_index'):
+        m = mapped.get(r['id'])
+        nodes.setdefault(r['transaction_id'], []).append(
+            {'id': r['id'], 'parentId': r['parent_id'], 'method': r['method'], 'mapped': bool(m), 'mappedTo': m})
+    out = []
+    for t in c.execute('SELECT * FROM lk_transaction ORDER BY rowid'):
+        items = nodes.get(t['id'], [])
+        out.append({'id': t['id'], 'name': t['name'], 'total': len(items),
+                    'mapped': sum(1 for i in items if i['mapped']), 'nodes': items})
+    return out
+
+
+def save_mapping(call_node_id, node_id):
+    c = connect()
+    try:
+        with c:
+            if not c.execute('SELECT 1 FROM lk_call_node WHERE id = ?', (call_node_id,)).fetchone():
+                raise ValueError('존재하지 않는 콜트리 항목입니다: ' + call_node_id)
+            if not c.execute('SELECT 1 FROM lk_node WHERE id = ?', (node_id,)).fetchone():
+                raise ValueError('존재하지 않는 캔버스 노드입니다: ' + node_id)
+            c.execute('INSERT INTO lk_mapping (call_node_id,node_id,mapped_at,mapped_by) VALUES (?,?,?,?) '
+                      'ON CONFLICT(call_node_id) DO UPDATE SET node_id=excluded.node_id, mapped_at=excluded.mapped_at',
+                      (call_node_id, node_id, now(), '시스템'))
+    finally:
+        c.close()
+
+
+def delete_mapping(call_node_id):
+    c = connect()
+    try:
+        with c:
+            c.execute('DELETE FROM lk_mapping WHERE call_node_id = ?', (call_node_id,))
+    finally:
+        c.close()

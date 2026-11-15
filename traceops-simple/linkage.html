@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TraceOps · 연계관리</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="css/style.css">
+</head><body>
+
+<div class="gnb">
+  <div class="wm">TraceOps</div>
+  <button class="tab" onclick="location.href='index.html#analysis'">상세공정관리</button>
+  <button class="tab" onclick="location.href='index.html#unit'">테스트관리</button>
+  <button class="tab" onclick="location.href='asis.html'">AS-IS 목록</button>
+  <button class="tab on">연계관리</button>
+  <div class="sp"></div>
+  <div class="util"><span class="noti">알림</span><div class="av">황</div></div>
+</div>
+
+<div class="main">
+
+  <div class="role-switch" style="justify-content:flex-end;margin-bottom:14px">
+    <span class="lbl">권한 미리보기 (데모)</span>
+    <div class="seg"><button id="btnPL" class="active">PL</button><button id="btnWorker">작업자</button></div>
+  </div>
+
+  <!-- ===== 목록 화면 ===== -->
+  <div id="lkList">
+    <div class="crumb">연계관리 · <b>AS-IS / TO-BE 프로세스</b></div>
+    <div class="page-hd">
+      <div>
+        <h1>연계관리</h1>
+        <p>AS-IS 콜트리를 근거로 업무 흐름을 캔버스로 정리하고, TO-BE 프로세스와 매핑합니다. 기존 추적 체인(분석·설계·개발·테스트)과는 독립된 부가 관리입니다.</p>
+      </div>
+      <div class="f-actions">
+        <button class="btn sm pl-only" id="btnNewTobe">+ TO-BE 프로세스</button>
+      </div>
+    </div>
+    <div class="filter-row" style="margin-bottom:14px">
+      <div class="f-field"><label>검색</label><input class="f-input" id="lkSearchQ" placeholder="이름·ID·담당자" style="min-width:220px"></div>
+      <div class="f-field"><label>카테고리</label><select class="f-select" id="lkDomainFilter"><option value="">전체</option></select></div>
+    </div>
+    <div id="banner"></div>
+    <div class="lk-groups" id="lkGroups"></div>
+  </div>
+
+  <!-- ===== 캔버스 화면 ===== -->
+  <div id="lkCanvasView" style="display:none">
+    <div class="crumb"><a href="#" id="lkBack" style="color:inherit">연계관리</a> · <b id="lkCrumbName"></b></div>
+    <div class="page-hd">
+      <div>
+        <h1 id="lkPName"></h1>
+        <p id="lkPMeta"></p>
+      </div>
+      <div class="f-actions">
+        <button class="btn ghost sm pl-only" id="btnEditProcess">수정</button>
+        <button class="btn ghost sm pl-del-only" id="btnDelProcess">프로세스 삭제</button>
+        <button class="btn sm pl-only" id="btnSaveCanvas">저장</button>
+      </div>
+    </div>
+    <div class="lk-toolbar pl-only">
+      <button class="btn ghost sm" id="btnAddNode">+ 노드 추가</button>
+      <button class="btn ghost sm" id="btnDelNode" disabled>선택 노드 삭제</button>
+      <span class="hint">노드 드래그: 이동 · 우측 원형 핸들 드래그: 연결선 생성 · 연결선 클릭: 동기↔비동기 전환 · Shift+클릭: 연결선 삭제 · 오른쪽 목록 드래그: 노드 생성</span>
+    </div>
+    <div class="lk-canvas-wrap">
+      <div class="lk-canvas-card">
+        <div class="lk-canvas" id="lkCanvas">
+          <svg class="lk-edge-svg" id="lkEdgeSvg">
+            <defs>
+              <marker id="lk-arrow" markerWidth="3" markerHeight="3" refX="2.25" refY="1.125" orient="auto">
+                <path d="M0,0 L2.25,1.125 L0,2.25 Z" fill="#767676"></path>
+              </marker>
+              <marker id="lk-arrow-async" markerWidth="3" markerHeight="3" refX="2.25" refY="1.125" orient="auto">
+                <path d="M0,0 L2.25,1.125 L0,2.25 Z" fill="#FB7520"></path>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+      </div>
+      <div class="lk-side-col">
+        <div class="lk-side" id="lkSide" style="display:none">
+          <h3>AS-IS 콜트리</h3>
+          <p class="sub">리프 항목을 캔버스 노드로 드래그하면 매핑됩니다.</p>
+          <div class="lk-tree" id="lkTree"></div>
+        </div>
+        <div class="lk-side" id="lkRefSide" style="display:none">
+          <h3 id="lkRefTitle"></h3>
+          <p class="sub">항목을 캔버스로 드래그하면 노드가 됩니다.</p>
+          <input class="f-input" id="lkRefQ" placeholder="검색" style="width:100%;margin-bottom:8px">
+          <div class="lk-tree" id="lkRefList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="modal-bg" id="newProcModal"><div class="modal" id="newProcBox"></div></div>
+<div class="modal-bg" id="refPickModal"><div class="modal" id="refPickBox"></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="js/store.js"></script>
+<script src="js/linkage.js"></script>
+</body></html>
