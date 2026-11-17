@@ -7,7 +7,7 @@
   var FILES = {
     master: 'data/master.json', proposals: 'data/proposals.json', schedule: 'data/schedule.json', comm: 'data/comm.json',
     boards: 'data/boards.json', matrix: 'data/matrix.json', expense: 'data/expense.json', effort: 'data/effort.json',
-    assets: 'data/assets.json', guide: 'data/guide.json', history: 'data/history.json'
+    guide: 'data/guide.json', history: 'data/history.json'
   };
   /* RFP·목차·제안서 검토·제안서 관리는 더 이상 정적 파일이 아니라 Java 백엔드(SQLite)가 보관 — js/store.js의 api()로 호출 */
   var PROJECT_ID = 'P-001';
@@ -140,7 +140,24 @@
     S.modal = null;
     $('modal').classList.add('open');
   }
-  function closeModal() { S.modal = null; $('modal').classList.remove('open'); }
+  function closeModal() { S.modal = null; S.slideViewer = null; $('modal').classList.remove('open'); }
+  /* 슬라이드 뷰어: 큰 이미지 + 이전/다음 + 키보드 방향키 */
+  function openSlideViewer(commitHash, slideCount, index) {
+    S.modal = null;
+    S.slideViewer = { commitHash: commitHash, slideCount: slideCount, index: index };
+    var imgUrl = apiPath('/versions/commits/' + encodeURIComponent(commitHash) + '/slides/' + index + '?width=1400');
+    $('modalBox').innerHTML = '<div class="modal-hd"><div><h3>슬라이드 미리보기</h3><span class="muted">' + (index + 1) + ' / ' + slideCount + '</span></div><button class="modal-close" data-x="1">✕</button></div>' +
+      '<div class="modal-list" style="text-align:center;padding:10px"><img src="' + imgUrl + '" alt="슬라이드 ' + (index + 1) + '" style="max-width:100%;max-height:70vh;border:1px solid var(--line2);border-radius:6px"></div>' +
+      '<div class="modal-input"><div class="row"><span><button class="btn ghost sm" data-slide-prev="1"' + (slideCount <= 1 ? ' disabled' : '') + '>← 이전</button></span>' +
+      '<span class="pick-btns"><button class="btn ghost sm" data-slide-next="1"' + (slideCount <= 1 ? ' disabled' : '') + '>다음 →</button></span></div></div>';
+    S.modal = null;
+    $('modal').classList.add('open');
+  }
+  function navSlideViewer(dir) {
+    var cur = S.slideViewer;
+    if (!cur || cur.slideCount <= 1) return;
+    openSlideViewer(cur.commitHash, cur.slideCount, ((cur.index + dir) % cur.slideCount + cur.slideCount) % cur.slideCount);
+  }
   // 삭제: 사유 필수, 실제로는 지우지 않고 '삭제됨'으로 표시 + 이력
   function askDelete(label, target, onOk, savedMsg) {
     openForm('삭제 · ' + label, [{ k: 'reason', label: '삭제 사유', type: 'textarea', req: true }], {}, function (v) {
@@ -321,16 +338,26 @@
   function viewRfp() {
     var data = S.data.rfp || { document: null, requirements: [] };
     var doc = data.document, reqs = data.requirements || [];
+    var candidates = (S.data.rfpCandidates || []).filter(function (c) { return c.status === 'candidate'; });
     if (!reqs.some(function (q) { return q.id === S.rfpReq; })) S.rfpReq = reqs.length ? reqs[0].id : null;
-    var sel = S.rfpReq;
+    var sel = S.rfpReq, can = canEdit('rfp');
     var h = doc
-      ? '<div class="card" style="display:flex;align-items:center;gap:14px"><span class="tag" style="background:#000;color:#fff;border-color:#000">PDF</span><div><div style="font-weight:700">' + esc(doc.fileName) + '</div><div class="muted">' + esc(doc.pageCount) + ' · ' + esc(doc.receivedDate) + '</div></div></div>'
-      : '<div class="card"><div class="empty">등록된 RFP 원문이 없습니다.</div></div>';
-    h += '<div class="grid2"><div><div class="card"><h3>요구사항 정리' + (canEdit('rfp') ? ' <button class="btn sm" data-req-add="1">＋ 추가</button>' : '') + '</h3><table><tbody>';
+      ? '<div class="card" style="display:flex;align-items:center;gap:14px"><span class="tag" style="background:#000;color:#fff;border-color:#000">PDF</span><div><div style="font-weight:700">' + esc(doc.fileName) + '</div><div class="muted">' + esc(doc.pageCount) + ' · ' + esc(doc.receivedDate) + '</div></div>' +
+        (can ? '<button class="btn sm" data-rfp-upload="1" style="margin-left:auto">RFP 업로드(자동 추출)</button><input type="file" id="rfpFile" accept=".pdf,.docx" style="display:none">' : '') + '</div>'
+      : '<div class="card"><div class="empty">등록된 RFP 원문이 없습니다.</div>' + (can ? '<button class="btn sm" data-rfp-upload="1" style="margin-top:8px">RFP 업로드(자동 추출)</button><input type="file" id="rfpFile" accept=".pdf,.docx" style="display:none">' : '') + '</div>';
+    if (candidates.length) {
+      h += '<div class="card"><h3>자동 추출 후보 <span class="chip">확정 전</span> <span class="muted">' + candidates.length + '건 · 방식 A(규칙 기반)</span></h3><table><tbody>';
+      candidates.forEach(function (c) {
+        h += '<tr class="prow"><td style="font-weight:700;width:90px">' + esc(c.code || '(번호 없음)') + '</td><td><b>' + esc(c.title) + '</b><div class="muted">' + esc(c.description || '') + (c.sourcePage ? ' · ' + esc(c.sourcePage) + '쪽' : '') + ' · 신뢰도 ' + Math.round(c.confidence * 100) + '%</div></td>' +
+          (can ? '<td style="white-space:nowrap"><button class="btn sm" data-rfp-cand-confirm="' + esc(c.id) + '">확정</button> <button class="btn ghost sm" data-rfp-cand-edit="' + esc(c.id) + '">수정</button> <button class="btn ghost sm" data-rfp-cand-reject="' + esc(c.id) + '">거절</button></td>' : '') + '</tr>';
+      });
+      h += '</tbody></table></div>';
+    }
+    h += '<div class="grid2"><div><div class="card"><h3>요구사항 정리' + (can ? ' <button class="btn sm" data-req-add="1">＋ 추가</button>' : '') + '</h3><table><tbody>';
     if (!reqs.length) h += '<tr><td class="empty" colspan="3">등록된 요구사항이 없습니다.</td></tr>';
     reqs.forEach(function (q) {
       h += '<tr class="prow" data-req="' + esc(q.id) + '" style="' + (q.id === sel ? 'background:var(--accent-bg)' : '') + '"><td style="font-weight:700;width:60px">' + esc(q.id) + '</td><td><b>' + esc(q.title) + '</b><div class="muted">' + esc(q.description || '') + '</div></td>' +
-        (canEdit('rfp') ? '<td><button class="btn ghost sm" data-req-del="' + esc(q.id) + '">삭제</button></td>' : '') + '</tr>';
+        (can ? '<td><button class="btn ghost sm" data-req-del="' + esc(q.id) + '">삭제</button></td>' : '') + '</tr>';
     });
     h += '</tbody></table></div></div><div><div class="card"><h3>유사 사례 추천 <span class="chip">Step 2</span></h3><div class="empty">추천 사례 기능은 Step 2에서 제공됩니다.</div></div></div></div>';
     return h;
@@ -395,7 +422,7 @@
       h += '<div style="margin:14px 0"><div style="font-size:13px;font-weight:700;margin-bottom:6px">슬라이드 미리보기 <span class="muted">' + esc(upload.fileName) + ' · ' + upload.slideCount + '장</span></div><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">';
       for (var si = 0; si < upload.slideCount; si++) {
         var imgUrl = apiPath('/versions/commits/' + encodeURIComponent(upload.commitHash) + '/slides/' + si);
-        h += '<a href="' + imgUrl + '" target="_blank"><img src="' + imgUrl + '" alt="슬라이드 ' + (si + 1) + '" style="height:140px;border:1px solid var(--line2);border-radius:6px;flex:none"></a>';
+        h += '<img src="' + imgUrl + '" alt="슬라이드 ' + (si + 1) + '" data-slide-view="' + esc(upload.commitHash) + '|' + si + '|' + upload.slideCount + '" style="height:140px;border:1px solid var(--line2);border-radius:6px;flex:none;cursor:pointer">';
       }
       h += '</div></div>';
     }
@@ -423,8 +450,10 @@
     h += '<div class="grid2" style="grid-template-columns:360px 1fr"><div class="card" style="padding:6px 4px"><div class="tabs" style="margin:8px">' + v.branches.map(function (b, i) { return '<button class="' + (i === 0 ? 'on' : '') + '">⑂ ' + esc(b) + '</button>'; }).join('') + '</div>';
     if (!filtered.length) h += '<div class="empty" style="padding:14px">커밋 내역이 없습니다.</div>';
     filtered.forEach(function (c) {
+      var unreadable = c.fileName && !c.isSnapshot && !c.slideCount;
       h += '<div class="commit' + (sel && c.commitHash === sel.commitHash ? ' sel' : '') + '" data-commit="' + esc(c.commitHash) + '"><div class="h">' + esc(c.commitHash) + ' · ' + esc(c.uploadedAt) + '</div><div style="font-weight:600">' + esc(c.message) + (c.fileName ? ' <span class="muted">(' + esc(c.fileName) + ')</span>' : '') + '</div><div class="muted">' + esc(c.uploadedBy) + (c.tag ? ' · <span class="tag">' + esc(c.tag) + '</span>' : '') + (c.tocRowId ? ' · <span class="tag">' + esc(tocTitleOf(c.tocRowId)) + '</span>' : '') +
-        (c.fileName ? ' · <a href="' + apiPath('/versions/commits/' + encodeURIComponent(c.commitHash) + '/download') + '" download>⬇ 다운로드</a>' : '') + '</div></div>';
+        (c.fileName ? ' · <a href="' + apiPath('/versions/commits/' + encodeURIComponent(c.commitHash) + '/download') + '" download>⬇ 다운로드</a>' : '') + '</div>' +
+        (unreadable ? '<div style="color:#d33;font-size:12px;margin-top:2px">⚠ 파일을 읽지 못했습니다(pptx 형식이 아니거나 DRM 암호화·손상된 파일일 수 있습니다)</div>' : '') + '</div>';
     });
     h += '</div><div class="card"><h3>변경 내용 <span class="muted">' + esc(sel ? sel.commitHash : '') + '</span></h3>';
     if (!sel) h += '<div class="empty">선택된 커밋이 없습니다.</div>';
@@ -432,6 +461,10 @@
     else sel.diff.forEach(function (d) {
       h += '<div class="act"><span class="' + (d.kind === 'add' ? 'diff-add' : 'diff-mod') + '" style="font-weight:700;min-width:90px">' + esc(d.label) + '</span><span>' + esc(d.detail) + '</span></div>';
     });
+    if (sel && sel.skippedFiles && sel.skippedFiles.length) {
+      h += '<div class="act" style="margin-top:10px;border-top:1px dashed #d33;padding-top:8px"><span style="font-weight:700;color:#d33;min-width:90px">⚠ 합본 제외</span><span>병합 중 아래 파일을 열 수 없어 건너뛰었습니다:<ul style="margin:4px 0 0 18px">' +
+        sel.skippedFiles.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ul></span></div>';
+    }
     return h + '</div></div>';
   }
 
@@ -502,13 +535,31 @@
 
   /* ---------- 화면: 자산 라이브러리 ---------- */
   function viewAssets() {
-    var h = '<div style="display:grid;grid-template-columns:200px 1fr;gap:16px"><div class="card" style="padding:14px"><div style="font-size:12px;font-weight:700;margin-bottom:10px">필터</div>' +
-      '<div style="font-size:12.5px;color:var(--ink2);line-height:2.2">발주처 ▾<br>문서 유형 ▾<br>연도 ▾</div>' +
-      '<div style="margin-top:14px;font-size:12px;color:#B85315;background:var(--accent-bg);padding:8px;border-radius:8px">의미(시맨틱) 검색과 요구사항 기준 페이지 추천은 <b>Step 2</b>입니다.</div></div><div class="cards">';
-    S.data.assets.cards.forEach(function (c) {
-      h += '<div class="acard"><div class="ti">' + esc(c.t) + '</div><div class="m">' + esc(c.m) + ' · ' + esc(c.s) + '</div><div class="p">' + esc(c.p) + '</div></div>';
+    var slides = S.data.assets || [], f = S.assetFilter || (S.assetFilter = { q: '', clientSector: '', year: '', won: '' });
+    var can = canEdit('assets');
+    var h = '<div style="display:grid;grid-template-columns:220px 1fr;gap:16px"><div class="card" style="padding:14px">' +
+      '<div style="font-size:12px;font-weight:700;margin-bottom:10px">검색(키워드·메타, Step 1)</div>' +
+      '<label class="fld"><span>키워드</span><input id="assetQ" value="' + esc(f.q) + '" placeholder="제목·본문·태그"></label>' +
+      '<label class="fld"><span>발주처(부문)</span><input id="assetSector" value="' + esc(f.clientSector) + '" placeholder="예: 보험"></label>' +
+      '<label class="fld"><span>연도</span><input id="assetYear" value="' + esc(f.year) + '" placeholder="예: 2026"></label>' +
+      '<label class="fld"><span>수주 여부</span><select id="assetWon"><option value=""' + (f.won === '' ? ' selected' : '') + '>전체</option><option value="yes"' + (f.won === 'yes' ? ' selected' : '') + '>수주</option><option value="no"' + (f.won === 'no' ? ' selected' : '') + '>미수주</option></select></label>' +
+      '<button class="btn sm" data-asset-search="1" style="width:100%;margin-top:4px">검색</button>' +
+      (can ? '<button class="btn ghost sm" data-asset-ingest="1" style="width:100%;margin-top:8px">＋ 과거 제안서 적재</button><input type="file" id="assetFile" accept=".pptx" style="display:none">' : '') +
+      '<div style="margin-top:14px;font-size:12px;color:#B85315;background:var(--accent-bg);padding:8px;border-radius:8px">의미(시맨틱) 검색은 <b>Step 2(P1)</b>입니다. 지금은 키워드·메타 일치만 찾습니다.</div></div><div class="cards">';
+    if (!slides.length) h += '<div class="empty" style="grid-column:1/-1">조건에 맞는 자산이 없습니다. 적재된 과거 제안서가 없거나 검색어가 결과와 겹치지 않습니다.</div>';
+    slides.forEach(function (s) {
+      h += '<div class="acard"><div class="ti">' + esc(s.proposalName) + ' <span class="muted">' + (s.slideNumber) + '쪽</span></div>' +
+        '<div class="m">' + esc(s.clientSector || '부문 미입력') + ' · ' + esc(s.year || '연도 미입력') + (s.won ? ' · 수주' : '') + '</div>' +
+        '<div class="p" style="font-weight:700">' + esc(s.title || '(제목 없음)') + '</div>' +
+        '<div class="muted" style="font-size:12px;max-height:3.6em;overflow:hidden">' + esc((s.body || '').slice(0, 120)) + '</div>' +
+        (s.tags && s.tags.length ? '<div style="margin-top:4px">' + s.tags.map(function (t) { return '<span class="tag" style="margin-right:4px">' + esc(t) + '</span>'; }).join('') + '</div>' : '') + '</div>';
     });
-    return h + '</div></div><p class="muted" style="margin:12px 4px">과거 제안서 페이지 단위 적재(Step 1) · 키워드·메타 검색(Step 1) · 시맨틱 추천(Step 2)</p>';
+    return h + '</div></div><p class="muted" style="margin:12px 4px">과거 제안서 슬라이드 단위 적재(Step 1) · 키워드·메타 검색(Step 1, P0) · 시맨틱 추천(Step 2, P1)</p>';
+  }
+  function assetFields() {
+    return [{ k: 'proposalName', label: '사업명', req: true }, { k: 'clientSector', label: '발주처 부문' }, { k: 'year', label: '연도' },
+      { k: 'won', label: '수주 여부', type: 'select', opts: [{ v: 'false', l: '미수주' }, { v: 'true', l: '수주' }] },
+      { k: 'author', label: '작성자' }, { k: 'confidentiality', label: '비밀 등급' }, { k: 'tags', label: '태그(쉼표로 구분)' }];
   }
 
   /* ---------- 화면: 시스템 접근 권한관리 ---------- */
@@ -648,10 +699,21 @@
   }
   function apiPath(p) { return '/api/projects/' + PROJECT_ID + p; }
   function loadRfp() { return api('GET', apiPath('/rfp')).then(function (d) { S.data.rfp = d; }); }
+  function loadRfpCandidates() { return api('GET', apiPath('/rfp/candidates')).then(function (d) { S.data.rfpCandidates = d; }); }
   function loadToc() { return api('GET', apiPath('/toc')).then(function (d) { S.data.toc = d; }); }
   function loadReview() { return api('GET', apiPath('/review')).then(function (d) { S.data.review = d; }); }
   function loadVersions() { return api('GET', apiPath('/versions')).then(function (d) { S.data.versions = d; }); }
-  function loadBackend() { return Promise.all([loadRfp(), loadToc(), loadReview(), loadVersions()]); }
+  function assetsSearchQuery() {
+    var f = S.assetFilter || {};
+    var qs = [];
+    if (f.q) qs.push('q=' + encodeURIComponent(f.q));
+    if (f.clientSector) qs.push('clientSector=' + encodeURIComponent(f.clientSector));
+    if (f.year) qs.push('year=' + encodeURIComponent(f.year));
+    if (f.won) qs.push('won=' + encodeURIComponent(f.won === 'yes'));
+    return qs.length ? '?' + qs.join('&') : '';
+  }
+  function loadAssets() { return api('GET', '/api/assets/search' + assetsSearchQuery()).then(function (d) { S.data.assets = d; }); }
+  function loadBackend() { return Promise.all([loadRfp(), loadRfpCandidates(), loadToc(), loadReview(), loadVersions(), loadAssets()]); }
   function memberById(id) { return S.data.master.members.filter(function (m) { return m.id === id && !m.deleted; })[0]; }
   function showLogin() {
     $('login').style.display = 'flex';
@@ -719,6 +781,11 @@
       if ((x = t.closest('[data-req]'))) { S.rfpReq = x.getAttribute('data-req'); renderContent(); return; }
       if ((x = t.closest('[data-node]'))) { S.rv = x.getAttribute('data-node'); renderContent(); return; }
       if ((x = t.closest('[data-commit]'))) { S.commit = x.getAttribute('data-commit'); renderContent(); return; }
+      if ((x = t.closest('[data-slide-view]'))) {
+        p = x.getAttribute('data-slide-view').split('|');
+        openSlideViewer(p[0], parseInt(p[2], 10), parseInt(p[1], 10));
+        return;
+      }
       if ((x = t.closest('[data-exp-tab]'))) { S.expTab = x.getAttribute('data-exp-tab'); renderContent(); return; }
       if ((x = t.closest('[data-cal]'))) {
         var cb = x.getAttribute('data-cal'), c = S.cal;
@@ -789,6 +856,47 @@
         var dp = postsOf(p[0]).filter(function (y) { return y.id === p[1]; })[0];
         if (!dp || !canEditPost(p[0], dp)) { toast('이 글은 삭제할 수 없습니다', true); return; }
         askDelete('글 ' + dp.title, p[1], function () { markDeleted(dp, S.lastReason); });
+        return;
+      }
+      if (t.closest('[data-asset-search]')) {
+        S.assetFilter = {
+          q: $('assetQ').value.trim(), clientSector: $('assetSector').value.trim(),
+          year: $('assetYear').value.trim(), won: $('assetWon').value
+        };
+        loadAssets().then(renderAll).catch(function (err) { toast(err.message || '검색하지 못했습니다', true); });
+        return;
+      }
+      if (t.closest('[data-asset-ingest]')) {
+        $('assetFile').click();
+        return;
+      }
+      if (t.closest('[data-rfp-upload]')) {
+        $('rfpFile').click();
+        return;
+      }
+      if ((x = t.closest('[data-rfp-cand-confirm]'))) {
+        id = x.getAttribute('data-rfp-cand-confirm');
+        api('POST', apiPath('/rfp/candidates/' + encodeURIComponent(id) + '/confirm'), { who: S.user.name }).then(function () {
+          logH('추가', '요구사항(자동추출 확정)', id);
+          return Promise.all([loadRfp(), loadRfpCandidates()]);
+        }).then(renderAll).catch(function (err) { toast(err.message || '처리하지 못했습니다', true); });
+        return;
+      }
+      if ((x = t.closest('[data-rfp-cand-edit]'))) {
+        id = x.getAttribute('data-rfp-cand-edit');
+        var cand = (S.data.rfpCandidates || []).filter(function (y) { return y.id === id; })[0];
+        if (!cand) return;
+        openForm('추출 후보 수정', [{ k: 'title', label: '요구사항', req: true }, { k: 'description', label: '설명', type: 'textarea' }],
+          { title: cand.title, description: cand.description || '' }, function (v) {
+            return api('PUT', apiPath('/rfp/candidates/' + encodeURIComponent(id)), { title: v.title, description: v.description, who: S.user.name }).then(loadRfpCandidates);
+          }, null, null, '수정했습니다');
+        return;
+      }
+      if ((x = t.closest('[data-rfp-cand-reject]'))) {
+        id = x.getAttribute('data-rfp-cand-reject');
+        askDelete('추출 후보', id, function (reason) {
+          return api('POST', apiPath('/rfp/candidates/' + encodeURIComponent(id) + '/reject'), { who: S.user.name, reason: reason }).then(loadRfpCandidates);
+        }, '거절했습니다');
         return;
       }
       if (t.closest('[data-req-add]')) {
@@ -932,6 +1040,42 @@
 
     $('content').addEventListener('change', function (e) {
       var t = e.target;
+      if (t.id === 'assetFile') {
+        var assetFile = t.files && t.files[0];
+        if (!assetFile) return;
+        openForm('과거 제안서 적재', assetFields(), { proposalName: assetFile.name.replace(/\.pptx$/i, ''), won: 'false' }, function (v) {
+          var fd = new FormData();
+          fd.append('file', assetFile);
+          fd.append('proposalName', v.proposalName);
+          fd.append('clientSector', v.clientSector || '');
+          fd.append('year', v.year || '');
+          fd.append('won', v.won === 'true' ? 'true' : 'false');
+          fd.append('author', v.author || '');
+          fd.append('confidentiality', v.confidentiality || '');
+          fd.append('tags', v.tags || '');
+          return apiUpload('/api/assets/ingest', fd).then(function () {
+            logH('추가', '자산 라이브러리', v.proposalName);
+            return loadAssets();
+          });
+        }, null, null, '슬라이드 단위로 적재했습니다');
+        t.value = '';
+        return;
+      }
+      if (t.id === 'rfpFile') {
+        var rfpFile = t.files && t.files[0];
+        if (!rfpFile) return;
+        openForm('RFP 업로드(자동 추출)', [{ k: 'receivedDate', label: '수령일', type: 'date' }], { receivedDate: todayISO() }, function (v) {
+          var fd = new FormData();
+          fd.append('file', rfpFile);
+          fd.append('receivedDate', v.receivedDate);
+          return apiUpload(apiPath('/rfp/extract'), fd).then(function () {
+            logH('추가', 'RFP 업로드', rfpFile.name);
+            return Promise.all([loadRfp(), loadRfpCandidates()]);
+          });
+        }, null, null, '업로드했습니다. 요구사항 후보를 확인해 확정해 주세요(방식 A: 규칙 기반, 확정은 사람이 합니다)');
+        t.value = '';
+        return;
+      }
       if (t.id === 'versionFile') {
         var file = t.files && t.files[0];
         if (!file) return;
@@ -989,6 +1133,8 @@
     $('modal').addEventListener('click', function (e) {
       var t = e.target, M = S.modal;
       if (t === this || t.hasAttribute('data-x')) { closeModal(); return; }
+      if (t.closest('[data-slide-prev]')) { navSlideViewer(-1); return; }
+      if (t.closest('[data-slide-next]')) { navSlideViewer(1); return; }
       if (!M) return;
       if (t.hasAttribute('data-del')) { var dfn = M.onDelete; closeModal(); if (dfn) dfn(); renderAll(); return; }
       if (t.hasAttribute('data-save')) {
@@ -1006,6 +1152,13 @@
           toast(M.savedMsg || '반영했습니다. 저장 버튼으로 확정하세요');
         }).catch(function (err) { toast(err.message || '처리하지 못했습니다', true); });
       }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (!S.slideViewer || !$('modal').classList.contains('open')) return;
+      if (e.key === 'ArrowLeft') { navSlideViewer(-1); e.preventDefault(); }
+      else if (e.key === 'ArrowRight') { navSlideViewer(1); e.preventDefault(); }
+      else if (e.key === 'Escape') { closeModal(); }
     });
   }
 

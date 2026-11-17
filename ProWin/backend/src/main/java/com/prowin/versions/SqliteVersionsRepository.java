@@ -40,6 +40,24 @@ public class SqliteVersionsRepository implements VersionsRepository {
         }
     }
 
+    private List<String> parseSkipped(String raw) {
+        if (raw == null || raw.isBlank()) return List.of();
+        try {
+            return json.readValue(raw, new TypeReference<List<String>>() {
+            });
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
+
+    private String writeSkipped(List<String> skipped) {
+        try {
+            return json.writeValueAsString(skipped == null ? List.of() : skipped);
+        } catch (Exception e) {
+            return "[]";
+        }
+    }
+
     private String randomHash() {
         byte[] bytes = new byte[3];
         RANDOM.nextBytes(bytes);
@@ -54,12 +72,12 @@ public class SqliteVersionsRepository implements VersionsRepository {
                 "SELECT branch FROM proposal_commit WHERE project_id = ? GROUP BY branch ORDER BY MIN(rowid)",
                 (rs, i) -> rs.getString("branch"), projectId);
         List<ProposalCommit> commits = jdbc.query(
-                "SELECT commit_hash, branch, message, tag, uploaded_by, uploaded_at, file_name, is_snapshot, diff_json, toc_row_id, slide_count " +
+                "SELECT commit_hash, branch, message, tag, uploaded_by, uploaded_at, file_name, is_snapshot, diff_json, toc_row_id, slide_count, skipped_files " +
                         "FROM proposal_commit WHERE project_id = ? ORDER BY rowid DESC",
                 (rs, i) -> new ProposalCommit(rs.getString("commit_hash"), rs.getString("branch"), rs.getString("message"),
                         rs.getString("tag"), rs.getString("uploaded_by"), rs.getString("uploaded_at"),
                         rs.getString("file_name"), rs.getInt("is_snapshot") != 0, parseDiff(rs.getString("diff_json")),
-                        rs.getString("toc_row_id"), rs.getInt("slide_count")),
+                        rs.getString("toc_row_id"), rs.getInt("slide_count"), parseSkipped(rs.getString("skipped_files"))),
                 projectId);
         return new VersionsResponse(branches, commits);
     }
@@ -73,7 +91,7 @@ public class SqliteVersionsRepository implements VersionsRepository {
         jdbc.update("INSERT INTO proposal_commit (commit_hash, project_id, branch, message, tag, uploaded_by, uploaded_at, file_name, file_path, is_snapshot, diff_json, toc_row_id, slide_count) " +
                         "VALUES (?, ?, ?, ?, NULL, ?, ?, ?, ?, 0, '[]', ?, ?)",
                 hash, projectId, branchName, message, who, now, fileName, filePath, tocRowId, slideCount);
-        return new ProposalCommit(hash, branchName, message, null, who, now, fileName, false, List.of(), tocRowId, slideCount);
+        return new ProposalCommit(hash, branchName, message, null, who, now, fileName, false, List.of(), tocRowId, slideCount, List.of());
     }
 
     @Override
@@ -84,18 +102,21 @@ public class SqliteVersionsRepository implements VersionsRepository {
     }
 
     @Override
-    public ProposalCommit createSnapshot(String projectId, String branch, String message, String who, String fileName, String filePath, int slideCount) {
+    public ProposalCommit createSnapshot(String projectId, String branch, String message, String who, String filePath, int slideCount, List<String> skippedFiles) {
         if (message == null || message.isBlank()) throw new ApiException("합본 메시지를 입력해 주세요");
-        Integer count = jdbc.queryForObject("SELECT COUNT(*) FROM proposal_commit WHERE project_id = ?", Integer.class, projectId);
-        int num = (count == null ? 0 : count) + 1;
+        // 버전 번호는 전체 커밋 수가 아니라 "이 프로젝트에서 몇 번째 합본인가"만 센다. 업로드 커밋은 세지 않는다.
+        Integer snapshotCount = jdbc.queryForObject(
+                "SELECT COUNT(*) FROM proposal_commit WHERE project_id = ? AND is_snapshot = 1", Integer.class, projectId);
+        int num = (snapshotCount == null ? 0 : snapshotCount) + 1;
         String tag = "v1." + num;
+        String fileName = "제안서_합본_" + tag + ".pptx";
         String hash = "snap" + randomHash();
         String now = Clock.nowText();
         String branchName = (branch == null || branch.isBlank()) ? "main" : branch;
         List<DiffEntry> diff = List.of(new DiffEntry("add", "+ 스냅샷", "현재 각 노드의 최신본을 묶어 생성"));
-        jdbc.update("INSERT INTO proposal_commit (commit_hash, project_id, branch, message, tag, uploaded_by, uploaded_at, file_name, file_path, is_snapshot, diff_json, slide_count) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)",
-                hash, projectId, branchName, message, tag, who, now, fileName, filePath, writeDiff(diff), slideCount);
-        return new ProposalCommit(hash, branchName, message, tag, who, now, fileName, true, diff, null, slideCount);
+        jdbc.update("INSERT INTO proposal_commit (commit_hash, project_id, branch, message, tag, uploaded_by, uploaded_at, file_name, file_path, is_snapshot, diff_json, slide_count, skipped_files) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?)",
+                hash, projectId, branchName, message, tag, who, now, fileName, filePath, writeDiff(diff), slideCount, writeSkipped(skippedFiles));
+        return new ProposalCommit(hash, branchName, message, tag, who, now, fileName, true, diff, null, slideCount, skippedFiles == null ? List.of() : skippedFiles);
     }
 }

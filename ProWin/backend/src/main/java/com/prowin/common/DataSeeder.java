@@ -22,6 +22,7 @@ public class DataSeeder implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
+        migrate();
         Integer tocCount = jdbc.queryForObject("SELECT COUNT(*) FROM toc_row WHERE project_id = ?", Integer.class, PROJECT_ID);
         if (tocCount != null && tocCount > 0) return;
 
@@ -29,6 +30,20 @@ public class DataSeeder implements ApplicationRunner {
         seedToc();
         seedReview();
         seedVersions();
+    }
+
+    /** schema.sql의 CREATE TABLE IF NOT EXISTS는 이미 있는 테이블에 새 컬럼을 추가하지 않으므로, 기존 DB용으로 직접 보강한다. */
+    private void migrate() {
+        try {
+            jdbc.execute("ALTER TABLE proposal_commit ADD COLUMN skipped_files TEXT");
+        } catch (Exception alreadyExists) {
+            // 컬럼이 이미 있으면 무시
+        }
+        try {
+            jdbc.execute("ALTER TABLE rfp_document ADD COLUMN file_path TEXT");
+        } catch (Exception alreadyExists) {
+            // 컬럼이 이미 있으면 무시
+        }
     }
 
     private void seedRfp() {

@@ -1,0 +1,10 @@
+com/prowin/versions/PptxExtractorTest.class
+com/prowin/versions/VersionsIntegrationTest.class
+com/prowin/versions/PptxMergerTest.class
+com/prowin/rfp/RfpExtractionIntegrationTest.class
+com/prowin/rfp/RfpExtractionIntegrationTest$1.class
+com/prowin/rfp/RfpRequirementExtractorTest.class
+com/prowin/versions/PptxRendererTest.class
+com/prowin/assets/AssetsIntegrationTest.class
+com/prowin/versions/VersionsIntegrationTest$1.class
+com/prowin/assets/AssetsIntegrationTest$1.class

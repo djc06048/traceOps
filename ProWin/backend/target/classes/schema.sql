@@ -2,7 +2,37 @@ CREATE TABLE IF NOT EXISTS rfp_document (
   project_id TEXT PRIMARY KEY,
   file_name TEXT NOT NULL,
   page_count TEXT,
-  received_date TEXT
+  received_date TEXT,
+  file_path TEXT
+);
+
+CREATE TABLE IF NOT EXISTS asset_slide (
+  id TEXT PRIMARY KEY,
+  proposal_name TEXT NOT NULL,
+  client_sector TEXT,
+  year TEXT,
+  won INTEGER NOT NULL DEFAULT 0,
+  author TEXT,
+  confidentiality TEXT,
+  tags TEXT,
+  slide_number INTEGER NOT NULL,
+  title TEXT,
+  body TEXT,
+  source_file TEXT,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS rfp_requirement_candidate (
+  id TEXT PRIMARY KEY,
+  project_id TEXT NOT NULL,
+  code TEXT,
+  title TEXT NOT NULL,
+  description TEXT,
+  source_page TEXT,
+  confidence REAL,
+  status TEXT NOT NULL DEFAULT 'candidate',
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS rfp_requirement (
@@ -62,5 +92,6 @@ CREATE TABLE IF NOT EXISTS proposal_commit (
   is_snapshot INTEGER NOT NULL DEFAULT 0,
   diff_json TEXT,
   toc_row_id TEXT REFERENCES toc_row(id),
-  slide_count INTEGER NOT NULL DEFAULT 0
+  slide_count INTEGER NOT NULL DEFAULT 0,
+  skipped_files TEXT
 );
