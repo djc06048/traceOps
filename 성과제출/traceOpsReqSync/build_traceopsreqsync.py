@@ -20,7 +20,7 @@ slides.append(D.cover('AI-ASSISTED TRACEABILITY MANAGEMENT', 'TraceOps · ReqSyn
 # ---------- 2 목차 ----------
 slides.append(D.contents([
     (2.7, 'Part. 1  개요', [(1, '성과 요약'), (2, 'TraceOps · ReqSync 소개'), (3, '프로젝트 수행주기와 적용 지점'), (4, '추진 배경'), (5, '목표 및 기대효과')]),
-    (4.85, 'Part. 2  AI 활용과 구현 내용', [(6, 'AI 활용 구조와 역할 설계'), (7, '업무 흐름'), (8, '주요 기능'), (9, '단계별 화면 및 기술 구성')]),
+    (4.85, 'Part. 2  AI 활용과 구현 내용', [(6, '업무 흐름'), (7, 'ReqSync 구성과 AI 역할'), (8, '주요 기능'), (9, '단계별 화면 및 기술 구성')]),
     (6.75, 'Part. 3  향후 계획', [(10, '고도화 계획')])]))
 
 # ---------- 3 성과 요약 ----------
@@ -72,7 +72,7 @@ body += box('flowbox aibox', colx(3), 3.25, cwp * 3 + 0.24, 1.1, '<div><b>연계
 body += box('flowbox card', colx(1), 4.5, cwp * 5 + 0.48, 0.75, '<div><b>요구사항 → 분석 → 설계 → 개발 → 테스트 정합성 관리 (상시)</b>삭제·변경 시 영향 안내, 하위 연결 누락과 재검증 표시</div>')
 for n in range(2, 6):
     body += box('flowbox', colx(n), 5.4, cwp, 0.82, f'<div><b style="font-size:11pt">산출물 스냅샷</b>{["분석", "설계", "개발·단위", "통합"][n-2]} 확정</div>', 'background:#fff;border:1.5px solid #AF947E;font-size:10.5pt;padding:0.06in 0.1in;')
-body += box('rbar sand', L, 6.4, CW, 0.95, '<span class="lb">확정 후 수정</span><span class="tx">단계 산출물은 스냅샷으로 확정하고, 확정 이후에 수정할 때는 <b>품질 검토를 거치도록</b> 합니다 <em class="tg">고도화</em></span>', 'font-size:13pt')
+body += box('rbar sand', L, 6.4, CW, 0.95, '<span class="lb">기준선 관리</span><span class="tx">단계 산출물은 스냅샷으로 <b>기준선을 확정</b>하고, 확정 이후의 변경은 <b>품질 검토를 거쳐 반영</b>합니다</span>', 'font-size:13pt')
 slides.append(frame('개요', '프로젝트 수행주기와 적용 지점', '수행주기 관점',
     '프로젝트는 <b>착수, 기술협상, 분석, 설계, 개발·단위테스트, 통합테스트</b> 순서로 진행되며 단계마다 산출물이 확정됩니다.<br><b>ReqSync는 기술협상·분석</b>에서 요구사항을 확정하고, <b>연계관리는 설계부터 통합테스트까지</b> 프로세스 완결을 확인합니다.', body, ai=True))
 
@@ -129,36 +129,6 @@ for i, (k, a, b) in enumerate(rows6):
 slides.append(frame('개요', '기대효과', '도입 전후 비교',
     '<b>AI와 추적 체계</b>를 도입하면 요구사항 반영과 연계 관리가 개인 의존에서 공유 체계로 바뀝니다.<br>요구사항 반영, 변경 이력, 연계 관계, 범위 관리 네 영역에서 변화가 나타납니다.', body))
 
-# ---------- 8 AI 활용 구조: 로컬 LLM 구성과 동작 ----------
-body = ''
-fw = 1.8; fg = (CW - 5 * fw) / 4
-fl = [('card', '<b>회의록</b>텍스트(.txt) 업로드<small>12분 단위로 분할</small>'),
-      ('aibox', '<b><span class="aitag o sm">AI</span>결정사항 추출</b>근거 발언과 상태<small>원문에 없는 문장은 표시</small>'),
-      ('aibox', '<b><span class="aitag o sm">AI</span>2차 검증</b>앞뒤 발언과 대조<small>합의가 아니면 제외</small>'),
-      ('aibox', '<b><span class="aitag o sm">AI</span>요구사항 매칭</b>유사 후보 15건 비교<small>신뢰도와 개정안 제시</small>'),
-      ('humbox', '<b>PL 검토 · 확정</b>원문과 비교<small>문구 편집, 확정 권한</small>')]
-for i, (cls, txt) in enumerate(fl):
-    x = L + i * (fw + fg)
-    body += box(f'flowbox {cls}', x, 2.1, fw, 1.55, txt)
-    if i < 4: body += box('tri', x + fw + (fg - 0.12) / 2, 2.72, 0.12, 0.3)
-body += box('lab', L, 3.9, 6, 0.3, '로컬 LLM 스펙')
-chips = [('실행 도구', 'Ollama', 'MIT 라이선스, 무료'), ('모델', 'Qwen3', 'Apache 2.0, 상업 사용 무료'),
-         ('호출 규격', 'OpenAI 호환 API', 'vLLM 등 다른 서버와 호환'), ('실행 위치', '사내 PC', '외부 전송과 외부 API 없음')]
-tw = (CW - 3 * 0.2) / 4
-for i, (c, v, sub) in enumerate(chips):
-    body += box('tchip', L + i * (tw + 0.2), 4.25, tw, 1.0, f'<div class="tcat">{e(c)}</div><div class="tval">{e(v)}</div><div style="font-size:10.5pt;color:#6B6B6B;margin-top:0.03in">{e(sub)}</div>')
-mw2 = (CW - 0.2) / 2
-body += box('mini', L, 5.38, mw2, 1.05, '<b>회의록은 사내에서만 처리</b><span>회의록과 요구사항이 외부로 나가지 않아 보안 제약 안에서 AI를 활용합니다</span>')
-body += box('mini', L + mw2 + 0.2, 5.38, mw2, 1.05, '<b>설정만으로 모델 교체</b><span>서버 주소와 모델 이름을 설정값으로 분리해 GPU 서버로 코드 수정 없이 교체합니다</span>')
-body += box('rbar sand', L, 6.55, CW, 0.85, '<span class="lb">운영 원칙</span><span class="tx">AI는 추출과 제안까지 맡고, 최종 확정 권한은 PL에게 두어 AI 오판 위험을 통제합니다</span>', 'font-size:13.5pt')
-slides.append(frame('AI', 'AI 활용 구조', '로컬 LLM 구성과 동작',
-    '보안상 외부 LLM API를 쓸 수 없어 <b>사내 PC에서 동작하는 로컬 LLM</b>으로 구성했습니다.<br>회의록을 올리면 추출, 2차 검증, 요구사항 매칭 순서로 처리하고, 확정은 PL이 합니다.', body, ai=True))
-
-# ---------- 9 AI 역할 설계 ----------
-sys.path.insert(0, os.path.join(HERE, '..', '..', 'traceops-simple', '1117_박혜림'))
-import local_llm_slides
-slides.append(local_llm_slides._roles().replace('보완 문장', '개정 문구'))
-
 # ---------- 10 업무 흐름 ----------
 HUM = '<span style="display:inline-block;font-size:9pt;font-weight:700;color:#fff;background:#6E5744;border-radius:0.08in;padding:0 0.07in;margin-right:0.08in;vertical-align:2px">사람</span>'
 def act(a):
@@ -183,7 +153,58 @@ for i, (c, t, role, acts, scr) in enumerate(steps):
     if i < 3: body += box('tri', l + sw + 0.1, 4.5, 0.14, 0.24)
 body += box('rbar sand', L, 6.65, CW, 0.85, '<span class="lb">역할 분담</span><span class="tx">AI는 추출과 제안까지, 확정과 이후 단계는 사람이 맡아 <b>같은 요구사항 기준의 하나의 흐름</b>으로 관리합니다</span>', 'font-size:13pt')
 slides.append(frame('구현', '업무 흐름', '단계별 프로세스',
-    '회의 결정사항이 요구사항으로 반영되고, 이어서 개발, 테스트, 연계까지 <b>하나의 추적 흐름</b>으로 연결됩니다.<br>AI는 추출과 제안을, 사람은 확정과 설계, 개발, 테스트를 맡아 역할을 나눕니다.', body, ai=True))
+    '<b>ReqSync를 도입하면</b> 회의 결정사항이 요구사항으로 반영되고, 개발, 테스트, 연계까지 <b>하나의 추적 흐름</b>으로 이어집니다.<br>AI는 추출과 제안을, 사람은 확정과 설계, 개발, 테스트를 맡아 역할을 나눕니다.', body, ai=True))
+
+# ---------- 8 AI 활용 구조: 로컬 LLM 구성과 동작 ----------
+body = ''
+fw = 1.8; fg = (CW - 5 * fw) / 4
+fl = [('card', '<b>회의록</b>텍스트(.txt) 업로드<small>12분 단위로 분할</small>'),
+      ('aibox', '<b><span class="aitag o sm">AI</span>결정사항 추출</b>근거 발언과 상태<small>원문에 없는 문장은 표시</small>'),
+      ('aibox', '<b><span class="aitag o sm">AI</span>2차 검증</b>앞뒤 발언과 대조<small>합의가 아니면 제외</small>'),
+      ('aibox', '<b><span class="aitag o sm">AI</span>요구사항 매칭</b>유사 후보 15건 비교<small>신뢰도와 개정안 제시</small>'),
+      ('humbox', '<b>PL 검토 · 확정</b>원문과 비교<small>문구 편집, 확정 권한</small>')]
+for i, (cls, txt) in enumerate(fl):
+    x = L + i * (fw + fg)
+    body += box(f'flowbox {cls}', x, 2.1, fw, 1.55, txt)
+    if i < 4: body += box('tri', x + fw + (fg - 0.12) / 2, 2.72, 0.12, 0.3)
+body += box('lab', L, 3.9, 6, 0.3, '로컬 LLM 스펙')
+chips = [('실행 도구', 'Ollama', 'MIT 라이선스, 무료'), ('모델', 'Qwen3', 'Apache 2.0, 상업 사용 무료'),
+         ('호출 규격', 'OpenAI 호환 API', 'vLLM 등 다른 서버와 호환'), ('실행 환경', 'CPU · GPU', '서버 사양에 맞춰 모델 선택')]
+tw = (CW - 3 * 0.2) / 4
+for i, (c, v, sub) in enumerate(chips):
+    body += box('tchip', L + i * (tw + 0.2), 4.25, tw, 1.0, f'<div class="tcat">{e(c)}</div><div class="tval">{e(v)}</div><div style="font-size:10.5pt;color:#6B6B6B;margin-top:0.03in">{e(sub)}</div>')
+mw2 = (CW - 0.2) / 2
+body += box('mini', L, 5.38, mw2, 1.05, '<b>ReqSync가 해결하는 일</b><span>회의에서 합의한 내용이 요구사항에 누락되지 않고 근거와 함께 반영되도록 돕습니다</span>')
+body += box('mini', L + mw2 + 0.2, 5.38, mw2, 1.05, '<b>설정만으로 모델 교체</b><span>서버 주소와 모델 이름을 설정값으로 분리해 GPU 서버로 코드 수정 없이 교체합니다</span>')
+body += box('rbar sand', L, 6.55, CW, 0.85, '<span class="lb">운영 원칙</span><span class="tx">AI는 추출과 제안까지 맡고, 최종 확정 권한은 PL에게 두어 AI 오판 위험을 통제합니다</span>', 'font-size:13.5pt')
+slides.append(frame('AI', 'ReqSync 구성과 동작', 'AI 요구사항 어시스턴트',
+    '<b>ReqSync</b>는 회의록의 결정사항을 AI가 추출해 요구사항에 반영하도록 돕는 <b>AI 요구사항 어시스턴트</b>입니다.<br>로컬 LLM으로 구성했으며, 추출, 2차 검증, 요구사항 매칭 순서로 처리하고 확정은 PL이 합니다.', body, ai=True))
+
+# ---------- 9 ReqSync AI 역할 설계 ----------
+body = ''
+gp = 0.2
+cw3 = (CW - 2 * gp) / 3
+roles = [
+    ('STEP 01 · 추출', '회의록 분석가', '너는 … 프로젝트의 회의록 분석가다', '회의록 조각(약 12분)', '결정사항, 근거 발언, 상태, 판단 근거', ['잡담과 일정 조율은 제외', '발언 원문 그대로 인용, 지어내지 않음']),
+    ('STEP 02 · 검증', '2차 검토자', '너는 … 결과를 검증하는 2차 검토자다', '결정사항과 앞뒤 대화', '예·아니오 3문항과 판단 근거', ['예·아니오 질문으로만 판단', '남은 승인·확인이 있으면 확정 불가']),
+    ('STEP 03 · 매칭', '요구사항 매핑 분석가', '너는 … 요구사항 등록부에 매핑하는 분석가다', '결정사항과 후보 요구사항 15건', '대상 요구사항, 신뢰도, 개정 문구', ['목록에 있는 요구사항ID만 선택', '보류여도 관련 ID, 없으면 신규']),
+]
+for i, (stp, t, q, inp, outp, rules) in enumerate(roles):
+    x = L + i * (cw3 + gp)
+    body += box('card', x, 2.1, cw3, 4.6)
+    body += box('cbar o', x, 2.1, cw3, 0.06)
+    body += box('stp o', x + 0.25, 2.32, cw3 - 0.4, 0.25, e(stp))
+    body += box('ct16', x + 0.25, 2.62, cw3 - 0.4, 0.4, '<span class="aitag o sm">AI</span>' + e(t), 'font-size:16pt')
+    body += box('', x + 0.25, 3.1, cw3 - 0.4, 0.3, e('“' + q + '”'), 'font-size:10pt;color:#AF947E')
+    body += box('hl-line', x + 0.25, 3.55, cw3 - 0.5, 0.01)
+    for j, (k, v) in enumerate((('입력', inp), ('출력', outp))):
+        y = 3.75 + j * 0.65
+        body += box('tcat', x + 0.25, y + 0.02, 0.5, 0.3, k, 'font-size:11pt')
+        body += box('', x + 0.8, y, cw3 - 1.0, 0.6, e(v), 'font-size:12pt;line-height:1.3')
+    body += box('tcat', x + 0.25, 5.15, cw3 - 0.4, 0.25, '핵심 규칙', 'color:#F46A25;font-size:11pt')
+    body += box('cd', x + 0.25, 5.5, cw3 - 0.4, 1.5, ''.join(f'<p>{e(r)}</p>' for r in rules), 'font-size:12pt;line-height:1.4')
+slides.append(frame('AI', 'ReqSync AI 역할 설계', '역할 지시문',
+    'ReqSync는 단계마다 AI에게 <b>역할과 판단 규칙</b>을 부여해, 같은 모델로 추출, 검증, 매칭을 나눠 수행합니다.<br>역할 지시문은 모델과 분리되어 있어, 실제 회의록으로 다듬으며 정확도를 높일 수 있습니다.', body, ai=True))
 
 # ---------- 10~14 주요 기능 ----------
 slides.append(detail('ReqSync 요구사항 개정 검토', '핵심 기능 1/5',
@@ -313,7 +334,7 @@ body += box('blk', 8.75, T0, 2.24, BH, '')
 body += box('bt', 9.0, T0 + 0.15, 1.9, 0.4, '데이터')
 body += box('chipw', 9.0, T0 + 0.7, 1.75, 0.95, '<div>SQLite<br><span style="font-size:10pt;font-weight:400;color:#6B6B6B">traceops.db<br>요구사항, 단계별 항목, 연결, 회의·결정사항, 연계</span></div>', 'font-size:12pt')
 ay = T0 + BH + 0.2
-body += box('flowbox aibox', L, ay, 5.05, 1.0, '<div><b><span class="aitag o sm">AI</span>로컬 LLM 서버 (Ollama · Qwen3)</b>ReqSync 결정사항 추출, 검증, 매칭을 사내 PC에서 수행</div>')
+body += box('flowbox aibox', L, ay, 5.05, 1.0, '<div><b><span class="aitag o sm">AI</span>로컬 LLM 서버 (Ollama · Qwen3)</b>ReqSync의 결정사항 추출, 검증, 매칭을 수행</div>')
 body += box('flowbox card', L + 5.24, ay, 5.05, 1.0, '<div><b>호출구조 정적분석</b>연계관리 화면에서 실행해 AS-IS 콜트리를 연계 데이터로 반영</div>')
 body += box('lab', L, 5.45, 4, 0.3, '상용화 시 보완 방향')
 comm = [('데이터 저장', 'SQLite를 서버형 DB로 전환하여 동시 접속, 백업 확보'),
@@ -337,7 +358,7 @@ for i, (tag, t, d) in enumerate(fut):
     body += box('futt', L + 0.3, y + 0.55, 5.8, 0.5, e(t))
     body += box('futd', L + 0.3, y + 1.05, 5.8, 0.8, e(d))
 body += box('lab', 7.4, 2.1, 3.5, 0.3, '수행관리 자동화')
-adds = [('단계말 스냅샷 확정', '분석, 설계, 개발·단위, 통합 산출물을 스냅샷으로 확정'), ('확정 후 수정 검토', '확정 이후 수정 시 품질 검토를 거치도록 관리'), ('제출 산출물과 진척 관리', '단계별 제출 산출물 생성과 진척 모니터링'), ('엑셀 · PMS 연동', '기존 관리 도구와 연동해 이중 입력 제거')]
+adds = [('단계말 스냅샷 확정', '분석, 설계, 개발·단위, 통합 산출물을 스냅샷으로 확정'), ('기준선 변경 검토', '확정된 기준선을 수정할 때 품질 검토를 거치도록 관리'), ('제출 산출물과 진척 관리', '단계별 제출 산출물 생성과 진척 모니터링'), ('엑셀 · PMS 연동', '기존 관리 도구와 연동해 이중 입력 제거')]
 for i, (t, d) in enumerate(adds):
     y = 2.45 + i * 1.0
     body += box('sq', 7.4, y + 0.1, 0.1, 0.1)
