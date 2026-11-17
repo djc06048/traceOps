@@ -284,6 +284,8 @@
   function renderCanvas() {
     var p = S.detail.process;
     document.body.classList.toggle('asis-locked', p.model === 'asis');
+    // 호출구조 정적분석 실행 버튼(AS-IS 전용). 화면만 있으며 분석 프로그램 연동은 아직 하지 않았다.
+    $('btnRunStatic').style.display = p.model === 'asis' ? '' : 'none';
     $('lkPName').textContent = p.name;
     $('lkCrumbName').textContent = p.name;
     $('lkPMeta').textContent = (p.model === 'asis' ? 'AS-IS' : 'TO-BE') + (p.txCode ? ' · ' + p.txCode : '') + (p.owner ? ' · ' + p.owner : '') + ' · ' + p.status;
