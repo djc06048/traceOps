@@ -1,0 +1,201 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>로컬 LLM 회의록 분석</title><style>@font-face{ font-family:'NanumBarunGothic'; font-weight:400; src:url('../../성과제출/fonts/NanumBarunGothic.ttf') format('truetype'); }
+@font-face{ font-family:'NanumBarunGothic'; font-weight:700; src:url('../../성과제출/fonts/NanumBarunGothicBold.ttf') format('truetype'); }
+@font-face{ font-family:'NanumBarunGothic'; font-weight:300; src:url('../../성과제출/fonts/NanumBarunGothicLight.ttf') format('truetype'); }
+@page { size: 297mm 210mm; margin: 0; }
+:root{
+  --orange:#F46A25; --orange-2:#F8931F; --orange-4:#EA5519; --orange-bg:#FFF0E6;
+  --brown:#6E5744; --tan:#AF947E; --sand:#F3ECE5; --gray-bg:#F7F5F3; --line:#E5E0DB;
+  --text:#2F2F2F; --sub:#6B6B6B;
+}
+*{ box-sizing:border-box; }
+html,body{ margin:0; background:#8a8a8a; }
+.slide{
+  position:relative; width:11.69in; height:8.27in; overflow:hidden; background:#fff; color:var(--text);
+  margin:0 auto 0.3in; page-break-after:always; break-after:page; font-size:14pt; line-height:1.4;
+  font-family:'NanumBarunGothic','나눔바른고딕','Malgun Gothic',sans-serif;
+}
+@media print{ html,body{ background:none; } .slide{ margin:0; } *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; } }
+.slide{ word-break:keep-all; }
+.a{ position:absolute; }
+b{ font-weight:700; }
+p{ margin:0; }
+
+/* 공통 틀 */
+.acc{ background:var(--orange); }
+.gov{ font-size:24pt; font-weight:700; line-height:1.3; color:var(--text); }
+.flogo{ left:0.7in; top:7.78in; height:0.24in; }
+.pgno{ font-size:10pt; color:var(--sub); text-align:right; }
+
+/* 표지 / 목차 / 엔딩 (템플릿 유지) */
+.coverbg{ position:absolute; left:0; top:0; width:11.69in; height:5.0in; background:url(../../성과제출/assets/bg-title-art.jpg) no-repeat top left / 11.69in auto; }
+.ctab{ left:1.0in; top:0; width:1.4in; }
+.csub{ font-size:24pt; font-weight:300; color:#fff; }
+.ctitle{ font-size:40pt; font-weight:700; color:#fff; line-height:1.2; }
+.cinfo{ font-size:14pt; font-weight:700; }
+.cline{ position:absolute; left:0.65in; top:7.74in; width:10.39in; border-top:2px solid #EC7000; }
+.gray{ background:#EAEAEA; }
+.contbg{ height:8.27in; background:url(../../성과제출/assets/bg-contents-art.jpg) no-repeat top left / 11.69in 8.27in; }
+.ctt{ font-size:40pt; font-weight:700; }
+.pbar{ background:var(--orange-2); }
+.ptag{ font-size:15pt; font-weight:700; }
+.pitems{ font-size:14pt; line-height:1.5; }
+.pitems b{ color:var(--orange-2); }
+.endslide{ background:#EC7000; }
+.endbg{ height:8.27in; background:url(../../성과제출/assets/bg-title-art.jpg) no-repeat top left / 11.69in 8.27in; }
+.endbox{ background:#fff; display:flex; flex-direction:column; justify-content:center; padding-left:0.4in; }
+.endbox span{ font-size:14pt; } .endbox b{ font-size:32pt; }
+.copy{ font-size:7pt; color:#7F7F7F; }
+.fline{ position:absolute; left:0.65in; top:7.76in; width:10.39in; border-top:1px solid #C8C8C8; }
+
+/* 카드 */
+.card{ background:var(--gray-bg); border-radius:0.14in; }
+.ct20{ font-size:20pt; font-weight:700; line-height:1.25; }
+.cd{ font-size:13.5pt; line-height:1.5; color:var(--text); }
+.cd p{ margin-bottom:0.1in; position:relative; padding-left:0.2in; }
+.cd p::before{ content:''; position:absolute; left:0; top:0.1in; width:0.08in; height:0.08in; border-radius:50%; background:var(--orange); }
+.cd.nd p{ padding-left:0; } .cd.nd p::before{ display:none; }
+.rbar{ border-radius:0.14in; display:flex; align-items:center; padding:0 0.35in; font-size:15pt; line-height:1.45; }
+.rbar.brown{ background:var(--brown); color:#fff; }
+.rbar.sand{ background:var(--sand); color:var(--text); }
+.rbar .lb{ font-weight:700; margin-right:0.35in; white-space:nowrap; }
+.rbar.brown .lb{ color:#E8DCD0; } .rbar.sand .lb{ color:var(--brown); }
+.rbar .tx b{ color:inherit; }
+.rbar.brown .tx{ color:#fff; }
+
+/* P2 */
+.idx{ font-size:30pt; font-weight:700; color:#F9C9AE; line-height:1; }
+.ct16{ font-size:16pt; font-weight:700; line-height:1.3; }
+.hl-line{ border-top:1px solid var(--line); }
+.imp3{ display:flex; gap:0.3in; width:100%; }
+.imp3 > div{ flex:1; font-size:14pt; font-weight:700; line-height:1.35; color:#fff; border-left:1px solid rgba(255,255,255,.25); padding-left:0.22in; }
+.imp3 > div:first-child{ border-left:none; padding-left:0; }
+.imp3 span{ display:block; font-size:11.5pt; font-weight:400; color:#E8DCD0; margin-top:0.03in; }
+
+/* P3 */
+.nc{ border-radius:50%; color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:26pt; }
+.nc.o{ background:var(--orange); } .nc.b{ background:var(--brown); } .nc.t{ background:var(--tan); }
+.rowline{ border-top:1px solid var(--line); }
+.outp{ border:2px solid var(--orange); border-radius:0.3in; color:var(--orange); font-weight:700; font-size:14pt; display:flex; align-items:center; justify-content:center; text-align:center; padding:0 0.1in; }
+.rt{ font-size:22pt; font-weight:700; } .rd{ font-size:14pt; color:#444; line-height:1.5; }
+
+/* P4 */
+.cat{ font-size:14pt; font-weight:700; color:var(--brown); display:flex; align-items:center; }
+.pan{ border-radius:0.12in; display:flex; align-items:center; padding:0 0.25in; font-size:13.5pt; line-height:1.45; }
+.pan.as{ background:var(--gray-bg); color:var(--sub); }
+.pan.tb{ background:var(--orange-bg); border-left:0.05in solid var(--orange); border-top-left-radius:0.04in; border-bottom-left-radius:0.04in; font-weight:700; }
+.tri{ background:var(--orange); clip-path:polygon(0 0,100% 50%,0 100%); }
+.colh{ font-size:12pt; font-weight:700; letter-spacing:0.02em; }
+
+/* P5 */
+.sn{ border-radius:50%; background:var(--orange); color:#fff; font-weight:700; font-size:16pt; display:flex; align-items:center; justify-content:center; }
+.sn.b{ background:var(--brown); } .sn.t{ background:var(--tan); }
+.st{ font-size:18pt; font-weight:700; }
+.conn{ background:#D9CFC5; height:2px; }
+.rtag{ border-radius:0.2in; color:#fff; font-weight:700; font-size:11.5pt; display:flex; align-items:center; justify-content:center; }
+.rtag.o{ background:var(--orange); } .rtag.b{ background:var(--brown); } .rtag.t{ background:var(--tan); }
+.scr{ font-size:11pt; color:var(--sub); line-height:1.35; } .scr small{ display:block; font-size:9.5pt; color:var(--tan); font-weight:700; letter-spacing:0.04em; }
+.tg{ font-style:normal; font-size:9pt; color:var(--orange); border:1px solid var(--orange); border-radius:0.1in; padding:0 0.06in; margin-left:0.06in; white-space:nowrap; font-weight:700; }
+
+/* P6 */
+.zoom{ border:2px solid var(--orange); border-radius:0.1in; background-repeat:no-repeat; background-color:#fff; box-shadow:0 0.04in 0.14in rgba(0,0,0,0.2); }
+.shot{ border:1px solid var(--line); border-radius:0.08in; overflow:hidden; background:#fff; }
+.shot img{ width:100%; display:block; }
+.hl{ position:absolute; border:2px solid var(--orange); border-radius:0.04in; box-sizing:border-box; font-style:normal; }
+.hl b{ position:absolute; left:-0.1in; top:-0.12in; background:var(--orange); color:#fff; font-size:8.5pt; width:0.22in; height:0.22in; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+.bd{ position:absolute; left:-0.12in; top:-0.12in; background:var(--orange); color:#fff; font-style:normal; font-weight:700; font-size:9pt; min-width:0.24in; height:0.24in; border-radius:0.12in; padding:0 0.05in; display:flex; align-items:center; justify-content:center; }
+.cap{ font-size:10pt; color:var(--sub); text-align:center; }
+.lab{ font-size:11pt; font-weight:700; color:var(--orange); letter-spacing:0.04em; }
+.nb{ background:var(--orange); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12pt; }
+.nt{ font-size:13pt; line-height:1.45; color:#444; } .nt b{ display:block; font-size:15pt; color:var(--text); margin-bottom:0.03in; }
+
+/* P7 */
+.tile{ }
+.timg{ background-repeat:no-repeat; border:1px solid var(--line); border-radius:0.08in; background-color:#F7F5F3; }
+.tn{ font-size:13pt; font-weight:700; } .tnote{ font-size:11.5pt; color:var(--sub); line-height:1.3; }
+
+/* P8 */
+.blk{ background:var(--gray-bg); border-radius:0.14in; }
+.blk.sd{ background:var(--sand); }
+.bt{ font-size:16pt; font-weight:700; } .bs{ font-size:12pt; color:var(--sub); }
+.chipw{ background:#fff; border:1px solid var(--line); border-radius:0.1in; font-size:12pt; font-weight:700; display:flex; align-items:center; justify-content:center; text-align:center; }
+.arrl{ height:2px; background:var(--tan); }
+.arrh{ background:var(--tan); clip-path:polygon(0 0,100% 50%,0 100%); }
+.alb{ font-size:10.5pt; color:var(--sub); text-align:center; }
+.tcat{ font-size:10pt; font-weight:700; color:var(--tan); letter-spacing:0.04em; }
+.tval{ font-size:13pt; font-weight:700; line-height:1.3; }
+.tchip{ background:#fff; border:1px solid var(--line); border-radius:0.1in; padding:0.1in 0.14in; }
+
+/* P9 */
+.dot{ width:0.1in; height:0.1in; border-radius:50%; background:var(--orange); }
+.li14{ font-size:14pt; line-height:1.45; }
+.vline{ width:2px; background:#E0D6CC; }
+.rst{ font-size:16pt; font-weight:700; } .rsd{ font-size:13pt; color:#555; line-height:1.45; }
+
+/* ===== v3 ===== */
+.badge{ background:var(--orange); color:#fff; border-radius:0.08in; font-size:12pt; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.ttl{ font-size:26pt; font-weight:700; display:flex; align-items:center; line-height:1.1; white-space:nowrap; }
+.chip{ background:var(--gray-bg); border:1px solid var(--line); color:var(--sub); border-radius:0.16in; font-size:10.5pt; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.msg{ font-size:14pt; line-height:1.6; color:#333; }
+.msg b{ color:#111; background:linear-gradient(transparent 62%, #FFE3D1 62%); }
+.big{ font-size:36pt; font-weight:700; color:var(--orange); line-height:1; letter-spacing:-0.02em; }
+.big.b{ color:var(--brown); } .big.t{ color:var(--tan); }
+.vrule{ background:var(--line); width:1px; }
+.stp{ font-size:10.5pt; font-weight:700; letter-spacing:0.08em; }
+.stp.o{ color:var(--orange); } .stp.b{ color:var(--brown); } .stp.t{ color:var(--tan); }
+.cbar{ height:0.06in; border-radius:0.03in; } .cbar.o{ background:var(--orange); } .cbar.b{ background:var(--brown); } .cbar.t{ background:var(--tan); }
+.ntag{ background:var(--orange); color:#fff; border-radius:0.06in; font-weight:700; font-size:11pt; display:flex; align-items:center; justify-content:center; }
+.pth{ font-size:10.5pt; color:var(--sub); }
+.pth b{ color:var(--tan); letter-spacing:0.04em; margin-right:0.1in; }
+.ptl{ font-size:10.5pt; font-weight:700; color:var(--sub); letter-spacing:0.04em; margin-bottom:0.06in; }
+.pts p{ position:relative; padding-left:0.22in; margin:0 0 0.07in; font-size:13pt; line-height:1.45; }
+.pts p::before{ content:'\203A'; position:absolute; left:0.03in; top:0; color:var(--orange); font-weight:700; font-size:13pt; }
+.eff{ background:var(--sand); border-left:0.06in solid var(--orange); border-radius:0.04in; padding:0.14in 0.25in; }
+.eff .ptl{ color:var(--brown); }
+.eff div.t{ font-size:14pt; font-weight:700; line-height:1.45; }
+.zt{ font-size:14pt; font-weight:700; display:flex; align-items:center; }
+.zd{ font-size:12pt; color:#555; line-height:1.4; }
+
+/* ===== v4 ===== */
+.pcard{ background:#fff; border:1px solid var(--line); border-radius:0.12in; border-left:0.06in solid var(--orange); padding:0.12in 0.2in; overflow:hidden; }
+.pk{ font-size:10.5pt; font-weight:700; color:var(--orange); letter-spacing:0.02em; margin-bottom:0.05in; }
+.pcard p{ font-size:12.5pt; line-height:1.4; margin:0; }
+.effb{ background:var(--brown); color:#fff; border-radius:0.12in; padding:0.14in 0.25in; }
+.effb .pk{ color:#E8DCD0; } .effb .et{ font-size:14pt; font-weight:700; line-height:1.4; }
+.hero{ font-size:34pt; font-weight:700; color:var(--orange); line-height:1.1; }
+.hero small{ font-size:15pt; color:var(--text); margin-left:0.06in; }
+.fut{ background:#fff; border:1px solid var(--line); border-radius:0.14in; padding:0.22in 0.3in; }
+.futtag{ display:inline-block; background:var(--orange); color:#fff; border-radius:0.06in; font-size:10.5pt; font-weight:700; padding:0.03in 0.12in; letter-spacing:0.04em; }
+.futt{ font-size:19pt; font-weight:700; margin:0.1in 0 0.06in; }
+.futd{ font-size:13pt; color:#444; line-height:1.5; }
+.sq{ width:0.1in; height:0.1in; border-radius:0.02in; background:var(--orange); }
+.mini{ background:var(--gray-bg); border-radius:0.12in; padding:0.14in 0.18in; }
+.mini b{ display:block; font-size:12pt; color:var(--brown); margin-bottom:0.04in; }
+.mini span{ font-size:11.5pt; line-height:1.4; color:#444; }
+.note9{ font-size:9.5pt; color:#8a8a8a; }
+
+/* AI 활용 표시 (TraceOps · ReqSync 자료) */
+.aitag{ font-style:normal; font-size:10.5pt; font-weight:700; color:#fff; background:var(--orange); border-radius:0.12in; padding:0.03in 0.13in; margin-left:0.18in; letter-spacing:0.04em; }
+.aitag.o{ background:#fff; color:var(--orange); border:1.5px solid var(--orange); margin-left:0; }
+.aibox{ border:2px solid var(--orange); background:var(--orange-bg); border-radius:0.14in; }
+.humbox{ border:2px solid var(--brown); background:var(--sand); border-radius:0.14in; }
+.flowbox{ border-radius:0.14in; display:flex; flex-direction:column; justify-content:center; padding:0.1in 0.18in; font-size:12.5pt; line-height:1.35; }
+.flowbox b{ font-size:14pt; display:block; margin-bottom:0.03in; }
+.flowbox small{ display:block; font-size:10.5pt; color:var(--sub); margin-top:0.03in; }
+.statcol{ background:#fff; border:1px solid var(--line); border-radius:0.12in; padding:0.14in 0.2in; }
+.statcol .st{ font-size:12pt; font-weight:700; color:var(--orange); margin-bottom:0.05in; letter-spacing:0.03em; }
+.aitag.sm{ display:inline-block; font-size:9pt; padding:0 0.07in; border-radius:0.08in; margin:0 0.08in 0 0; vertical-align:2px; }
+</style></head><body>
+<section class="slide"><div class="a badge" style="left:0.700in;top:0.550in;width:0.780in;height:0.360in;">AI</div><div class="a ttl" style="left:1.650in;top:0.450in;width:7.400in;height:0.560in;">로컬 LLM 구성<i class="aitag">AI 활용</i></div><div class="a chip" style="left:9.190in;top:0.550in;width:1.800in;height:0.340in;">시스템 구성</div><div class="a msg" style="left:0.700in;top:1.180in;width:10.290in;height:0.800in;">보안상 외부 LLM API를 쓸 수 없어 <b>사내 PC에서 동작하는 로컬 LLM</b>으로 구성했습니다.<br>회의록은 외부로 전송되지 않으며, 무료로 공개된 모델과 실행 도구만 사용합니다.</div><div class="a blk" style="left:0.700in;top:2.100in;width:2.250in;height:1.850in;"></div><div class="a bt" style="left:0.900in;top:2.250in;width:1.950in;height:0.350in;">브라우저</div><div class="a bs" style="left:0.900in;top:2.620in;width:1.950in;height:0.300in;font-size:10.5pt;color:#AF947E;font-weight:700">요구사항 개정 검토 화면</div><div class="a cd" style="left:0.900in;top:2.980in;width:1.950in;height:0.950in;font-size:11pt;line-height:1.35"><p>회의록 업로드</p><p>진행 상황 표시</p><p>PL 검토와 확정</p></div><div class="a arrl" style="left:3.010in;top:3.020in;width:0.230in;height:0.020in;"></div><div class="a arrh" style="left:3.220in;top:2.960in;width:0.100in;height:0.140in;"></div><div class="a blk" style="left:3.380in;top:2.100in;width:2.250in;height:1.850in;"></div><div class="a bt" style="left:3.580in;top:2.250in;width:1.950in;height:0.350in;">TraceOps 서버</div><div class="a bs" style="left:3.580in;top:2.620in;width:1.950in;height:0.300in;font-size:10.5pt;color:#AF947E;font-weight:700">server.py · Python</div><div class="a cd" style="left:3.580in;top:2.980in;width:1.950in;height:0.950in;font-size:11pt;line-height:1.35"><p>분석 작업 생성과 관리</p><p>LLM 호출과 결과 보정</p><p>결과 저장(SQLite)</p></div><div class="a arrl" style="left:5.690in;top:3.020in;width:0.230in;height:0.020in;"></div><div class="a arrh" style="left:5.900in;top:2.960in;width:0.100in;height:0.140in;"></div><div class="a aibox" style="left:6.060in;top:2.100in;width:2.250in;height:1.850in;"></div><div class="a bt" style="left:6.260in;top:2.250in;width:1.950in;height:0.350in;"><span class="aitag o sm">AI</span>로컬 LLM 서버</div><div class="a bs" style="left:6.260in;top:2.620in;width:1.950in;height:0.300in;font-size:10.5pt;color:#AF947E;font-weight:700">Ollama · localhost:11434</div><div class="a cd" style="left:6.260in;top:2.980in;width:1.950in;height:0.950in;font-size:11pt;line-height:1.35"><p>모델 적재와 추론 실행</p><p>OpenAI 호환 API 제공</p><p>CPU·GPU 자동 선택</p></div><div class="a arrl" style="left:8.370in;top:3.020in;width:0.230in;height:0.020in;"></div><div class="a arrh" style="left:8.580in;top:2.960in;width:0.100in;height:0.140in;"></div><div class="a aibox" style="left:8.740in;top:2.100in;width:2.250in;height:1.850in;"></div><div class="a bt" style="left:8.940in;top:2.250in;width:1.950in;height:0.350in;"><span class="aitag o sm">AI</span>LLM 모델</div><div class="a bs" style="left:8.940in;top:2.620in;width:1.950in;height:0.300in;font-size:10.5pt;color:#AF947E;font-weight:700">Qwen3 4B · CPU 실행</div><div class="a cd" style="left:8.940in;top:2.980in;width:1.950in;height:0.950in;font-size:11pt;line-height:1.35"><p>결정사항 추출</p><p>요구사항 매칭</p><p>보완 문장 제안</p></div><div class="a " style="left:3.380in;top:4.070in;width:7.610in;height:0.320in;border-top:2px dashed #AF947E;font-size:11pt;color:#6B6B6B;padding-top:0.06in"><b style="color:#6E5744">사내 PC 내부에서만 동작</b>&nbsp;&nbsp;회의록과 요구사항은 외부로 전송되지 않습니다</div><div class="a tchip" style="left:0.700in;top:4.650in;width:2.422in;height:0.950in;"><div class="tcat">실행 도구</div><div class="tval">Ollama</div><div style="font-size:10.5pt;color:#6B6B6B;margin-top:0.03in">MIT 라이선스, 무료</div></div><div class="a tchip" style="left:3.322in;top:4.650in;width:2.422in;height:0.950in;"><div class="tcat">모델</div><div class="tval">Qwen3</div><div style="font-size:10.5pt;color:#6B6B6B;margin-top:0.03in">Apache 2.0, 상업 사용 무료</div></div><div class="a tchip" style="left:5.945in;top:4.650in;width:2.422in;height:0.950in;"><div class="tcat">호출 규격</div><div class="tval">OpenAI 호환 API</div><div style="font-size:10.5pt;color:#6B6B6B;margin-top:0.03in">vLLM 등 다른 서버와 호환</div></div><div class="a tchip" style="left:8.567in;top:4.650in;width:2.422in;height:0.950in;"><div class="tcat">서버 · 저장소</div><div class="tval">Python · SQLite</div><div style="font-size:10.5pt;color:#6B6B6B;margin-top:0.03in">표준 라이브러리만 사용</div></div><div class="a rbar brown" style="left:0.700in;top:5.950in;width:10.290in;height:1.200in;font-size:14pt"><span class="lb">교체 방식</span><span class="tx">서버 주소와 모델 이름을 설정값으로 분리해, GPU 서버나 사내 승인 LLM으로 <b>코드 수정 없이 교체</b>합니다</span></div><img class="a flogo" src="../../성과제출/assets/logo-footer.png" alt="한화시스템"><div class="a pgno" style="left:9.990in;top:7.820in;width:1.000in;height:0.200in;">1</div></section><section class="slide"><div class="a badge" style="left:0.700in;top:0.550in;width:0.780in;height:0.360in;">AI</div><div class="a ttl" style="left:1.650in;top:0.450in;width:7.400in;height:0.560in;">로컬 LLM 분석 흐름<i class="aitag">AI 활용</i></div><div class="a chip" style="left:9.190in;top:0.550in;width:1.800in;height:0.340in;">처리 흐름</div><div class="a msg" style="left:0.700in;top:1.180in;width:10.290in;height:0.800in;">로컬 LLM을 기동한 뒤 회의록을 올리면 <b>결정사항 추출, 2차 검증, 요구사항 매칭</b>이 자동으로 진행됩니다.<br>AI 결과는 보완안으로만 제시되고, PL이 원문과 비교해 확정해야 요구사항에 반영됩니다.</div><div class="a cbar t" style="left:0.700in;top:2.100in;width:1.898in;height:0.060in;"></div><div class="a stp t" style="left:0.700in;top:2.260in;width:1.898in;height:0.250in;">STEP 01</div><div class="a st" style="left:0.700in;top:2.500in;width:1.898in;height:0.420in;font-size:15pt">로컬 LLM 기동</div><div class="a rtag t" style="left:0.700in;top:3.000in;width:1.898in;height:0.340in;font-size:10.5pt">운영자</div><div class="a card" style="left:0.700in;top:3.450in;width:1.898in;height:2.200in;"></div><div class="a cd" style="left:0.850in;top:3.620in;width:1.648in;height:2.000in;font-size:11.5pt;line-height:1.4"><p>Ollama 서버 실행</p><p>Qwen3 모델 적재</p><p>연결 상태를 화면 상단에 표시</p></div><div class="a scr" style="left:0.700in;top:5.780in;width:1.898in;height:0.600in;font-size:10pt"><small>관련 위치</small>ollama serve<br>/api/llm/status</div><div class="a tri" style="left:2.648in;top:4.400in;width:0.100in;height:0.220in;"></div><div class="a cbar b" style="left:2.798in;top:2.100in;width:1.898in;height:0.060in;"></div><div class="a stp b" style="left:2.798in;top:2.260in;width:1.898in;height:0.250in;">STEP 02</div><div class="a st" style="left:2.798in;top:2.500in;width:1.898in;height:0.420in;font-size:15pt">회의록 업로드</div><div class="a rtag b" style="left:2.798in;top:3.000in;width:1.898in;height:0.340in;font-size:10.5pt">PL</div><div class="a card" style="left:2.798in;top:3.450in;width:1.898in;height:2.200in;"></div><div class="a cd" style="left:2.948in;top:3.620in;width:1.648in;height:2.000in;font-size:11.5pt;line-height:1.4"><p>클로바노트 텍스트 업로드</p><p>화자와 발언 시각 단위로 읽기</p><p>약 12분 단위 조각으로 분할</p></div><div class="a scr" style="left:2.798in;top:5.780in;width:1.898in;height:0.600in;font-size:10pt"><small>관련 위치</small>요구사항 개정 검토 화면</div><div class="a tri" style="left:4.746in;top:4.400in;width:0.100in;height:0.220in;"></div><div class="a cbar o" style="left:4.896in;top:2.100in;width:1.898in;height:0.060in;"></div><div class="a stp o" style="left:4.896in;top:2.260in;width:1.898in;height:0.250in;">STEP 03</div><div class="a st" style="left:4.896in;top:2.500in;width:1.898in;height:0.420in;font-size:15pt">추출 · 2차 검증</div><div class="a rtag o" style="left:4.896in;top:3.000in;width:1.898in;height:0.340in;font-size:10.5pt">AI · 로컬 LLM</div><div class="a aibox" style="left:4.896in;top:3.450in;width:1.898in;height:2.200in;"></div><div class="a cd" style="left:5.046in;top:3.620in;width:1.648in;height:2.000in;font-size:11.5pt;line-height:1.4"><p>조각마다 결정사항과 근거 발언 추출</p><p>앞뒤 발언과 대조해 AI가 다시 판단</p><p>합의가 아니면 제외, 상태 보정</p></div><div class="a scr" style="left:4.896in;top:5.780in;width:1.898in;height:0.600in;font-size:10pt"><small>관련 위치</small>1단계 추출, 2단계 검증 (minutes.py)</div><div class="a tri" style="left:6.844in;top:4.400in;width:0.100in;height:0.220in;"></div><div class="a cbar o" style="left:6.994in;top:2.100in;width:1.898in;height:0.060in;"></div><div class="a stp o" style="left:6.994in;top:2.260in;width:1.898in;height:0.250in;">STEP 04</div><div class="a st" style="left:6.994in;top:2.500in;width:1.898in;height:0.420in;font-size:15pt">요구사항 매칭</div><div class="a rtag o" style="left:6.994in;top:3.000in;width:1.898in;height:0.340in;font-size:10.5pt">AI · 로컬 LLM</div><div class="a aibox" style="left:6.994in;top:3.450in;width:1.898in;height:2.200in;"></div><div class="a cd" style="left:7.144in;top:3.620in;width:1.648in;height:2.000in;font-size:11.5pt;line-height:1.4"><p>유사 요구사항 15건을 후보로 선별</p><p>대상 요구사항과 신뢰도 판단</p><p>보완 문장 또는 신규 후보 제시</p></div><div class="a scr" style="left:6.994in;top:5.780in;width:1.898in;height:0.600in;font-size:10pt"><small>관련 위치</small>3단계 매칭 (minutes.py)</div><div class="a tri" style="left:8.942in;top:4.400in;width:0.100in;height:0.220in;"></div><div class="a cbar b" style="left:9.092in;top:2.100in;width:1.898in;height:0.060in;"></div><div class="a stp b" style="left:9.092in;top:2.260in;width:1.898in;height:0.250in;">STEP 05</div><div class="a st" style="left:9.092in;top:2.500in;width:1.898in;height:0.420in;font-size:15pt">검토 · 확정</div><div class="a rtag b" style="left:9.092in;top:3.000in;width:1.898in;height:0.340in;font-size:10.5pt">PL</div><div class="a card" style="left:9.092in;top:3.450in;width:1.898in;height:2.200in;"></div><div class="a cd" style="left:9.242in;top:3.620in;width:1.648in;height:2.000in;font-size:11.5pt;line-height:1.4"><p>원문 발췌와 보완안 비교</p><p>문구 편집 후 확정</p><p>변경 이력에 근거 회의 기록</p></div><div class="a scr" style="left:9.092in;top:5.780in;width:1.898in;height:0.600in;font-size:10pt"><small>관련 위치</small>요구사항 개정 검토 화면</div><div class="a rbar sand" style="left:0.700in;top:6.600in;width:10.290in;height:0.850in;font-size:13.5pt"><span class="lb">운영 원칙</span><span class="tx">AI는 추출과 보완안 제시까지 맡고, 반영 확정은 PL이 하여 <b>AI 오판 위험을 통제</b>합니다</span></div><img class="a flogo" src="../../성과제출/assets/logo-footer.png" alt="한화시스템"><div class="a pgno" style="left:9.990in;top:7.820in;width:1.000in;height:0.200in;">2</div></section><section class="slide"><div class="a badge" style="left:0.700in;top:0.550in;width:0.780in;height:0.360in;">AI</div><div class="a ttl" style="left:1.650in;top:0.450in;width:7.400in;height:0.560in;">AI 역할 설계<i class="aitag">AI 활용</i></div><div class="a chip" style="left:9.190in;top:0.550in;width:1.800in;height:0.340in;">역할 지시문</div><div class="a msg" style="left:0.700in;top:1.180in;width:10.290in;height:0.800in;">AI에게 단계마다 <b>역할과 판단 규칙</b>을 부여해, 같은 모델로 추출, 검증, 매칭을 나눠 수행합니다.<br>역할 지시문은 모델과 분리되어 있어, 실제 회의록으로 다듬으며 정확도를 계속 높일 수 있습니다.</div><div class="a card" style="left:0.700in;top:2.100in;width:3.297in;height:3.300in;"></div><div class="a cbar o" style="left:0.700in;top:2.100in;width:3.297in;height:0.060in;"></div><div class="a stp o" style="left:0.950in;top:2.260in;width:2.897in;height:0.250in;">STEP 01 · 추출</div><div class="a ct16" style="left:0.950in;top:2.500in;width:2.897in;height:0.400in;font-size:15.5pt"><span class="aitag o sm">AI</span>회의록 분석가</div><div class="a " style="left:0.950in;top:2.900in;width:2.897in;height:0.280in;font-size:9.5pt;color:#AF947E">“너는 … 프로젝트의 회의록 분석가다”</div><div class="a hl-line" style="left:0.950in;top:3.250in;width:2.797in;height:0.010in;"></div><div class="a tcat" style="left:0.950in;top:3.370in;width:0.500in;height:0.300in;">입력</div><div class="a " style="left:1.450in;top:3.350in;width:2.347in;height:0.380in;font-size:11pt;line-height:1.3">회의록 조각(약 12분)</div><div class="a tcat" style="left:0.950in;top:3.790in;width:0.500in;height:0.300in;">출력</div><div class="a " style="left:1.450in;top:3.770in;width:2.347in;height:0.380in;font-size:11pt;line-height:1.3">결정사항, 근거 발언, 상태, 판단 근거</div><div class="a tcat" style="left:0.950in;top:4.250in;width:2.897in;height:0.250in;color:#F46A25">핵심 규칙</div><div class="a cd" style="left:0.950in;top:4.500in;width:2.897in;height:0.850in;font-size:11pt;line-height:1.35"><p>잡담과 일정 조율은 제외</p><p>발언 원문 그대로 인용, 지어내지 않음</p></div><div class="a card" style="left:4.197in;top:2.100in;width:3.297in;height:3.300in;"></div><div class="a cbar o" style="left:4.197in;top:2.100in;width:3.297in;height:0.060in;"></div><div class="a stp o" style="left:4.447in;top:2.260in;width:2.897in;height:0.250in;">STEP 02 · 검증</div><div class="a ct16" style="left:4.447in;top:2.500in;width:2.897in;height:0.400in;font-size:15.5pt"><span class="aitag o sm">AI</span>2차 검토자</div><div class="a " style="left:4.447in;top:2.900in;width:2.897in;height:0.280in;font-size:9.5pt;color:#AF947E">“너는 … 결과를 검증하는 2차 검토자다”</div><div class="a hl-line" style="left:4.447in;top:3.250in;width:2.797in;height:0.010in;"></div><div class="a tcat" style="left:4.447in;top:3.370in;width:0.500in;height:0.300in;">입력</div><div class="a " style="left:4.947in;top:3.350in;width:2.347in;height:0.380in;font-size:11pt;line-height:1.3">결정사항과 앞뒤 대화</div><div class="a tcat" style="left:4.447in;top:3.790in;width:0.500in;height:0.300in;">출력</div><div class="a " style="left:4.947in;top:3.770in;width:2.347in;height:0.380in;font-size:11pt;line-height:1.3">예·아니오 3문항과 판단 근거</div><div class="a tcat" style="left:4.447in;top:4.250in;width:2.897in;height:0.250in;color:#F46A25">핵심 규칙</div><div class="a cd" style="left:4.447in;top:4.500in;width:2.897in;height:0.850in;font-size:11pt;line-height:1.35"><p>예·아니오 질문으로만 판단</p><p>남은 승인·확인이 있으면 확정 불가</p></div><div class="a card" style="left:7.693in;top:2.100in;width:3.297in;height:3.300in;"></div><div class="a cbar o" style="left:7.693in;top:2.100in;width:3.297in;height:0.060in;"></div><div class="a stp o" style="left:7.943in;top:2.260in;width:2.897in;height:0.250in;">STEP 03 · 매칭</div><div class="a ct16" style="left:7.943in;top:2.500in;width:2.897in;height:0.400in;font-size:15.5pt"><span class="aitag o sm">AI</span>요구사항 매핑 분석가</div><div class="a " style="left:7.943in;top:2.900in;width:2.897in;height:0.280in;font-size:9.5pt;color:#AF947E">“너는 … 요구사항 등록부에 매핑하는 분석가다”</div><div class="a hl-line" style="left:7.943in;top:3.250in;width:2.797in;height:0.010in;"></div><div class="a tcat" style="left:7.943in;top:3.370in;width:0.500in;height:0.300in;">입력</div><div class="a " style="left:8.443in;top:3.350in;width:2.347in;height:0.380in;font-size:11pt;line-height:1.3">결정사항과 후보 요구사항 15건</div><div class="a tcat" style="left:7.943in;top:3.790in;width:0.500in;height:0.300in;">출력</div><div class="a " style="left:8.443in;top:3.770in;width:2.347in;height:0.380in;font-size:11pt;line-height:1.3">대상 요구사항, 신뢰도, 보완 문장</div><div class="a tcat" style="left:7.943in;top:4.250in;width:2.897in;height:0.250in;color:#F46A25">핵심 규칙</div><div class="a cd" style="left:7.943in;top:4.500in;width:2.897in;height:0.850in;font-size:11pt;line-height:1.35"><p>목록에 있는 요구사항ID만 선택</p><p>보류여도 관련 ID, 없으면 신규</p></div><div class="a lab" style="left:0.700in;top:5.600in;width:10.290in;height:0.300in;">고도화 방향<em class="tg">고도화</em></div><div class="a mini" style="left:0.700in;top:5.950in;width:3.297in;height:1.000in;"><b>오판 사례 예시 추가</b><span>실제 회의록에서 나온 오판을 예시로 넣어 판단 기준 보강</span></div><div class="a mini" style="left:4.197in;top:5.950in;width:3.297in;height:1.000in;"><b>프로젝트 용어집 반영</b><span>업무 약어와 시스템명을 역할 지시문에 추가</span></div><div class="a mini" style="left:7.693in;top:5.950in;width:3.297in;height:1.000in;"><b>지시문 버전 관리</b><span>지시문 변경 전후 결과를 비교해 개선 효과 확인</span></div><img class="a flogo" src="../../성과제출/assets/logo-footer.png" alt="한화시스템"><div class="a pgno" style="left:9.990in;top:7.820in;width:1.000in;height:0.200in;">3</div></section><section class="slide"><div class="a badge" style="left:0.700in;top:0.550in;width:0.780in;height:0.360in;">AI</div><div class="a ttl" style="left:1.650in;top:0.450in;width:7.400in;height:0.560in;">백엔드 모델 호출 구조<i class="aitag">AI 활용</i></div><div class="a chip" style="left:9.190in;top:0.550in;width:1.800in;height:0.340in;">호출 방식</div><div class="a msg" style="left:0.700in;top:1.180in;width:10.290in;height:0.800in;">분석은 수 분 이상 걸리므로 서버가 <b>백그라운드 작업</b>으로 처리하고, 화면은 진행 상황을 주기적으로 조회합니다.<br>결정사항은 한 건씩 저장되어, 분석이 끝나기 전에도 화면에서 먼저 검토할 수 있습니다.</div><div class="a big" style="left:0.700in;top:2.220in;width:0.800in;height:0.600in;font-size:26pt">01</div><div class="a vrule" style="left:1.550in;top:2.180in;width:0.010in;height:0.720in;"></div><div class="a " style="left:1.750in;top:2.120in;width:4.500in;height:0.300in;"><b style="font-size:14pt">업로드 요청</b></div><div class="a " style="left:1.750in;top:2.430in;width:4.500in;height:0.250in;font-family:Consolas,'D2Coding',monospace;font-size:10.5pt;color:#F46A25;font-weight:700">POST /api/meetings/analyze</div><div class="a " style="left:1.750in;top:2.680in;width:4.500in;height:0.300in;font-size:11.5pt;color:#555">LLM 연결을 확인한 뒤 작업 ID를 바로 돌려줌</div><div class="a rowline" style="left:0.700in;top:3.010in;width:5.550in;height:0.010in;"></div><div class="a big" style="left:0.700in;top:3.200in;width:0.800in;height:0.600in;font-size:26pt">02</div><div class="a vrule" style="left:1.550in;top:3.160in;width:0.010in;height:0.720in;"></div><div class="a " style="left:1.750in;top:3.100in;width:4.500in;height:0.300in;"><b style="font-size:14pt">백그라운드 작업</b></div><div class="a " style="left:1.750in;top:3.410in;width:4.500in;height:0.250in;font-family:Consolas,'D2Coding',monospace;font-size:10.5pt;color:#F46A25;font-weight:700">threading.Thread (1건씩)</div><div class="a " style="left:1.750in;top:3.660in;width:4.500in;height:0.300in;font-size:11.5pt;color:#555">조각마다 추출, 검증, 매칭 순서로 LLM 호출</div><div class="a rowline" style="left:0.700in;top:3.990in;width:5.550in;height:0.010in;"></div><div class="a big" style="left:0.700in;top:4.180in;width:0.800in;height:0.600in;font-size:26pt">03</div><div class="a vrule" style="left:1.550in;top:4.140in;width:0.010in;height:0.720in;"></div><div class="a " style="left:1.750in;top:4.080in;width:4.500in;height:0.300in;"><b style="font-size:14pt">결과 저장</b></div><div class="a " style="left:1.750in;top:4.390in;width:4.500in;height:0.250in;font-family:Consolas,'D2Coding',monospace;font-size:10.5pt;color:#F46A25;font-weight:700">decisions 테이블 (ID AI-n)</div><div class="a " style="left:1.750in;top:4.640in;width:4.500in;height:0.300in;font-size:11.5pt;color:#555">매칭이 끝난 결정사항을 한 건씩 바로 저장</div><div class="a rowline" style="left:0.700in;top:4.970in;width:5.550in;height:0.010in;"></div><div class="a big" style="left:0.700in;top:5.160in;width:0.800in;height:0.600in;font-size:26pt">04</div><div class="a vrule" style="left:1.550in;top:5.120in;width:0.010in;height:0.720in;"></div><div class="a " style="left:1.750in;top:5.060in;width:4.500in;height:0.300in;"><b style="font-size:14pt">진행 조회</b></div><div class="a " style="left:1.750in;top:5.370in;width:4.500in;height:0.250in;font-family:Consolas,'D2Coding',monospace;font-size:10.5pt;color:#F46A25;font-weight:700">GET /api/jobs/{id} (1.5초 간격)</div><div class="a " style="left:1.750in;top:5.620in;width:4.500in;height:0.300in;font-size:11.5pt;color:#555">진행 단계와 새 결정사항을 화면에 추가</div><div class="a lab" style="left:6.550in;top:2.050in;width:4.440in;height:0.300in;">로컬 LLM 호출 요청 (OpenAI 호환)</div><div class="a " style="left:6.550in;top:2.400in;width:4.440in;height:2.500in;background:#F7F5F3;border:1px solid #E5E0DB;border-radius:0.12in;padding:0.14in 0.18in;overflow:hidden"><pre style="margin:0;white-space:pre;font-family:Consolas,'D2Coding',monospace;font-size:9.5pt;line-height:1.45">POST http://localhost:11434/v1/chat/completions
+{
+  &quot;model&quot;: &quot;qwen3:4b&quot;,
+  &quot;temperature&quot;: 0,
+  &quot;messages&quot;: [
+    {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;추출 규칙&quot;},
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;회의록 조각&quot;}
+  ],
+  &quot;response_format&quot;: {&quot;type&quot;: &quot;json_schema&quot;, ...},
+  &quot;reasoning_effort&quot;: &quot;none&quot;
+}</pre></div><div class="a mini" style="left:6.550in;top:5.050in;width:4.440in;height:0.800in;"><b>응답 예시 (JSON)</b><span style="font-family:Consolas,'D2Coding',monospace;font-size:9.5pt;white-space:nowrap">{&quot;reqId&quot;: &quot;RQ_QPM_0002&quot;, &quot;confidence&quot;: &quot;high&quot;}</span></div><div class="a pcard" style="left:0.700in;top:6.100in;width:3.330in;height:1.000in;"><div class="pk">형식 강제</div><p>JSON 스키마로 고정, 틀리면 재요청</p></div><div class="a pcard" style="left:4.180in;top:6.100in;width:3.330in;height:1.000in;"><div class="pk">AI 2차 검증</div><p>앞뒤 발언과 대조해 상태 보정·제외</p></div><div class="a pcard" style="left:7.660in;top:6.100in;width:3.330in;height:1.000in;"><div class="pk">결과 보정</div><p>목록에 없는 ID는 신규 후보로 처리</p></div><img class="a flogo" src="../../성과제출/assets/logo-footer.png" alt="한화시스템"><div class="a pgno" style="left:9.990in;top:7.820in;width:1.000in;height:0.200in;">4</div></section><section class="slide"><div class="a badge" style="left:0.700in;top:0.550in;width:0.780in;height:0.360in;">AI</div><div class="a ttl" style="left:1.650in;top:0.450in;width:7.400in;height:0.560in;">처리 시간 단축과 대기 대응<i class="aitag">AI 활용</i></div><div class="a chip" style="left:9.190in;top:0.550in;width:1.800in;height:0.340in;">성능 대응</div><div class="a msg" style="left:0.700in;top:1.180in;width:10.290in;height:0.800in;">CPU만 있는 노트북에서도 쓸 수 있도록 <b>모델의 출력과 입력 길이를 줄여</b> 처리 시간을 단축했습니다.<br>LLM 서버가 꺼져 있으면 저장된 분석 결과로 동작하여 시연과 검토가 중단되지 않습니다.</div><div class="a colh" style="left:2.250in;top:2.000in;width:3.850in;height:0.300in;"><span style="color:#8a8a8a">적용 전</span></div><div class="a colh" style="left:6.600in;top:2.000in;width:4.390in;height:0.300in;"><span style="color:#F46A25">적용 후</span></div><div class="a cat" style="left:0.700in;top:2.400in;width:1.500in;height:0.850in;">결정사항 추출</div><div class="a pan as" style="left:2.250in;top:2.400in;width:3.850in;height:0.850in;">사고 과정까지 출력해 조각당 약 5분</div><div class="a tri" style="left:6.170in;top:2.670in;width:0.300in;height:0.320in;"></div><div class="a pan tb" style="left:6.600in;top:2.400in;width:4.390in;height:0.850in;">사고 과정 출력을 꺼 조각당 25~60초</div><div class="a cat" style="left:0.700in;top:3.380in;width:1.500in;height:0.850in;">요구사항 매칭</div><div class="a pan as" style="left:2.250in;top:3.380in;width:3.850in;height:0.850in;">요구사항 77건 전체를 입력해 건당 약 5분</div><div class="a tri" style="left:6.170in;top:3.650in;width:0.300in;height:0.320in;"></div><div class="a pan tb" style="left:6.600in;top:3.380in;width:4.390in;height:0.850in;">유사 후보 15건만 입력해 건당 1분 이내</div><div class="a cat" style="left:0.700in;top:4.360in;width:1.500in;height:0.850in;">화면 대기</div><div class="a pan as" style="left:2.250in;top:4.360in;width:3.850in;height:0.850in;">분석이 모두 끝나야 결과를 확인</div><div class="a tri" style="left:6.170in;top:4.630in;width:0.300in;height:0.320in;"></div><div class="a pan tb" style="left:6.600in;top:4.360in;width:4.390in;height:0.850in;">결정사항이 추출되는 대로 목록에 표시</div><div class="a cat" style="left:0.700in;top:5.340in;width:1.500in;height:0.850in;">LLM 서버 중단</div><div class="a pan as" style="left:2.250in;top:5.340in;width:3.850in;height:0.850in;">분석 요청이 실패해 화면 사용 불가</div><div class="a tri" style="left:6.170in;top:5.610in;width:0.300in;height:0.320in;"></div><div class="a pan tb" style="left:6.600in;top:5.340in;width:4.390in;height:0.850in;">저장된 분석 결과로 동작(시연 모드)</div><div class="a note9" style="left:0.700in;top:6.350in;width:10.290in;height:0.250in;">측정 환경: CPU 노트북(i7-1360P, RAM 16GB), Qwen3 4B. 25분 분량 샘플 회의록을 2차 검증까지 포함해 3분 41초에 처리</div><div class="a rbar sand" style="left:0.700in;top:6.650in;width:10.290in;height:0.800in;font-size:13.5pt"><span class="lb">운영 전환</span><span class="tx">GPU 서버로 옮기면 같은 구조에서 <b>더 큰 모델로 정확도와 속도</b>를 함께 높일 수 있습니다</span></div><img class="a flogo" src="../../성과제출/assets/logo-footer.png" alt="한화시스템"><div class="a pgno" style="left:9.990in;top:7.820in;width:1.000in;height:0.200in;">5</div></section><section class="slide"><div class="a badge" style="left:0.700in;top:0.550in;width:0.780in;height:0.360in;">계획</div><div class="a ttl" style="left:1.650in;top:0.450in;width:7.400in;height:0.560in;">로컬 LLM 고도화 방향<i class="aitag">AI 활용</i></div><div class="a chip" style="left:9.190in;top:0.550in;width:1.800in;height:0.340in;">향후 계획</div><div class="a msg" style="left:0.700in;top:1.180in;width:10.290in;height:0.800in;">로컬 LLM으로 <b>기동부터 추출, 검증, 매칭, 확정까지</b> 동작하는 흐름을 구현했습니다.<br>운영 환경에서는 GPU 서버 이전과 실회의록 검증으로 정확도와 처리 속도를 높입니다.</div><div class="a ptl" style="left:0.700in;top:2.100in;width:4.300in;height:0.300in;">현재 구현</div><div class="a pts" style="left:0.700in;top:2.450in;width:4.300in;height:3.400in;"><p>로컬 LLM(Ollama, Qwen3) 기동과 연결 확인</p><p>회의록 조각 분할과 결정사항 자동 추출</p><p>AI 2차 검증으로 상태 보정과 오추출 제외</p><p>요구사항 후보 선별과 매칭, 보완 문장 제안</p><p>백그라운드 분석과 진행 상황 표시</p><p>LLM 서버 중단 시 시연 모드 자동 전환</p></div><div class="a vline" style="left:5.250in;top:2.100in;width:0.020in;height:3.900in;"></div><div class="a big" style="left:5.550in;top:2.180in;width:0.900in;height:0.600in;font-size:30pt">01</div><div class="a rst" style="left:6.550in;top:2.120in;width:4.440in;height:0.400in;">GPU 서버 이전<em class="tg">고도화</em></div><div class="a rsd" style="left:6.550in;top:2.550in;width:4.440in;height:0.700in;">설정값만 바꿔 GPU 서버로 옮기고 14B 이상 모델로 정확도 향상</div><div class="a big b" style="left:5.550in;top:3.480in;width:0.900in;height:0.600in;font-size:30pt">02</div><div class="a rst" style="left:6.550in;top:3.420in;width:4.440in;height:0.400in;">묶음 매칭<em class="tg">고도화</em></div><div class="a rsd" style="left:6.550in;top:3.850in;width:4.440in;height:0.700in;">한 조각의 결정사항을 한 번에 매칭해 호출 횟수 감소</div><div class="a big t" style="left:5.550in;top:4.780in;width:0.900in;height:0.600in;font-size:30pt">03</div><div class="a rst" style="left:6.550in;top:4.720in;width:4.440in;height:0.400in;">실회의록 검증<em class="tg">고도화</em></div><div class="a rsd" style="left:6.550in;top:5.150in;width:4.440in;height:0.700in;">실제 회의록으로 결과를 점검하고 AI 역할 지시문(프롬프트) 개선</div><div class="a rbar brown" style="left:0.700in;top:6.200in;width:10.290in;height:1.100in;font-size:14pt"><span class="lb">기대 효과</span><span class="tx">외부 API 없이 사내에서 <b>회의록 결정사항의 요구사항 반영</b>을 자동화하는 기반을 확보합니다</span></div><img class="a flogo" src="../../성과제출/assets/logo-footer.png" alt="한화시스템"><div class="a pgno" style="left:9.990in;top:7.820in;width:1.000in;height:0.200in;">6</div></section>
+</body></html>
