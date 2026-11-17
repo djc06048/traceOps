@@ -366,7 +366,7 @@ for i, (t, d) in enumerate(adds):
     body += box('rsd', 7.65, y + 0.33, 3.35, 0.6, e(d), 'font-size:11pt;line-height:1.3')
 body += box('rbar sand', L, 6.55, CW, 0.85, '<span class="lb">추진 방향</span><span class="tx">AI 활용 정확도 향상과 연계관리 확장을 우선 추진하고, 이후 수행관리 자동화로 확대합니다</span>', 'font-size:13.5pt')
 slides.append(frame('계획', '고도화 계획', '추후 추진',
-    '<b>AI 활용 범위 확대와 연계관리 확장</b>을 우선 추진하고, 수행관리 자동화로 이어가겠습니다.<br>로컬 LLM은 정확도와 처리 속도를, 연계관리는 채널과 AI Agent까지 관리 범위를 넓힙니다.', body, ai=True))
+    '<b>AI 활용 범위 확대와 연계관리 확장</b>을 우선 추진하고, 수행관리 자동화로 이어가겠습니다.<br>로컬 LLM은 정확도와 처리 속도를, 연계관리는 채널과 AI Agent까지 관리 범위를 넓힙니다.', body))
 
 # ---------- 18 엔딩 ----------
 slides.append(D.ending())
