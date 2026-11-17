@@ -44,7 +44,7 @@ def frame(badge, title, chip, msg, body, ai=False):
     h = '<section class="slide">'
     h += box('badge', L, 0.55, 0.78, 0.36, e(badge))
     h += box('ttl', 1.65, 0.45, 7.4, 0.56, e(title) + ('<i class="aitag">AI 활용</i>' if ai else ''))
-    if chip: h += box('chip', 9.19, 0.55, 1.8, 0.34, e(chip))
+    # 우측 상단 태그(chip)는 표시하지 않는다. 인자는 호출부 호환을 위해 남겨 둔다.
     h += box('msg', L, 1.18, CW, 0.8, e(msg))
     h += body
     h += f'<img class="a flogo" src="{ASSETS}logo-footer.png" alt="한화시스템">'
