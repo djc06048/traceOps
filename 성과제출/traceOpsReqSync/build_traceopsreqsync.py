@@ -20,32 +20,31 @@ slides.append(D.cover('AI-ASSISTED TRACEABILITY MANAGEMENT', 'TraceOps · ReqSyn
 # ---------- 2 목차 ----------
 slides.append(D.contents([
     (2.7, 'Part. 1  개요', [(1, '성과 요약'), (2, 'TraceOps · ReqSync 소개'), (3, '프로젝트 수행주기와 적용 지점'), (4, '추진 배경'), (5, '목표 및 기대효과')]),
-    (4.85, 'Part. 2  AI 활용과 구현 내용', [(6, 'AI 활용 구조'), (7, '업무 흐름'), (8, '주요 기능'), (9, '단계별 화면 및 기술 구성')]),
+    (4.85, 'Part. 2  AI 활용과 구현 내용', [(6, 'AI 활용 구조와 역할 설계'), (7, '업무 흐름'), (8, '주요 기능'), (9, '단계별 화면 및 기술 구성')]),
     (6.75, 'Part. 3  향후 계획', [(10, '고도화 계획')])]))
 
 # ---------- 3 성과 요약 ----------
 body = ''
 cw = (CW - 3 * 0.2) / 4
-sumdata = [('AI', 'ReqSync 요구사항 개정', ['회의록에서 결정사항을 추출하고 요구사항 매칭과 개정안 제시까지 AI 기반으로 설계', 'AI 추출 결과를 PL이 원문과 비교해 확정하는 검토 화면을 구현']),
+sumdata = [('AI', 'ReqSync 요구사항 개정', ['로컬 LLM이 회의록에서 결정사항을 추출하고 요구사항 매칭과 개정안 제시까지 수행', 'AI 추출 결과를 PL이 원문과 비교해 확정하는 검토 화면을 구현']),
            ('6단계', '추적 관계 관리 구현', ['요구사항부터 분석, 설계, 개발, 단위·통합 테스트까지 연결하여 관리', '삭제·변경 시 영향을 안내하고 검토 후 진행하도록 구현']),
-           ('POC', '호출구조 연계 분석', ['소스 호출구조(클래스·메서드)를 추출해 연계 데이터로 구성', '연계 캔버스 노드에 매핑해 연계 관계를 팀이 공유']),
+           ('연계관리', '연계 프로세스 관리', ['프로세스 단위로 메서드 누락을 확인하고 연계 테스트케이스로 검증', '호출구조 정적분석을 연계관리 화면에서 실행해 AS-IS 콜트리를 반영']),
            ('정합성', '단계 간 정합성 관리', ['요구사항부터 통합테스트까지 연결을 DB 제약과 검증으로 보장', '상위 항목이 바뀌면 하위에 재검증을 표시하고, 요구사항 변경 이력을 자동 기록'])]
 for i, (hero, t, ds) in enumerate(sumdata):
     l = L + i * (cw + 0.2)
-    body += box('card', l, 2.1, cw, 3.65)
-    body += box('hero', l + 0.25, 2.35, cw - 0.4, 0.7, e(hero))
-    body += box('ct16', l + 0.25, 3.15, cw - 0.4, 0.4, e(t), 'font-size:13.5pt')
-    body += box('hl-line', l + 0.25, 3.65, cw - 0.5, 0.01)
-    body += box('cd', l + 0.25, 3.8, cw - 0.45, 1.9, ''.join(f'<p>{e(d)}</p>' for d in ds), 'font-size:11.5pt')
-body += box('rbar brown', L, 5.95, CW, 1.05, '<span class="lb">다음 단계</span><span class="tx">로컬 LLM 기반 결정사항 추출 연동과 호출구조 분석의 TraceOps 통합을 보완하여 AI 활용을 완성합니다</span>')
+    body += box('card', l, 2.1, cw, 5.2)
+    body += box('hero', l + 0.25, 2.55, cw - 0.4, 0.8, e(hero))
+    body += box('ct16', l + 0.25, 3.6, cw - 0.4, 0.45, e(t), 'font-size:14.5pt')
+    body += box('hl-line', l + 0.25, 4.2, cw - 0.5, 0.01)
+    body += box('cd', l + 0.25, 4.4, cw - 0.45, 2.7, ''.join(f'<p>{e(d)}</p>' for d in ds), 'font-size:14pt')
 slides.append(frame('개요', '성과 요약', 'AI 활용 성과',
-    '<b>AI 기반 요구사항 개정 검토(ReqSync)</b>를 포함한 TraceOps로 요구사항부터 연계까지 추적 체계를 구현했습니다.<br>AI 추출은 설계와 검토 화면으로 검증했으며, 로컬 LLM 연동과 호출구조 분석 통합은 보완할 예정입니다.', body, ai=True))
+    '<b>AI 기반 요구사항 개정 검토(ReqSync)와 연계관리</b>를 포함한 TraceOps로 요구사항부터 연계 검증까지 추적 체계를 구현했습니다.<br>로컬 LLM이 회의 결정사항을 추출하고, 연계관리는 프로세스 단위로 누락을 확인하고 검증합니다.', body, ai=True))
 
 # ---------- 4 소개 ----------
 body = ''
 data = [('check', '추적 관리', ['요구사항부터 분석, 설계, 개발, 단위·통합 테스트까지 연결', '삭제·변경 시 영향을 안내하고 하위가 참조 중이면 삭제 차단', '상위 단계의 요구사항과 물리ID를 자동 상속']),
         ('spark', 'ReqSync (AI)', ['회의록 결정사항을 AI가 추출해 요구사항과 매칭', '개정안을 원문과 비교해 PL이 확정', '근거 회의가 변경 이력에 남음']),
-        ('stack', '연계 관리', ['프로세스의 메서드가 개발 대상에 빠짐없이 포함되도록 관리', '소스 호출구조(클래스·메서드)를 캔버스에 매핑', 'AS-IS는 조회, TO-BE는 설계'])]
+        ('stack', '연계 관리', ['프로세스의 메서드가 개발 대상에 빠짐없이 포함되도록 관리', '소스 호출구조(클래스·메서드)를 캔버스에 매핑', '프로세스별 연계 테스트케이스(E2E)로 검증'])]
 cw = 3.25; gp = (CW - 3 * cw) / 2
 for i, (ic, t, ds) in enumerate(data):
     l = L + i * (cw + gp)
@@ -69,11 +68,10 @@ for n, (t, sub, c) in enumerate(stg):
     body += box('st', x, 2.4, cwp, 0.4, e(t), 'font-size:13pt')
     body += box('scr', x, 2.78, cwp, 0.3, e(sub), 'font-size:10pt')
 body += box('flowbox aibox', colx(1), 3.25, cwp * 2 + 0.12, 1.1, '<div><b><span class="aitag o sm">AI</span>ReqSync</b>회의록으로 요구사항 보완·확정<small>고객사 협의 내용을 근거와 함께 반영</small></div>')
-body += box('flowbox aibox', colx(3), 3.25, cwp * 3 + 0.24, 1.1, '<div><b>연계관리</b>프로세스 설계(PL·메인 설계자) → 개발 항목 배분 → 통합테스트로 프로세스 완결 확인<small>메서드 누락이 없는지 프로세스 단위로 확인</small></div>')
+body += box('flowbox aibox', colx(3), 3.25, cwp * 3 + 0.24, 1.1, '<div><b>연계관리</b>프로세스 설계(PL·메인 설계자) → 개발 항목 배분 → 연계 테스트케이스로 프로세스 완결 확인<small>메서드 누락이 없는지 프로세스 단위로 확인</small></div>')
 body += box('flowbox card', colx(1), 4.5, cwp * 5 + 0.48, 0.75, '<div><b>요구사항 → 분석 → 설계 → 개발 → 테스트 정합성 관리 (상시)</b>삭제·변경 시 영향 안내, 하위 연결 누락과 재검증 표시</div>')
 for n in range(2, 6):
-    body += box('flowbox', colx(n), 5.4, cwp, 0.82, f'<div><b style="font-size:11pt">산출물 스냅샷</b>{["분석", "설계", "개발·단위", "통합"][n-2]} 확정 <em class="tg">고도화</em></div>', 'background:#fff;border:1.5px solid #AF947E;font-size:10.5pt;padding:0.06in 0.1in;')
-body += box('flowbox card', colx(0), 5.4, cwp, 0.82, '<div><b style="font-size:11pt">현황</b>엑셀·PMS 수작업 관리</div>', 'font-size:10.5pt;padding:0.06in 0.1in;')
+    body += box('flowbox', colx(n), 5.4, cwp, 0.82, f'<div><b style="font-size:11pt">산출물 스냅샷</b>{["분석", "설계", "개발·단위", "통합"][n-2]} 확정</div>', 'background:#fff;border:1.5px solid #AF947E;font-size:10.5pt;padding:0.06in 0.1in;')
 body += box('rbar sand', L, 6.4, CW, 0.95, '<span class="lb">확정 후 수정</span><span class="tx">단계 산출물은 스냅샷으로 확정하고, 확정 이후에 수정할 때는 <b>품질 검토를 거치도록</b> 합니다 <em class="tg">고도화</em></span>', 'font-size:13pt')
 slides.append(frame('개요', '프로젝트 수행주기와 적용 지점', '수행주기 관점',
     '프로젝트는 <b>착수, 기술협상, 분석, 설계, 개발·단위테스트, 통합테스트</b> 순서로 진행되며 단계마다 산출물이 확정됩니다.<br><b>ReqSync는 기술협상·분석</b>에서 요구사항을 확정하고, <b>연계관리는 설계부터 통합테스트까지</b> 프로세스 완결을 확인합니다.', body, ai=True))
@@ -131,36 +129,47 @@ for i, (k, a, b) in enumerate(rows6):
 slides.append(frame('개요', '기대효과', '도입 전후 비교',
     '<b>AI와 추적 체계</b>를 도입하면 요구사항 반영과 연계 관리가 개인 의존에서 공유 체계로 바뀝니다.<br>요구사항 반영, 변경 이력, 연계 관계, 범위 관리 네 영역에서 변화가 나타납니다.', body))
 
-# ---------- 8 AI 활용 구조 ----------
+# ---------- 8 AI 활용 구조: 로컬 LLM 구성과 동작 ----------
 body = ''
-fw = [1.55, 2.2, 2.2, 2.0, 1.74]; fg = (CW - sum(fw)) / 4
-fl = [('card', '<b>회의록</b>텍스트(.txt)로 업로드<small>회의록 단위로 분석 결과 관리</small>'),
-      ('aibox', '<b><span class="aitag o sm">AI</span>결정사항 추출</b>로컬 LLM 활용<small>1차 생성 후 2차 검증</small>'),
-      ('aibox', '<b><span class="aitag o sm">AI</span>매칭 · 개정안</b>신뢰도 표시<small>원문 발췌와 diff 제시</small>'),
-      ('humbox', '<b>PL 검토 · 확정</b>원문과 비교<small>문구 직접 편집, 확정 권한</small>'),
-      ('card', '<b>반영과 이력</b>요구사항 내역 반영<small>근거 회의를 이력에 기록</small>')]
-x = L
-for i, ((cls, txt), w) in enumerate(zip(fl, fw)):
-    body += box(f'flowbox {cls}', x, 2.1, w, 1.55, txt)
-    if i < 4: body += box('tri', x + w + (fg - 0.12) / 2, 2.72, 0.12, 0.3)
-    x += w + fg
-cols = [('AI가 하는 일', ['회의록에서 결정사항과 미정사항을 추출', '기존 요구사항과 매칭하고 신뢰도를 표시', '개정안을 기존 문구와 비교해 제시']),
-        ('사람(PL)이 하는 일', ['발언 원문 근거를 보고 판단', '개정 문구를 직접 편집', '반영 확정과 이력 기록은 PL이 수행']),
-        ('현재 상태와 보완', ['설계 완료, 병렬 검토 화면 구현', 'AI 추출 결과(사전 분석)를 API로 조회', '로컬 LLM 실행 연동 {{보완 필요}}', '구현 방안은 TraceOps 담당 개발자가 작성'])]
-cw3 = (CW - 2 * 0.2) / 3
-for i, (t, its) in enumerate(cols):
-    l = L + i * (cw3 + 0.2)
-    body += box('statcol', l, 3.9, cw3, 2.45, f'<div class="st">{e(t)}</div>' + '<ul class="ck sm">' + ''.join(f'<li>{e(a)}</li>' for a in its) + '</ul>')
+fw = 1.8; fg = (CW - 5 * fw) / 4
+fl = [('card', '<b>회의록</b>텍스트(.txt) 업로드<small>12분 단위로 분할</small>'),
+      ('aibox', '<b><span class="aitag o sm">AI</span>결정사항 추출</b>근거 발언과 상태<small>원문에 없는 문장은 표시</small>'),
+      ('aibox', '<b><span class="aitag o sm">AI</span>2차 검증</b>앞뒤 발언과 대조<small>합의가 아니면 제외</small>'),
+      ('aibox', '<b><span class="aitag o sm">AI</span>요구사항 매칭</b>유사 후보 15건 비교<small>신뢰도와 개정안 제시</small>'),
+      ('humbox', '<b>PL 검토 · 확정</b>원문과 비교<small>문구 편집, 확정 권한</small>')]
+for i, (cls, txt) in enumerate(fl):
+    x = L + i * (fw + fg)
+    body += box(f'flowbox {cls}', x, 2.1, fw, 1.55, txt)
+    if i < 4: body += box('tri', x + fw + (fg - 0.12) / 2, 2.72, 0.12, 0.3)
+body += box('lab', L, 3.9, 6, 0.3, '로컬 LLM 스펙')
+chips = [('실행 도구', 'Ollama', 'MIT 라이선스, 무료'), ('모델', 'Qwen3', 'Apache 2.0, 상업 사용 무료'),
+         ('호출 규격', 'OpenAI 호환 API', 'vLLM 등 다른 서버와 호환'), ('실행 위치', '사내 PC', '외부 전송과 외부 API 없음')]
+tw = (CW - 3 * 0.2) / 4
+for i, (c, v, sub) in enumerate(chips):
+    body += box('tchip', L + i * (tw + 0.2), 4.25, tw, 1.0, f'<div class="tcat">{e(c)}</div><div class="tval">{e(v)}</div><div style="font-size:10.5pt;color:#6B6B6B;margin-top:0.03in">{e(sub)}</div>')
+mw2 = (CW - 0.2) / 2
+body += box('mini', L, 5.38, mw2, 1.05, '<b>회의록은 사내에서만 처리</b><span>회의록과 요구사항이 외부로 나가지 않아 보안 제약 안에서 AI를 활용합니다</span>')
+body += box('mini', L + mw2 + 0.2, 5.38, mw2, 1.05, '<b>설정만으로 모델 교체</b><span>서버 주소와 모델 이름을 설정값으로 분리해 GPU 서버로 코드 수정 없이 교체합니다</span>')
 body += box('rbar sand', L, 6.55, CW, 0.85, '<span class="lb">운영 원칙</span><span class="tx">AI는 추출과 제안까지 맡고, 최종 확정 권한은 PL에게 두어 AI 오판 위험을 통제합니다</span>', 'font-size:13.5pt')
-slides.append(frame('AI', 'AI 활용 구조', 'KPI 핵심',
-    '<b>AI는 추출과 제안</b>을 맡고 <b>확정은 사람(PL)</b>이 합니다.<br>회의 결정사항을 요구사항에 반영하는 과정에 로컬 LLM을 활용하는 구조입니다.', body, ai=True))
+slides.append(frame('AI', 'AI 활용 구조', '로컬 LLM 구성과 동작',
+    '보안상 외부 LLM API를 쓸 수 없어 <b>사내 PC에서 동작하는 로컬 LLM</b>으로 구성했습니다.<br>회의록을 올리면 추출, 2차 검증, 요구사항 매칭 순서로 처리하고, 확정은 PL이 합니다.', body, ai=True))
 
-# ---------- 9 업무 흐름 ----------
+# ---------- 9 AI 역할 설계 ----------
+sys.path.insert(0, os.path.join(HERE, '..', '..', 'traceops-simple', '1117_박혜림'))
+import local_llm_slides
+slides.append(local_llm_slides._roles().replace('보완 문장', '개정 문구'))
+
+# ---------- 10 업무 흐름 ----------
+HUM = '<span style="display:inline-block;font-size:9pt;font-weight:700;color:#fff;background:#6E5744;border-radius:0.08in;padding:0 0.07in;margin-right:0.08in;vertical-align:2px">사람</span>'
+def act(a):
+    if a.startswith('AI|'): return '<p><span class="aitag o sm">AI</span>' + e(a[3:]) + '</p>'
+    if a.startswith('사람|'): return '<p>' + HUM + e(a[3:]) + '</p>'
+    return f'<p>{e(a)}</p>'
 body = ''
-steps = [('o', '요구사항 개정', 'PL', ['회의록 업로드', '결정사항 추출, 요구사항 매칭 {{AI}}', '원문과 비교해 확정'], '요구사항 개정 검토(ReqSync)'),
-         ('b', '상세공정 관리', '작업자 · PL', ['분석, 설계, 개발 항목에 요구사항 연결', '계획, 실적, 증적 관리', '삭제·변경 시 영향 안내'], '분석 · 설계 · 개발단계'),
-         ('o', '연계 관리', 'PL · 메인 설계자', ['프로세스 설계(기간계, 채널, AI Agent)', '메서드를 개발 항목으로 연결해 개발자에게 배분', '호출구조 기반 AS-IS 연계 조회'], '연계관리, AS-IS 목록'),
-         ('t', '테스트 관리', '작업자', ['단위테스트 등록과 수행', '통합테스트로 프로세스 전체를 검증', '요구사항, 물리ID 자동 연결'], '단위 · 통합테스트')]
+steps = [('o', '요구사항 개정', 'PL', ['AI|결정사항 추출, 요구사항 매칭, 개정안 제시', '사람|원문과 비교해 편집하고 PL이 확정', '근거 회의가 변경 이력에 기록'], '요구사항 개정 검토(ReqSync)'),
+         ('b', '상세공정 관리', '작업자 · PL', ['사람|분석, 설계, 개발 항목에 요구사항 연결', '계획, 실적, 증적 관리', '삭제·변경 시 영향 안내'], '분석 · 설계 · 개발단계'),
+         ('o', '연계 관리', 'PL · 메인 설계자', ['사람|프로세스 설계(기간계, 채널, AI Agent)', '메서드를 개발 항목으로 연결해 개발자에게 배분', '호출구조 정적분석으로 AS-IS 반영'], '연계관리, AS-IS 목록'),
+         ('t', '테스트 관리', '작업자', ['사람|단위테스트 등록과 수행', '연계 테스트케이스(단위테스트 묶음)로 E2E 검증', '요구사항, 물리ID 자동 연결'], '단위 · 통합테스트, 연계 테스트케이스')]
 sw = 2.31; sg = (CW - 4 * sw) / 3
 for i, (c, t, role, acts, scr) in enumerate(steps):
     l = L + i * (sw + sg)
@@ -169,12 +178,12 @@ for i, (c, t, role, acts, scr) in enumerate(steps):
     body += box('st', l, 2.52, sw, 0.45, e(t))
     body += box(f'rtag {c}', l, 3.05, sw, 0.36, e(role))
     body += box('card', l, 3.5, sw, 2.3)
-    body += box('cd', l + 0.2, 3.68, sw - 0.35, 2.1, ''.join(f'<p>{e(a)}</p>' for a in acts), 'font-size:12.5pt')
+    body += box('cd', l + 0.2, 3.68, sw - 0.35, 2.1, ''.join(act(a) for a in acts), 'font-size:12pt')
     body += box('scr', l, 5.92, sw, 0.6, f'<small>관련 화면</small>{e(scr)}')
     if i < 3: body += box('tri', l + sw + 0.1, 4.5, 0.14, 0.24)
-body += box('rbar sand', L, 6.65, CW, 0.85, '<span class="lb">기대 효과</span><span class="tx">회의 결정사항이 요구사항으로 이어지고, 같은 기준으로 개발, 테스트, 연계까지 하나의 흐름으로 관리합니다</span>', 'font-size:13pt')
+body += box('rbar sand', L, 6.65, CW, 0.85, '<span class="lb">역할 분담</span><span class="tx">AI는 추출과 제안까지, 확정과 이후 단계는 사람이 맡아 <b>같은 요구사항 기준의 하나의 흐름</b>으로 관리합니다</span>', 'font-size:13pt')
 slides.append(frame('구현', '업무 흐름', '단계별 프로세스',
-    '회의 결정사항이 요구사항으로 반영되고, 이어서 개발, 테스트, 연계까지 <b>하나의 추적 흐름</b>으로 연결됩니다.<br>PL이 ReqSync로 요구사항을 확정하면 이후 단계가 같은 기준을 따릅니다.', body))
+    '회의 결정사항이 요구사항으로 반영되고, 이어서 개발, 테스트, 연계까지 <b>하나의 추적 흐름</b>으로 연결됩니다.<br>AI는 추출과 제안을, 사람은 확정과 설계, 개발, 테스트를 맡아 역할을 나눕니다.', body, ai=True))
 
 # ---------- 10~14 주요 기능 ----------
 slides.append(detail('ReqSync 요구사항 개정 검토', '핵심 기능 1/5',
@@ -182,7 +191,7 @@ slides.append(detail('ReqSync 요구사항 개정 검토', '핵심 기능 1/5',
     'review_modal.png', 1440, 900,
     [dict(t='AI 결정사항 추출과 매칭', d='회의록에서 결정사항을 추출하고 기존 요구사항과 신뢰도, 발언 원문과 함께 제시합니다', zoom=(258, 240, 445, 150), capH=1.2),
      dict(t='AI 개정안과 PL 확정', d='기존 문구 대비 개정안을 diff로 보여 주고, PL이 편집한 뒤 확정합니다', zoom=(739, 472, 445, 150), capH=1.2)],
-    [('원문 근거 · 사람 확정', '발언 원문을 보고 PL이 확정, 이력 기록'), ('로컬 LLM 추출', '실행 연동은 구현 방안 작성 후 적용 {{보완 필요}}')],
+    [('원문 근거 · 사람 확정', '발언 원문을 보고 PL이 확정, 이력 기록'), ('로컬 LLM 추출 · 2차 검증', '추출 결과를 한 번 더 검증해 오추출을 줄이고, 근거 발언과 신뢰도를 함께 표시')],
     '결정사항의 요구사항 반영을 근거와 함께 관리', '요구사항관리 > ReqSync(요구사항 개정 검토)', ai=True))
 slides.append(detail('요구사항 관리와 변경 이력', '핵심 기능 2/5',
     '요구사항을 <b>목록 하나로 관리</b>하고, 변경은 이전 값과 비교한 이력으로 자동 기록합니다.<br>ReqSync 확정 내용도 같은 목록과 이력에 반영됩니다.',
@@ -224,14 +233,14 @@ ax = mx0 + sw[1] + sg
 body += box('flowbox aibox', ax, 2.5, sw[2], 1.45, '<div><b><span class="aitag o sm">AI</span>AI Agent</b>호출하는 기간계 기능<small>AI 기능의 의존 관계</small></div>')
 cw3 = (CW - 2 * 0.2) / 3
 why = [('필요한 이유 1', '메서드 누락 방지', '메인 프로세스의 메서드는 담당 개발자가 서로 달라 한 사람이 전체를 파악하기 어렵고, 하나만 빠져도 프로세스가 동작하지 않음'),
-       ('필요한 이유 2', '통합테스트 대상 파악', '연계 프로세스 전체가 동작해야 정상이므로, 어떤 프로세스를 통합테스트해야 하는지 알 수 있음'),
+       ('필요한 이유 2', '연계 테스트케이스', '프로세스를 구성하는 단위테스트를 묶어 E2E 방식으로 수행하고, 어떤 프로세스를 테스트해야 하는지 파악'),
        ('필요한 이유 3', '기간계 외 연계 관리', '채널이 기간계의 어떤 메서드를 호출하는지, AI 기능이 어떤 기간계 호출에 의존하는지 확인')]
 for n, (k1, t, d) in enumerate(why):
     l = L + n * (cw3 + 0.2)
     body += box('pcard', l, 4.4, cw3, 1.65, f'<div class="pk">{e(k1)}</div><p style="font-weight:700;font-size:13.5pt">{e(t)}</p><p style="font-size:11pt;color:#555;margin-top:0.04in">{e(d)}</p>')
-body += box('rbar sand', L, 6.25, CW, 1.1, '<span class="lb">운영 방식</span><div class="tx" style="font-size:12.5pt;line-height:1.5">PL과 메인 설계자가 프로세스를 등록·설계하고, 하위 메서드는 개발 항목이 되어 개발자별로 배분됩니다.<br>프로세스 단위로 통합테스트를 연결하여 테스트 대상과 결과를 확인합니다.</div>')
+body += box('rbar sand', L, 6.25, CW, 1.1, '<span class="lb">운영 방식</span><div class="tx" style="font-size:12.5pt;line-height:1.5">PL과 메인 설계자가 프로세스를 등록·설계하고, 하위 메서드는 개발 항목이 되어 개발자별로 배분됩니다.<br>프로세스별로 단위테스트를 묶은 연계 테스트케이스(E2E)를 구성해 테스트 대상과 결과를 확인합니다.</div>')
 slides.append(frame('구현', '연계관리 개요', '개념과 필요성',
-    '연계관리는 <b>기간계의 메인 프로세스</b>뿐 아니라 <b>채널과 AI Agent 등 기간계 바깥의 연계</b>까지 프로세스로 관리하는 기능입니다.<br>프로세스 안의 메서드가 하나만 빠져도 동작하지 않으므로, 누락을 막고 통합테스트 대상을 파악하기 위해 필요합니다.', body, ai=True))
+    '연계관리는 <b>기간계의 메인 프로세스</b>뿐 아니라 <b>채널과 AI Agent 등 기간계 바깥의 연계</b>까지 프로세스로 관리하는 기능입니다.<br>프로세스 안의 메서드가 하나만 빠져도 동작하지 않으므로, 누락을 막고 연계 테스트케이스로 검증하기 위해 필요합니다.', body, ai=True))
 
 # ---------- 연계관리 2/3: 관리 예시 ----------
 body = ''
@@ -267,17 +276,17 @@ body += chain(4.85, '예 3. AI 기능을 구현하는 경우 (AI 인수지침 �
     ('ch', '프론트', 'AI 인수지침 위배해소 액션'),
     ('m', '기간계: Input 생성', '설계 대상건 조회 → 위배내용 조회 → …'),
     ('ai', 'AI Agent', 'AI 인수지침 위배해소')])
-body += box('rbar sand', L, 6.4, CW, 0.95, '<span class="lb">관리 효과</span><span class="tx" style="font-size:12.5pt">세 경우 모두 호출 경로에 빠진 메서드가 없는지 확인하고, <b>어떤 프로세스를 통합테스트해야 하는지</b> 알 수 있습니다.</span>')
+body += box('rbar sand', L, 6.4, CW, 0.95, '<span class="lb">관리 효과</span><span class="tx" style="font-size:12.5pt">세 경우 모두 호출 경로에 빠진 메서드가 없는지 확인하고, <b>연계 테스트케이스(E2E)</b>로 프로세스 전체 동작을 검증합니다.</span>')
 slides.append(frame('구현', '연계관리 예시', '기간계 · 채널 · AI Agent',
-    '기간계 내부의 <b>메인 프로세스</b>, 채널의 요청, AI Agent의 호출을 모두 <b>프로세스</b>로 관리할 수 있습니다.<br>각 프로세스가 어떤 메서드를 거쳐 응답되는지 보여 주므로 누락 확인과 통합테스트 대상 파악에 활용합니다.', body, ai=True))
+    '기간계 내부의 <b>메인 프로세스</b>, 채널의 요청, AI Agent의 호출을 모두 <b>프로세스</b>로 관리할 수 있습니다.<br>각 프로세스가 어떤 메서드를 거쳐 응답되는지 보여 주므로 누락 확인과 연계 테스트케이스 구성에 활용합니다.', body, ai=True))
 
 slides.append(detail('연계관리 화면', '핵심 기능 5/5',
-    '실제 화면에서는 프로세스를 <b>연계 캔버스</b>에 노드와 연결선으로 그려, 메서드 단위로 설계하고 관리합니다.<br>호출구조 정적분석 POC로 추출한 AS-IS 콜트리(클래스·메서드)를 캔버스 노드에 매핑합니다.',
+    '실제 화면에서는 프로세스를 <b>연계 캔버스</b>에 노드와 연결선으로 그려, 메서드 단위로 설계하고 관리합니다.<br>연계관리 화면에서 호출구조 정적분석을 실행해 반영한 AS-IS 콜트리(클래스·메서드)를 캔버스 노드에 매핑합니다.',
     'linkage_asis.png', 1440, 900,
     [dict(t='연계 프로세스 캔버스', d='업무 흐름을 노드와 연결선으로 그리고 동기·비동기 호출을 구분합니다', zoom=(95, 300, 700, 120)),
-     dict(t='AS-IS 콜트리 매핑', d='정적분석으로 추출한 호출구조를 캔버스 노드에 매핑합니다', zoom=(1100, 250, 300, 112), capH=1.2)],
+     dict(t='AS-IS 콜트리 매핑', d='호출구조 정적분석 결과를 캔버스 노드에 매핑합니다', zoom=(1100, 250, 300, 112), capH=1.2)],
     [('호출구조 기반', '클래스·메서드 호출 관계를 노드와 연결'), ('조회와 설계 분리', 'AS-IS는 조회 전용, TO-BE는 PL·메인 설계자가 설계')],
-    '프로세스를 메서드 단위로 설계해 개발 누락 방지', '연계관리 > AS-IS 프로세스 (POC 추출 데이터)'))
+    '프로세스를 메서드 단위로 설계해 개발 누락 방지', '연계관리 > AS-IS 프로세스'))
 
 # ---------- 15 단계별 화면 ----------
 full = (0, 52, 1440, 832)
@@ -304,40 +313,39 @@ body += box('blk', 8.75, T0, 2.24, BH, '')
 body += box('bt', 9.0, T0 + 0.15, 1.9, 0.4, '데이터')
 body += box('chipw', 9.0, T0 + 0.7, 1.75, 0.95, '<div>SQLite<br><span style="font-size:10pt;font-weight:400;color:#6B6B6B">traceops.db<br>요구사항, 단계별 항목, 연결, 회의·결정사항, 연계</span></div>', 'font-size:12pt')
 ay = T0 + BH + 0.2
-body += box('flowbox aibox', L, ay, 5.05, 1.0, '<div><b><span class="aitag o sm">AI</span>로컬 LLM 결정사항 추출</b>현재는 사전 분석 결과를 API로 조회, 실행 연동 <em class="tg">보완 필요</em></div>')
-body += box('flowbox card', L + 5.24, ay, 5.05, 1.0, '<div><b>호출구조 정적분석 (POC)</b>구현·추출 완료, TraceOps 통합 <em class="tg">보완 필요</em></div>')
+body += box('flowbox aibox', L, ay, 5.05, 1.0, '<div><b><span class="aitag o sm">AI</span>로컬 LLM 서버 (Ollama · Qwen3)</b>ReqSync 결정사항 추출, 검증, 매칭을 사내 PC에서 수행</div>')
+body += box('flowbox card', L + 5.24, ay, 5.05, 1.0, '<div><b>호출구조 정적분석</b>연계관리 화면에서 실행해 AS-IS 콜트리를 연계 데이터로 반영</div>')
 body += box('lab', L, 5.45, 4, 0.3, '상용화 시 보완 방향')
 comm = [('데이터 저장', 'SQLite를 서버형 DB로 전환하여 동시 접속, 백업 확보'),
         ('인증과 권한', '사내 계정 연동과 서버 측 권한 검증 (현재는 화면의 PL·작업자 미리보기)'),
-        ('연계 분석 통합', '호출구조 분석기를 TraceOps에 편입하고 연계 데이터를 자동 적재'),
+        ('AI 실행 환경', 'GPU 서버 적용, 모델 반입·갱신 절차, 회의록 보관 정책'),
         ('운영 체계', '배포 자동화, 모니터링, 정기 백업, 보안 점검')]
 mw = (CW - 3 * 0.15) / 4
 for i, (a, t) in enumerate(comm):
     body += box('mini', L + i * (mw + 0.15), 5.8, mw, 1.55, f'<b>{e(a)}</b><span>{e(t)}</span>')
 slides.append(frame('구현', '기술 구성', '시스템 구성',
-    '<b>Python 서버와 SQLite</b>로 가볍게 구현하여 별도 설치 없이 실행됩니다.<br>AI 추출과 호출구조 분석은 연동과 통합이 남아 있어 상용화 단계에서 보완합니다.', body))
+    '<b>Python 서버와 SQLite</b>로 가볍게 구현하여 별도 설치 없이 실행됩니다.<br>로컬 LLM과 호출구조 분석이 서버에 연동되어 있으며, 상용화 단계에서는 데이터, 보안, 운영 영역을 보완합니다.', body))
 
 # ---------- 17 고도화 계획 ----------
 body = ''
-fut = [('ReqSync · AI 활용', '로컬 LLM 기반 결정사항 추출', '회의록을 올리면 로컬 LLM이 결정사항을 추출하고 요구사항과 매칭하도록 실제로 연동합니다. 구현 방안은 TraceOps 담당 개발자가 작성합니다.', '보완 필요'),
-       ('연계관리', '호출구조 정적분석 TraceOps 통합', 'POC로 구현한 호출구조 추출을 TraceOps 안으로 통합하여 연계 데이터를 자동으로 적재합니다.', '보완 필요')]
-for i, (tag, t, d, eff) in enumerate(fut):
+fut = [('ReqSync · AI 활용', 'AI 정확도와 활용 범위 확대', 'GPU 서버와 더 큰 모델을 적용하고, 실회의록 검증으로 역할 지시문을 개선합니다. RFP 등 문서에서 요구사항 후보를 추출하는 기능으로도 확장합니다.'),
+       ('연계관리', '연계 범위와 검증 확대', '채널(CM, TM, 콜센터)과 AI Agent를 노드로 구분해 호출 경로를 관리하고, 변경 영향을 추적해 인터페이스 누락을 사전에 차단합니다.')]
+for i, (tag, t, d) in enumerate(fut):
     y = 2.1 + i * 2.15
     body += box('fut', L, y, 6.4, 1.95, '')
     body += box('', L + 0.3, y + 0.22, 2.4, 0.3, f'<span class="futtag">{e(tag)}</span>')
     body += box('futt', L + 0.3, y + 0.55, 5.8, 0.5, e(t))
     body += box('futd', L + 0.3, y + 1.05, 5.8, 0.8, e(d))
-    body += box('outp', L + 4.9, y + 0.2, 1.25, 0.4, e(eff), 'font-size:11pt')
-body += box('lab', 7.4, 2.1, 3.5, 0.3, '추가 고도화')
-adds = [('채널 · AI Agent 연계 확장', '채널 종류(CM, TM, 콜센터)와 AI Agent를 노드로 구분하여 호출 경로 관리'), ('변경 영향 추적', '변경 영향을 추적해 인터페이스 누락을 사전 차단'), ('수행관리 자동화', '단계말 스냅샷 확정, 제출 산출물 생성, 진척 모니터링, 통합테스트 시나리오 구성'), ('프로세스 단위 통합테스트 연결', '연계 프로세스와 통합테스트를 연결하여 테스트 대상과 결과를 프로세스 단위로 확인')]
+body += box('lab', 7.4, 2.1, 3.5, 0.3, '수행관리 자동화')
+adds = [('단계말 스냅샷 확정', '분석, 설계, 개발·단위, 통합 산출물을 스냅샷으로 확정'), ('확정 후 수정 검토', '확정 이후 수정 시 품질 검토를 거치도록 관리'), ('제출 산출물과 진척 관리', '단계별 제출 산출물 생성과 진척 모니터링'), ('엑셀 · PMS 연동', '기존 관리 도구와 연동해 이중 입력 제거')]
 for i, (t, d) in enumerate(adds):
     y = 2.45 + i * 1.0
     body += box('sq', 7.4, y + 0.1, 0.1, 0.1)
     body += box('rst', 7.65, y - 0.05, 3.35, 0.4, e(t), 'font-size:14.5pt')
     body += box('rsd', 7.65, y + 0.33, 3.35, 0.6, e(d), 'font-size:11pt;line-height:1.3')
-body += box('rbar sand', L, 6.55, CW, 0.85, '<span class="lb">추진 방향</span><span class="tx">AI 추출 연동과 호출구조 분석 통합을 우선 추진하고, 이후 수행관리 자동화로 확대합니다</span>', 'font-size:13.5pt')
+body += box('rbar sand', L, 6.55, CW, 0.85, '<span class="lb">추진 방향</span><span class="tx">AI 활용 정확도 향상과 연계관리 확장을 우선 추진하고, 이후 수행관리 자동화로 확대합니다</span>', 'font-size:13.5pt')
 slides.append(frame('계획', '고도화 계획', '추후 추진',
-    '<b>로컬 LLM 기반 결정사항 추출과 호출구조 분석 통합</b>을 보완하여 AI 활용을 완성하겠습니다.<br>두 과제의 구현 방안은 TraceOps 담당 개발자가 작성하며, 보완 사항은 별도 문서로 전달합니다.', body, ai=True))
+    '<b>AI 활용 범위 확대와 연계관리 확장</b>을 우선 추진하고, 수행관리 자동화로 이어가겠습니다.<br>로컬 LLM은 정확도와 처리 속도를, 연계관리는 채널과 AI Agent까지 관리 범위를 넓힙니다.', body, ai=True))
 
 # ---------- 18 엔딩 ----------
 slides.append(D.ending())
