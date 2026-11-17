@@ -7,15 +7,62 @@
        /api/linkage/map (POST), /api/linkage/map/<callNodeId> (DELETE)
        TO-BE 프로세스는 nodeSource('free'|'design'|'dev')를 가지며, free가 아니면 캔버스 노드가 /api/design, /api/dev 항목(refId)을 참조한다.
 그 외(마스터 등)는 JSON 문서 저장: /api/store[/<key>]
+로컬 LLM 회의록 분석: POST /api/meetings/analyze {file, text} → {jobId}, GET /api/jobs/<id> (진행 상황), GET /api/llm/status
 """
-import json, os, sqlite3
+import json, os, sqlite3, threading, uuid
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import unquote
 
+import llm
+import minutes
 import reqdb
 
 PORT = int(os.environ.get('PORT', 8000))
 os.chdir(reqdb.ROOT)
+
+# 회의록 분석 작업 상태(메모리). 로컬 LLM은 동시에 여러 건을 돌리면 느려지므로 한 번에 하나만 실행한다.
+JOBS = {}
+JOBS_LOCK = threading.Lock()
+
+
+def _analyze(job, file, text):
+    def progress(p):
+        job.update(p)
+
+    def decision(d):
+        job['decisionIds'].append(reqdb.insert_decision(file, d))
+    try:
+        c = reqdb.connect()
+        try:
+            reqs = reqdb.req_items(c)
+        finally:
+            c.close()
+        minutes.run(text, reqs, llm.chat_json, progress, decision)
+        job['state'] = 'done'
+    except Exception as e:  # 스레드 안에서 끝나므로 모든 오류를 작업 상태로 남긴다
+        job['state'] = 'error'
+        job['error'] = str(e)
+
+
+def start_analysis(body):
+    file = os.path.basename(str(body.get('file') or '')).strip()
+    text = str(body.get('text') or '')
+    if not file or not text.strip():
+        raise ValueError('회의록 파일명과 내용이 필요합니다')
+    with JOBS_LOCK:
+        if any(j['state'] == 'running' for j in JOBS.values()):
+            raise ValueError('다른 회의록을 분석하는 중입니다. 끝난 뒤 다시 시도하세요.')
+        st = llm.status()
+        if not st['ok']:
+            raise ValueError(st['error'])
+        parsed = minutes.parse_clova(text)
+        reqdb.upsert_meeting(file, parsed['label'], parsed['duration'])
+        reqdb.clear_ai_decisions(file)
+        jid = uuid.uuid4().hex[:12]
+        job = JOBS[jid] = {'id': jid, 'file': file, 'state': 'running', 'step': '회의록을 읽는 중', 'done': 0,
+                           'total': 0, 'decisionIds': [], 'error': None, 'model': st['model']}
+    threading.Thread(target=_analyze, args=(job, file, text), daemon=True).start()
+    return {'jobId': jid}
 
 
 class H(SimpleHTTPRequestHandler):
@@ -64,6 +111,11 @@ class H(SimpleHTTPRequestHandler):
                 return self._json({'kind': 'decisions', 'items': reqdb.decisions(c)})
             if p == '/api/reviews':
                 return self._json(reqdb.reviews(c))
+            if p == '/api/llm/status':
+                return self._json(llm.status())
+            k = self._tail('/api/jobs/')
+            if k:
+                return self._json(JOBS[k]) if k in JOBS else self._json({'error': '작업을 찾을 수 없습니다'}, 404)
             if p == '/api/linkage/processes':
                 return self._json({'kind': 'processes', 'items': reqdb.lk_processes(c)})
             if p == '/api/linkage/transactions':
@@ -84,6 +136,8 @@ class H(SimpleHTTPRequestHandler):
             if p == '/api/linkage/map':
                 reqdb.save_mapping(b['callNodeId'], b['nodeId'])
                 return self._send(204)
+            if p == '/api/meetings/analyze':
+                return self._json(start_analysis(b))
             self._send(404)
         self._api(run)
 

@@ -55,6 +55,12 @@
   .rv-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:70px 20px;color:var(--ink3);font-size:13px}
   .rv-loading b{color:var(--ink2);font-weight:600;margin-top:4px}
   .rv-spin{width:30px;height:30px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:rvspin .8s linear infinite}
+  .rv-spin.sm{width:16px;height:16px;border-width:2px;flex:none}
+  .rv-progress{border:1px solid var(--accent);background:var(--accent-bg);border-radius:var(--r-lg);padding:10px 12px;margin-bottom:10px;font-size:12px;color:var(--ink2)}
+  .rv-progress.err{border-color:#d33;background:#fdecec;color:#a11}
+  .rv-progress-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .rv-bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:6px}
+  .rv-bar i{display:block;height:100%;background:var(--accent);transition:width .3s}
   @keyframes rvspin{to{transform:rotate(360deg)}}
 </style>
 </head><body>
@@ -93,7 +99,7 @@
     <label class="file-attach" style="background:#fff">📎 회의록 업로드 (.txt)
       <input type="file" accept=".txt" id="uploadInput">
     </label>
-    <p>이미 분석된 회의는 아래 카드를 클릭하면 바로 결과를 볼 수 있습니다. 새 회의록을 업로드하면 AI가 해당 회의록만 분석합니다.</p>
+    <p>이미 분석된 회의는 아래 카드를 클릭하면 바로 결과를 볼 수 있습니다. 새 회의록(클로바노트 .txt)을 업로드하면 로컬 LLM이 결정사항을 뽑아 요구사항에 매칭합니다. 회의록은 외부로 전송되지 않습니다.</p>
   </div>
 
   <div class="meet-grid" id="meetGrid"></div>

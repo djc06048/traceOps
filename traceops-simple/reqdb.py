@@ -531,6 +531,46 @@ def save_review(did, rv):
         c.close()
 
 
+# ---------- 로컬 LLM 분석 결과 저장 (minutes.py) ----------
+def upsert_meeting(file, label, duration):
+    c = connect()
+    with c:
+        c.execute('INSERT OR IGNORE INTO meetings VALUES (?,?,?)', (file, label or file, duration or ''))
+        if label:  # 헤더에서 읽은 값이 있을 때만 갱신(빈 값으로 덮어쓰지 않음)
+            c.execute('UPDATE meetings SET label = ? WHERE file = ?', (label, file))
+        if duration:
+            c.execute('UPDATE meetings SET duration = ? WHERE file = ?', (duration, file))
+    c.close()
+
+
+def clear_ai_decisions(meeting_file):
+    """재분석 전 이 회의의 AI 결정사항을 지운다. 검토 기록(확정·이력)이 있는 건은 남긴다."""
+    c = connect()
+    with c:
+        c.execute("DELETE FROM decisions WHERE meeting_file = ? AND id LIKE 'AI-%' "
+                  "AND id NOT IN (SELECT decision_id FROM decision_reviews) "
+                  "AND id NOT IN (SELECT decision_id FROM review_history)", (meeting_file,))
+    c.close()
+
+
+def insert_decision(meeting_file, d):
+    """AI가 뽑은 결정사항 1건 저장 → 새 ID(AI-<순번>)."""
+    c = connect()
+    try:
+        with c:
+            n = c.execute("SELECT MAX(CAST(SUBSTR(id, 4) AS INTEGER)) FROM decisions WHERE id LIKE 'AI-%'").fetchone()[0] or 0
+            did = 'AI-%d' % (n + 1)
+            label = c.execute('SELECT label FROM meetings WHERE file = ?', (meeting_file,)).fetchone()
+            c.execute('INSERT INTO decisions VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)', (
+                did, meeting_file, d.get('reqId'), label[0] if label else '', d.get('excerptTs', ''),
+                d.get('excerpt', ''), d['decision'], d.get('rawStatus', ''), d['finalStatus'],
+                d.get('verificationNote', ''), d.get('confidence', ''), d.get('addition'),
+                d.get('replaceWith'), d.get('newReqHint')))
+        return did
+    finally:
+        c.close()
+
+
 # ---------- 분석 / 설계 / 개발 / 단위 / 통합 + 물리ID ----------
 import re
 

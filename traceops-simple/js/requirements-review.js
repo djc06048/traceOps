@@ -1,6 +1,8 @@
 /* 요구사항 개정 검토 (ReqSync) — 회의록 업로드/선택 → 팝업(스플릿) 검토 → PL 확정 → 요구사항 반영 + 하이라이트
  * 데이터: 관계형 DB(traceops.db) — /api/meetings, /api/decisions, /api/reviews, /api/requirements
- * 실제 유료 AI API는 붙이지 않는다 — 업로드한 파일명을 data/meetings.json 목록과 매칭해 "이미 분석된 척" 결과를 보여주는 시뮬레이션.
+ * 새 회의록 업로드 시 서버가 로컬 LLM(Ollama 등, /api/meetings/analyze)으로 결정사항 추출·요구사항 매핑을 하고,
+ * 화면은 /api/jobs/<id>를 폴링해 뽑히는 대로 결정사항을 보여준다. 이미 분석된 회의록은 저장된 결과를 바로 연다.
+ * 로컬 LLM이 떠 있지 않으면 기존 시뮬레이션으로 동작한다(파일명을 회의 목록과 매칭해 저장된 결과를 분석 연출과 함께 표시).
  * 확정 시 요구사항 내용이 DB의 requirements에 반영되어(변경 이력에 근거 회의·결정사항 기록)
  * 요구사항관리 화면에서도 바로 확인된다(?reqId= 하이라이트도 그 화면의 기존 기능을 그대로 재사용).
  */
@@ -11,7 +13,8 @@
 
   var S = {
     meetings: [], decisions: [], requirements: [], review: {},
-    activeMeetingFile: null, activeId: null, lastAcceptedReqId: null
+    activeMeetingFile: null, activeId: null, lastAcceptedReqId: null,
+    job: null, llm: null
   };
 
   function $(id) { return document.getElementById(id); }
@@ -92,8 +95,16 @@
     });
   }
 
-  /* ---------- 업로드(시뮬레이션): 파일명으로 기존 분석 결과 매칭 ---------- */
-  function handleUpload(file) {
+  /* ---------- 업로드: 로컬 LLM이 떠 있으면 실제 분석, 없으면 기존 시뮬레이션(파일명으로 저장된 결과 매칭) ---------- */
+  async function refreshLlm() {
+    try { S.llm = await fetchJSON('/api/llm/status'); } catch (e) { S.llm = { ok: false, error: e.message }; }
+    var base = '관계형 DB(traceops.db) 사용 중';
+    $('dataState').textContent = base + (S.llm.ok ? ' · 로컬 LLM 연결됨 (' + S.llm.model + ')' : ' · 로컬 LLM 미연결 (저장된 분석 결과로 시연)');
+    $('dataState').title = S.llm.ok ? '' : (S.llm.error || '');
+    return S.llm.ok;
+  }
+
+  function simulateUpload(file) {
     var m = meetingOf(file.name);
     if (!m) {
       toast('등록되지 않은 회의록입니다. 회의록 관리 목록에 먼저 등록한 뒤 다시 업로드해 주세요.', true);
@@ -101,6 +112,73 @@
     }
     if (!decisionsOf(m.file).length) { toast('이 회의록에서는 추출된 결정사항이 없습니다'); return; }
     openMeetingModal(m.file, true);
+  }
+
+  async function handleUpload(file) {
+    if (!(await refreshLlm())) { simulateUpload(file); return; } // 업로드 시점에 다시 확인 (서버를 나중에 띄운 경우)
+    var m = meetingOf(file.name);
+    if (m && decisionsOf(m.file).length &&
+        !confirm('이미 분석된 회의록입니다.\n[확인] 로컬 LLM으로 다시 분석 (검토 기록이 있는 건은 유지)\n[취소] 기존 결과 보기')) {
+      openMeetingModal(m.file, false);
+      return;
+    }
+    analyze(file);
+  }
+
+  async function analyze(file) {
+    if (S.job && S.job.state === 'running') { toast('다른 회의록을 분석하는 중입니다', true); return; }
+    var text, res;
+    try {
+      text = await file.text();
+      res = await api('POST', '/api/meetings/analyze', { file: file.name, text: text });
+    } catch (e) { toast('분석 시작 실패: ' + e.message, true); return; }
+    S.meetings = (await fetchJSON('/api/meetings')).items;
+    S.decisions = (await fetchJSON('/api/decisions')).items; // 재분석 시 지워진 건 반영
+    S.job = { id: res.jobId, file: file.name, state: 'running', step: '회의록을 읽는 중', done: 0, total: 0, decisionIds: [] };
+    S.activeMeetingFile = file.name;
+    S.activeId = null;
+    var m = meetingOf(file.name);
+    $('mTitle').textContent = m ? m.label : file.name;
+    $('rrvModal').classList.add('open');
+    renderLibrary(); renderMList(); renderMEdit(); updateSub();
+    pollJob();
+  }
+
+  async function pollJob() {
+    var job = S.job, j;
+    try { j = await api('GET', '/api/jobs/' + job.id); } catch (e) { j = { state: 'error', error: e.message, decisionIds: job.decisionIds }; }
+    var grew = j.decisionIds.length !== job.decisionIds.length, first = false;
+    S.job = Object.assign(job, j);
+    if (grew) {
+      try { S.decisions = (await fetchJSON('/api/decisions')).items; } catch (e) { /* 다음 폴링에서 다시 */ }
+      if (!S.activeId && job.decisionIds.length) { S.activeId = job.decisionIds[0]; first = true; }
+    }
+    if (S.activeMeetingFile === job.file) {
+      renderMList();
+      if (first) renderMEdit(); // 편집 중인 오른쪽 패널은 새 건이 와도 다시 그리지 않음
+      updateSub();
+    }
+    if (j.state === 'running') { setTimeout(pollJob, 1500); return; }
+    renderLibrary();
+    if (j.state === 'done') toast('분석 완료 · 결정사항 ' + j.decisionIds.length + '건');
+    else toast('분석 실패: ' + j.error, true);
+  }
+
+  function updateSub() {
+    var file = S.activeMeetingFile, n = decisionsOf(file).length, job = S.job;
+    if (job && job.file === file && job.state === 'running') $('mSub').textContent = '로컬 LLM 분석 중 (' + (job.model || '') + ') · ' + file + ' · ' + n + '건 추출';
+    else if (job && job.file === file) $('mSub').textContent = '방금 분석 · ' + file + ' · ' + n + '건 추출';
+  }
+
+  function progressBlock() {
+    var job = S.job;
+    if (!job || job.file !== S.activeMeetingFile) return '';
+    if (job.state === 'error') return '<div class="rv-progress err">분석 실패 — ' + esc(job.error) + '</div>';
+    if (job.state !== 'running') return '';
+    var pct = job.total ? Math.round(job.done / job.total * 100) : 0;
+    return '<div class="rv-progress"><div class="rv-progress-row"><div class="rv-spin sm"></div><b>' + esc(job.step) + '</b></div>' +
+      '<div class="rv-bar"><i style="width:' + pct + '%"></i></div>' +
+      '<small>결정사항은 뽑히는 대로 아래에 표시됩니다. CPU에서는 회의록 1건에 수 분 이상 걸릴 수 있습니다.</small></div>';
   }
 
   /* ---------- 분석 로딩 연출: 신규 업로드는 단계별 문구로 길게, 기존 카드 재열람은 짧게 ---------- */
@@ -141,7 +219,7 @@
     var list = $('mDecisionList');
     var items = decisionsOf(S.activeMeetingFile);
     $('mCount').textContent = items.length + '건';
-    list.innerHTML = items.map(function (d) {
+    list.innerHTML = progressBlock() + items.map(function (d) {
       var rv = reviewOf(d.id);
       var status = rv.status || d.finalStatus;
       var st = STATUS_META[status];
@@ -305,6 +383,7 @@
     $('dataState').textContent = '관계형 DB(traceops.db) 사용 중';
     bind();
     renderLibrary();
+    refreshLlm();
   }
 
   boot();

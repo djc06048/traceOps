@@ -20,6 +20,56 @@ PORT=8011 python3 server.py    # 포트 변경
 
 Python 3.9 이상 표준 라이브러리만 사용합니다. 파일을 더블클릭해서 열면 API가 없어 동작하지 않으니 반드시 서버로 실행하세요.
 
+## 회의록 AI 분석 (로컬 LLM, 무료)
+
+`requirements-review.html`에서 새 회의록(클로바노트 .txt)을 업로드하면, 서버가 **로컬 LLM**으로 결정사항을 뽑고 요구사항에 매칭합니다.
+회의록은 외부로 나가지 않습니다. 결과는 뽑히는 대로 화면에 표시되며, PL이 확정해야 요구사항에 반영됩니다.
+
+**로컬 LLM이 떠 있지 않으면** 예전처럼 시연 모드로 동작합니다. 업로드한 파일명을 회의 목록과 맞춰, 저장된 분석 결과를 분석 연출과 함께 보여줍니다. 업로드할 때마다 연결 상태를 다시 확인하므로, 나중에 Ollama를 띄우면 새로고침 없이 실제 분석으로 바뀝니다.
+
+| 구성 | 사용 | 라이선스 |
+|---|---|---|
+| LLM 서버 | [Ollama](https://ollama.com) | MIT (무료) |
+| 모델 | Qwen3 | Apache 2.0 (상업 사용 무료) |
+
+EXAONE, Qwen2.5-3B/72B 등 비상업 라이선스 모델은 쓰지 마세요.
+
+### 설치 (최초 1회)
+
+```bash
+# 1) Ollama 설치 (Windows 설치 파일 또는 Linux: curl -fsSL https://ollama.com/install.sh | sh)
+#    설치 파일이 막힌 PC(VDI 등)는 GitHub 릴리스의 ollama-windows-amd64.zip을 풀어 ollama.exe serve 로 실행
+# 2) 문맥 길이를 8K로 (요구사항 목록 + 회의록 조각이 들어가야 함). 설정 후 Ollama 재시작
+setx OLLAMA_CONTEXT_LENGTH 8192          # Linux: export OLLAMA_CONTEXT_LENGTH=8192
+# 3) 모델 받기
+ollama pull qwen3:4b
+```
+
+### 설정 (환경변수, 모두 선택)
+
+| 변수 | 기본값 | 설명 |
+|---|---|---|
+| `LLM_BASE_URL` | `http://localhost:11434/v1` | OpenAI 호환 주소. 별도 GPU 서버로 옮기면 이 값만 바꿉니다 (vLLM 등도 가능) |
+| `LLM_MODEL` | `qwen3:4b` | 사용할 모델 |
+| `LLM_API_KEY` | 없음 | 인증이 필요한 서버만 |
+| `LLM_TIMEOUT` | `600` | 요청당 초 |
+| `LLM_NO_THINK` | `1` | 사고 과정 출력 끄기(`reasoning_effort: none`). 지원하지 않는 서버면 `0` |
+
+하드웨어별 권장 모델:
+- GPU 없음 (시험용): `qwen3:4b`. 실측(i7-1360P, RAM 16GB): 결정사항 추출은 조각당 약 25~60초, 매핑은 건당 약 1분. 결정사항 10건짜리 1시간 회의면 약 15분
+- GPU 16GB: `qwen3:14b`
+- GPU 24GB 이상: `qwen3:32b` (운영 권장)
+
+동작 확인: `http://localhost:8000/api/llm/status`. 화면 상단에도 연결 상태가 표시됩니다.
+시험용 회의록: `samples/sample_meeting.txt`
+
+### 처리 방식 (`minutes.py`)
+1. 클로바노트 형식(`참석자 N 00:00` + 발언)을 읽고, 약 12분(최대 6,000자) 단위 조각으로 자릅니다.
+2. 조각마다 결정사항을 뽑습니다(발췌·시각·상태·검증 메모). 회의록에 없는 발췌문이면 검증 메모에 표시합니다.
+3. **AI 2차 검증**: 결정사항마다 근거 발언과 앞뒤 대화(앞 1개, 뒤 3개 발언)를 LLM에 다시 보내 판단합니다. 결정사항이 아니면 제외하고, 상태(확정·검토 중·미정)가 틀리면 고칩니다. 검증 메모에 `1차: … / 2차 검증: … (상태 보정: 확정 → 미정)` 형태로 남습니다. `MINUTES_VERIFY=0`이면 끕니다.
+4. 결정사항마다 글자가 많이 겹치는 요구사항 15건을 후보로 골라 LLM에 넘기고 매칭합니다. 목록 전체(77건)를 넣으면 CPU에서 건당 5분 이상 걸립니다. 목록에 없는 ID가 오면 신규 후보(`new`)로 처리합니다.
+5. 같은 회의록을 다시 분석하면, 검토 기록이 없는 AI 결정사항(`AI-*`)만 지우고 새로 만듭니다.
+
 ## 화면
 
 | 주소 | 화면 |
@@ -43,6 +93,10 @@ traceops-simple/
 ├─ server.py          정적 파일 서버 + API (표준 라이브러리 http.server)
 ├─ reqdb.py           스키마, 시드, 조회·저장·파생값 계산, 마이그레이션
 ├─ test_reqdb.py      DB 자체 점검 (python3 test_reqdb.py)
+├─ llm.py             로컬 LLM 호출 (OpenAI 호환 API, 표준 라이브러리)
+├─ minutes.py         회의록 파싱 → 결정사항 추출 → 요구사항 매핑
+├─ test_minutes.py    분석 파이프라인 점검 (가짜 LLM, Ollama 불필요)
+├─ samples/           시험용 회의록
 ├─ traceops.db        SQLite 파일 (자동 생성, git 제외)
 ├─ docs/ERD.md        ERD (Mermaid)
 ├─ index.html / requirements.html / requirements-review.html / asis.html
