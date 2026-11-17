@@ -131,14 +131,16 @@ slides.append(frame('개요', '기대효과', '도입 전후 비교',
 
 # ---------- 10 업무 흐름 ----------
 HUM = '<span style="display:inline-block;font-size:9pt;font-weight:700;color:#fff;background:#6E5744;border-radius:0.08in;padding:0 0.07in;margin-right:0.08in;vertical-align:2px">사람</span>'
+AUTO = '<span style="display:inline-block;font-size:9pt;font-weight:700;color:#6E5744;background:#fff;border:1.5px solid #6E5744;border-radius:0.08in;padding:0 0.07in;margin-right:0.08in;vertical-align:2px">자동</span>'
 def act(a):
     if a.startswith('AI|'): return '<p><span class="aitag o sm">AI</span>' + e(a[3:]) + '</p>'
     if a.startswith('사람|'): return '<p>' + HUM + e(a[3:]) + '</p>'
+    if a.startswith('자동|'): return '<p>' + AUTO + e(a[3:]) + '</p>'
     return f'<p>{e(a)}</p>'
 body = ''
 steps = [('o', '요구사항 개정', 'PL', ['AI|결정사항 추출, 요구사항 매칭, 개정안 제시', '사람|원문과 비교해 편집하고 PL이 확정', '근거 회의가 변경 이력에 기록'], '요구사항 개정 검토(ReqSync)'),
          ('b', '상세공정 관리', '작업자 · PL', ['사람|분석, 설계, 개발 항목에 요구사항 연결', '계획, 실적, 증적 관리', '삭제·변경 시 영향 안내'], '분석 · 설계 · 개발단계'),
-         ('o', '연계 관리', 'PL · 메인 설계자', ['사람|프로세스 설계(기간계, 채널, AI Agent)', '메서드를 개발 항목으로 연결해 개발자에게 배분', '호출구조 정적분석으로 AS-IS 반영'], '연계관리, AS-IS 목록'),
+         ('o', '연계 관리', 'PL · 메인 설계자', ['사람|프로세스 설계(기간계, 채널, AI Agent)', '메서드를 개발 항목으로 연결해 개발자에게 배분', '자동|호출구조 정적분석으로 AS-IS 반영'], '연계관리, AS-IS 목록'),
          ('t', '테스트 관리', '작업자', ['사람|단위테스트 등록과 수행', '프로세스 기준 연계 테스트케이스로 전체 흐름 검증', '요구사항, 물리ID 자동 연결'], '단위 · 통합테스트, 연계 테스트케이스')]
 sw = 2.31; sg = (CW - 4 * sw) / 3
 for i, (c, t, role, acts, scr) in enumerate(steps):
@@ -261,7 +263,7 @@ for n, (k1, t, d) in enumerate(why):
     body += box('pcard', l, 4.4, cw3, 1.65, f'<div class="pk">{e(k1)}</div><p style="font-weight:700;font-size:13.5pt">{e(t)}</p><p style="font-size:11pt;color:#555;margin-top:0.04in">{e(d)}</p>')
 body += box('rbar sand', L, 6.25, CW, 1.1, '<span class="lb">운영 방식</span><div class="tx" style="font-size:12.5pt;line-height:1.5">PL과 메인 설계자가 프로세스를 등록·설계하고, 하위 메서드는 개발 항목이 되어 개발자별로 배분됩니다.<br>개발 항목 기준의 통합테스트와 달리, 프로세스 기준으로 단위테스트를 묶은 연계 테스트케이스를 구성해 테스트 대상과 결과를 확인합니다.</div>')
 slides.append(frame('구현', '연계관리 개요', '개념과 필요성',
-    '연계관리는 <b>기간계의 메인 프로세스</b>뿐 아니라 <b>채널과 AI Agent 등 기간계 바깥의 연계</b>까지 프로세스로 관리하는 기능입니다.<br>프로세스 안의 메서드가 하나만 빠져도 동작하지 않으므로, 누락을 막고 연계 테스트케이스로 검증하기 위해 필요합니다.', body, ai=True))
+    '연계관리는 <b>기간계의 메인 프로세스</b>뿐 아니라 <b>채널과 AI Agent 등 기간계 바깥의 연계</b>까지 프로세스로 관리하는 기능입니다.<br>프로세스 안의 메서드가 하나만 빠져도 동작하지 않으므로, 누락을 막고 연계 테스트케이스로 검증하기 위해 필요합니다.', body))
 
 # ---------- 연계관리 2/3: 관리 예시 ----------
 body = ''
@@ -299,7 +301,7 @@ body += chain(4.85, '예 3. AI 기능을 구현하는 경우 (AI 인수지침 �
     ('ai', 'AI Agent', 'AI 인수지침 위배해소')])
 body += box('rbar sand', L, 6.4, CW, 0.95, '<span class="lb">관리 효과</span><span class="tx" style="font-size:12.5pt">세 경우 모두 호출 경로에 빠진 메서드가 없는지 확인하고, <b>연계 테스트케이스(E2E)</b>로 프로세스 전체 동작을 검증합니다.</span>')
 slides.append(frame('구현', '연계관리 예시', '기간계 · 채널 · AI Agent',
-    '기간계 내부의 <b>메인 프로세스</b>, 채널의 요청, AI Agent의 호출을 모두 <b>프로세스</b>로 관리할 수 있습니다.<br>각 프로세스가 어떤 메서드를 거쳐 응답되는지 보여 주므로 누락 확인과 연계 테스트케이스 구성에 활용합니다.', body, ai=True))
+    '기간계 내부의 <b>메인 프로세스</b>, 채널의 요청, AI Agent의 호출을 모두 <b>프로세스</b>로 관리할 수 있습니다.<br>각 프로세스가 어떤 메서드를 거쳐 응답되는지 보여 주므로 누락 확인과 연계 테스트케이스 구성에 활용합니다.', body))
 
 slides.append(detail('연계관리 화면', '핵심 기능 5/5',
     '실제 화면에서는 프로세스를 <b>연계 캔버스</b>에 노드와 연결선으로 그려, 메서드 단위로 설계하고 관리합니다.<br>연계관리 화면에서 호출구조 정적분석을 실행해 반영한 AS-IS 콜트리(클래스·메서드)를 캔버스 노드에 매핑합니다.',
@@ -326,7 +328,7 @@ body += box('bs', L + 0.3, T0 + 1.25, 2.0, 0.6, 'HTML, JavaScript')
 body += box('arrl', 3.3, T0 + 1.0, 0.6, 0.02) + box('arrh', 3.86, T0 + 0.93, 0.12, 0.16) + box('alb', 3.1, T0 + 0.6, 1.0, 0.3, 'REST API')
 body += box('blk sd', 4.05, T0, 4.1, BH, '')
 body += box('bt', 4.35, T0 + 0.12, 3.6, 0.4, 'TraceOps 서버 (Python)')
-body += box('bs', 4.35, T0 + 0.5, 3.6, 0.3, '표준 라이브러리 기반, 별도 설치 없음')
+body += box('bs', 4.35, T0 + 0.5, 3.6, 0.3, 'Python 표준 라이브러리 기반')
 for k, nm in enumerate(['요구사항', '추적(분석~통합)', 'ReqSync 검토', '연계']):
     body += box('chipw', 4.35 + (k % 2) * 1.82, T0 + 0.9 + (k // 2) * 0.48, 1.7, 0.4, nm, 'font-size:11pt')
 body += box('arrl', 8.2, T0 + 1.0, 0.45, 0.02) + box('arrh', 8.6, T0 + 0.93, 0.12, 0.16) + box('alb', 8.0, T0 + 0.6, 0.9, 0.3, 'SQL')
@@ -345,7 +347,7 @@ mw = (CW - 3 * 0.15) / 4
 for i, (a, t) in enumerate(comm):
     body += box('mini', L + i * (mw + 0.15), 5.8, mw, 1.55, f'<b>{e(a)}</b><span>{e(t)}</span>')
 slides.append(frame('구현', '기술 구성', '시스템 구성',
-    '<b>Python 서버와 SQLite</b>로 가볍게 구현하여 별도 설치 없이 실행됩니다.<br>로컬 LLM과 호출구조 분석이 서버에 연동되어 있으며, 상용화 단계에서는 데이터, 보안, 운영 영역을 보완합니다.', body))
+    '<b>Python 서버와 SQLite</b>로 가볍게 구현하고, AI 기능은 로컬 LLM 서버(Ollama)와 연동합니다.<br>호출구조 분석은 연계관리 화면에서 실행하며, 상용화 단계에서는 데이터, 보안, 운영 영역을 보완합니다.', body))
 
 # ---------- 17 고도화 계획 ----------
 body = ''
