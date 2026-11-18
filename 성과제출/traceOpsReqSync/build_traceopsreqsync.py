@@ -42,7 +42,7 @@ slides.append(frame('개요', '성과 요약', 'AI 활용 성과',
 
 # ---------- 4 소개 ----------
 body = ''
-data = [('check', '추적 관리', ['ProWin 확정 RFP 요구사항을 가져와 단계별로 연결', '삭제·변경 시 영향을 안내하고 하위가 참조 중이면 삭제 차단', '상위 단계의 요구사항과 물리ID를 자동 상속']),
+data = [('check', '추적 관리', ['ProWin¹ 확정 RFP 요구사항²을 가져와 단계별로 연결', '삭제·변경 시 영향을 안내하고 하위가 참조 중이면 삭제 차단', '상위 단계의 요구사항과 물리ID를 자동 상속']),
         ('spark', 'ReqSync (AI)', ['회의록 결정사항을 AI가 추출해 요구사항과 매칭', '개정안을 원문과 비교해 PL이 확정', '근거 회의가 변경 이력에 남음']),
         ('stack', '연계 관리', ['프로세스의 메서드가 개발 대상에 빠짐없이 포함되도록 관리', '소스 호출구조(클래스·메서드)를 캔버스에 매핑', '프로세스별 연계 테스트케이스(E2E)로 검증'])]
 cw = 3.25; gp = (CW - 3 * cw) / 2
@@ -53,6 +53,7 @@ for i, (ic, t, ds) in enumerate(data):
     body += box('ct20', l + 0.3, 3.2, cw - 0.6, 0.45, e(t))
     body += box('cd', l + 0.3, 3.8, cw - 0.55, 1.85, ''.join(f'<p>{e(d)}</p>' for d in ds))
 body += box('rbar brown', L, 5.95, CW, 1.05, '<span class="lb">구성 원칙</span><span class="tx">ReqSync는 TraceOps 안의 요구사항 모듈입니다. <b>AI는 추출과 제안</b>까지 맡고, <b>확정은 사람</b>이 합니다</span>')
+body += box('', L, 7.08, CW, 0.55, '<div>¹ <b>ProWin</b>: RFP 등록, 요구사항·목차 관리, 제안서 검토와 버전관리까지 제안 업무를 한 흐름으로 관리하는 제안 워크스페이스입니다.</div><div>² <b>확정 RFP 요구사항</b>: ProWin에서 RFP로부터 추출한 요구사항 후보를 PM이 검토해 확정한 목록으로, 코드, 제목, 설명, RFP 출처 페이지를 포함합니다.</div>', 'font-size:9.5pt;line-height:1.45;color:#6B6B6B')
 slides.append(frame('개요', 'TraceOps · ReqSync 소개', '플랫폼 구성',
     '<b>요구사항부터 연계까지 추적</b>하는 TraceOps에 <b>AI 요구사항 어시스턴트(ReqSync)</b>를 더한 플랫폼입니다.<br>회의 결정사항은 근거와 함께 요구사항에 반영되고, 하위 단계는 같은 요구사항 기준을 사용합니다.', body, ai=True))
 
